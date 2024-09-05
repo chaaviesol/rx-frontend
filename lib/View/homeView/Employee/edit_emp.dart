@@ -15,8 +15,8 @@ import '../../../widgets/customDropDown.dart';
 import '../home_view_rep.dart';
 
 class EditRep extends StatefulWidget {
-  String uniqueID;
-  int userID;
+  final String uniqueID;
+  final int userID;
   EditRep({required this.uniqueID,required this.userID,super.key});
 
   @override
@@ -47,40 +47,69 @@ class _EditRepState extends State<EditRep> {
   String? fileName;
 
   Future<dynamic> fetchemployeedata() async {
-    print('caledd....');
+    print('called....');
     var data = {
-      "uniqueId":widget.uniqueID
+      "uniqueId": widget.uniqueID // Use the passed uniqueID to fetch employee details
     };
     String url = AppUrl.single_employee_details; // Replace with your actual API URL
-    final response = await http.post(Uri.parse(url),
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
         },
-    body: jsonEncode(data),
-    );
-    try{
+        body: jsonEncode(data),
+      );
+
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        var data = responseData['data'][0];
-        _nameController.text = data['name'];
-        _qualificationController.text = data['qualification'];
-        _dobController.text = data['date_of_birth'];
-        _nationalityController.text = data['Nationality'];
-        _mobileController.text = data['mobile'];
-        _emailController.text = data['email'];
-        _designationController.text = data['designation'];
-        _passwordController.text = data['password'];
-        _addressController.text = data['address'] ?? 'N/A';
-        _gender = data['gender'];
-        // _selectedReportingOfficer = data['reporting_officer'];
-        return responseData['data'];
+
+        // Check if 'data' is a list or a map
+        if (responseData['data'] is List && responseData['data'].isNotEmpty) {
+          var data = responseData['data'][0];  // Access the first item if it's a list
+
+          _nameController.text = data['name'];
+          _qualificationController.text = data['qualification'];
+          _dobController.text = data['date_of_birth'];
+          _nationalityController.text = data['nationality'];  // Note: changed to lowercase 'nationality'
+          _mobileController.text = data['mobile'];
+          _emailController.text = data['email'];
+          _designationController.text = data['designation'];
+          _passwordController.text = data['password'];
+          _addressController.text = data['address'] ?? 'N/A'; // Handle null address
+          _gender = data['gender'];
+
+          // Return the entire 'data' object for further use if necessary
+          return responseData['data'];
+        } else if (responseData['data'] is Map) {
+          var data = responseData['data'];  // Directly use if 'data' is a map
+
+          _nameController.text = data['name'];
+          _qualificationController.text = data['qualification'];
+          _dobController.text = data['date_of_birth'];
+          _nationalityController.text = data['nationality'];  // Note: changed to lowercase 'nationality'
+          _mobileController.text = data['mobile'];
+          _emailController.text = data['email'];
+          _designationController.text = data['designation'];
+          _passwordController.text = data['password'];
+          _addressController.text = data['address'] ?? 'N/A'; // Handle null address
+          _gender = data['gender'];
+
+          return data; // Return the map
+        } else {
+          throw Exception('Unexpected data format');
+        }
       } else {
-        throw Exception('Failed to load ');
+        throw Exception('Failed to load employee data');
       }
-    }catch(e){
+    } catch (e) {
+      // Handle and log the exception
+      print('Error: $e');
       throw Exception(e.toString());
     }
   }
+
 
   Future<List<Headquarter>> fetchHeadquarters() async {
     String url = AppUrl.list_headqrts; // Replace with your actual API URL
@@ -206,6 +235,7 @@ class _EditRepState extends State<EditRep> {
   @override
   void initState() {
     // TODO: implement initState
+    fetchemployeedata();
     fetchHeadquarters();
     _loadOfficers();
     super.initState();
@@ -249,9 +279,9 @@ class _EditRepState extends State<EditRep> {
             width: MediaQuery.of(context).size.width / 3,
             child: InkWell(
               onTap: () {
-                if (_formKey.currentState!.validate()) {
+                // if (_formKey.currentState!.validate()) {
                   edit_empoyee();
-                }
+                // }
               },
               child: Defaultbutton(
                 text: 'Submit',
@@ -286,17 +316,7 @@ class _EditRepState extends State<EditRep> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder(
-            future:fetchemployeedata(),
-            builder: (context,snapshot) {
-             if(snapshot.connectionState == ConnectionState.waiting){
-               return Center(child:CircularProgressIndicator(),);
-             }else if(snapshot.hasError){
-               return Center(child: Text('Some error occured !'),);
-             }else if(snapshot.hasData){
-               return Form(
-                 key: _formKey,
-                 child: ListView(
+          child:  ListView(
                    children: [
                      Row(
                        children: [
@@ -709,196 +729,16 @@ class _EditRepState extends State<EditRep> {
                      SizedBox(height: 100,),
                    ],
                  ),
-               );
-             }
-             return Center(child: Text('Some error occured , Please restart your application'),);
-            }
-          ),
+
+
+
         ),
       ),
     );
   }
 
 }
-// class AddressAddingWidget extends StatefulWidget {
-//   const AddressAddingWidget({super.key});
-//
-//   @override
-//   State<AddressAddingWidget> createState() => _AddressAddingWidgetState();
-// }
-//
-// class _AddressAddingWidgetState extends State<AddressAddingWidget> {
-//   final List<FieldEntry> fields = [FieldEntry()];
-//
-//   Future<void> fetchLatLon(String placeName, TextEditingController latController, TextEditingController lonController) async {
-//     try {
-//       final coordinates = await getLatLon(placeName);
-//       setState(() {
-//         latController.text = coordinates['lat']!;
-//         lonController.text = coordinates['lon']!;
-//       });
-//     } catch (e) {
-//       print(e);
-//     }
-//   }
-//
-//   Future<Map<String, String>> getLatLon(String placeName) async {
-//     final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$placeName&format=json&limit=1');
-//     final response = await http.get(url);
-//
-//     if (response.statusCode == 200) {
-//       final List data = jsonDecode(response.body);
-//       if (data.isNotEmpty) {
-//         final lat = data[0]['lat'];
-//         final lon = data[0]['lon'];
-//         return {'lat': lat, 'lon': lon};
-//       } else {
-//         throw Exception('Place not found');
-//       }
-//     } else {
-//       throw Exception('Failed to load data');
-//     }
-//   }
-//
-//   Future<List<String>> fetchSuggestions(String query) async {
-//     final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=$query&format=json&addressdetails=1&limit=5');
-//     final response = await http.get(url);
-//
-//     if (response.statusCode == 200) {
-//       final List data = jsonDecode(response.body);
-//       return data.map<String>((item) => item['display_name']).toList();
-//     } else {
-//       throw Exception('Failed to load suggestions');
-//     }
-//   }
-//
-//   void addField() {
-//     setState(() {
-//       fields.add(FieldEntry());
-//     });
-//   }
-//
-//   void removeField(int index) {
-//     setState(() {
-//       fields.removeAt(index);
-//     });
-//   }
-//
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: EdgeInsets.all(16.0),
-//       child: Column(
-//         children: [
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.end,
-//             children: [
-//               IconButton(
-//                 icon: Icon(Icons.add_circle_outline_sharp,color: AppColors.primaryColor,),
-//                 onPressed: addField,
-//               ),
-//               IconButton(
-//                 icon: Icon(Icons.remove_circle_outline,color: AppColors.primaryColor,),
-//                 onPressed: fields.length > 1 ? () => removeField(fields.length - 1) : null,
-//               ),
-//             ],
-//           ),
-//           Expanded(
-//             child: ListView.builder(
-//               itemCount: fields.length,
-//               itemBuilder: (context, index) {
-//                 return Padding(
-//                   padding: EdgeInsets.symmetric(vertical: 8.0),
-//                   child: Column(
-//                     children: [
-//                       Row(
-//                         children: [
-//                           Expanded(
-//                             flex: 3,
-//                             child: Container(
-//                               decoration: BoxDecoration(
-//                                 color: AppColors.textfiedlColor,
-//                                 borderRadius: BorderRadius.circular(6)
-//                               ),
-//                               child: TypeAheadField(
-//                                   controller: fields[index].placeController,
-//                                 suggestionsCallback: (pattern) async {
-//                                   return await fetchSuggestions(pattern);
-//                                 },
-//                                 itemBuilder: (context, suggestion) {
-//                                   return ListTile(
-//                                     title: Text(suggestion),
-//                                   );
-//                                 },
-//                                  onSelected: (String value) {
-//                                 fields[index].placeController.text = value;
-//                               },
-//                               ),
-//                             ),
-//                           ),
-//                           SizedBox(width: 10),
-//                           IconButton(
-//                             icon: Icon(Icons.location_on,color: AppColors.primaryColor,),
-//                             onPressed: () {
-//                               fetchLatLon(fields[index].placeController.text, fields[index].latController, fields[index].lonController);
-//                             },
-//                           ),
-//                         ],
-//                       ),
-//                       SizedBox(height: 10),
-//                       Row(
-//                         children: [
-//                           Expanded(
-//                             flex: 1,
-//                             child: Container(
-//                               decoration: BoxDecoration(
-//                                 color: AppColors.textfiedlColor,
-//                                 borderRadius: BorderRadius.circular(6)
-//                               ),
-//                               child: TextField(
-//                                 controller: fields[index].latController,
-//                                 decoration: InputDecoration(
-//                                   labelText: 'Latitude',
-//                                   border: InputBorder.none,
-//                                   contentPadding: EdgeInsets.only(left: 10)
-//                                 ),
-//                                 readOnly: true,
-//                               ),
-//                             ),
-//                           ),
-//                           SizedBox(width: 10),
-//                           Expanded(
-//                             flex: 1,
-//                             child: Container(
-//                               decoration: BoxDecoration(
-//                                 color: AppColors.textfiedlColor,
-//                                 borderRadius: BorderRadius.circular(6)
-//                               ),
-//                               child: TextField(
-//                                 controller: fields[index].lonController,
-//                                 decoration: InputDecoration(
-//                                   labelText: 'Longitude',
-//                                   border: InputBorder.none,
-//                                   contentPadding: EdgeInsets.only(left: 10)
-//                                 ),
-//                                 readOnly: true,
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 );
-//               },
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+
 
 class FieldEntry {
   final TextEditingController placeController = TextEditingController();

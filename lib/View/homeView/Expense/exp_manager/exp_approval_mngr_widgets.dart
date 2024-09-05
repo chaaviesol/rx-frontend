@@ -162,13 +162,13 @@ class _ExpenseListState extends State<ExpenseList> {
                                   color: AppColors.borderColor,
                                   fontSize: 12)),
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(left: 20.0),
-                              child: Text('${snapdata[index]['userDetails'][0]['designation'].toString().toUpperCase()}', style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.borderColor,
-                                  fontSize: 12)),
-                            ),
+                            // Padding(
+                            //   padding: EdgeInsets.only(left: 20.0),
+                            //   child: Text('${snapdata[index]['userDetails'][0]['designation'].toString().toUpperCase()}', style: TextStyle(
+                            //       fontWeight: FontWeight.w400,
+                            //       color: AppColors.borderColor,
+                            //       fontSize: 12)),
+                            // ),
                             SizedBox(height: 30,),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

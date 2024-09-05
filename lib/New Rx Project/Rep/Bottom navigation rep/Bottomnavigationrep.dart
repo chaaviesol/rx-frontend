@@ -10,6 +10,7 @@ import 'package:rx_route_new/app_colors.dart';
 import '../../../constants/styles.dart';
 import '../../Manager/BottomNav/Travel plan/My_TP.dart';
 import '../../Manager/Doctors_mngr/Add_chemist.dart';
+import '../My list (Rep)/My list.dart';
 import 'Leave and expense/Leave and expense.dart';
 
 
@@ -28,7 +29,7 @@ class _BottomNavigationRepState extends State<BottomNavigationRep>
 
   final pages = [
     RepHomepage(),
-    My_list(),
+    My_list_rep(),
     MyLeaveandexpense(),
     Mngr_T_P(),
   ];

@@ -49,7 +49,7 @@ class _MyApprovalState extends State<MyApproval> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(automaticallyImplyLeading: false,
         backgroundColor: AppColors.whiteColor,
         // leading: IconButton(
         //   icon: CircleAvatar(

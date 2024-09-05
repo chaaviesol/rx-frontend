@@ -341,66 +341,84 @@ class _EmpDetailsState extends State<EmpDetails> with SingleTickerProviderStateM
             ),
           ],
         ),
-        body: SafeArea(
-          child: FutureBuilder(
-            future: single_employee_details(),
-            builder: (context,snapshot) {
-              if(snapshot.connectionState == ConnectionState.waiting){
-                return Center(child: CircularProgressIndicator(),);
-              }else if(snapshot.hasError){
-                return Center(child: Text('Some error occured !'),);
-              }else if(snapshot.hasData){
-                final List<Widget> _pages = [
-                  EmpDetailsWidgets.BasicInfo(snapshot.data),
-                  PerformanceWidget(context),
-                  EmployeeList(context)
-                ];
-                // return Text('${snapshot.data}');
-                var snapdata = snapshot.data;
-                return Column(
-                  children: [
-                    ListTile(
-                      leading:  CircleAvatar(
-                        radius: 50,
-                        child: Text('${snapdata[0]['name'][0]}'),
-                      ),
-                      title:  Text('${snapdata[0]['name']}', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('${snapdata[0]['qualification']}', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12)),
-                          Text('${snapdata[0]['designation']}', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12)),
-                        ],
-                      ),
-                      trailing: InkWell(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => EditRep(uniqueID: snapdata['unique_id'],userID: snapdata['id'],),));
-                        },
-                        child: SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: Image.asset('assets/icons/edit.png'),
+          body: SafeArea(
+            child: FutureBuilder(
+              future: single_employee_details(), // Fetch employee details
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Some error occurred!'));
+                } else if (snapshot.hasData) {
+                  var snapdata = snapshot.data; // Since it's a Map, we use it as an object.
+
+                  // Check if snapdata is not null and is a map
+                  if (snapdata is Map<String, dynamic>) {
+                    // List of pages you want to display in TabBarView
+                    final List<Widget> _pages = [
+                      EmpDetailsWidgets.BasicInfo(empDetails),
+                      PerformanceWidget(context),
+                      EmployeeList(context),
+                    ];
+
+                    // Building UI with snapdata (since it's a map, access fields directly)
+                    return Column(
+                      children: [
+                        ListTile(
+                          leading: CircleAvatar(
+                            radius: 50,
+                            child: Text('${snapdata['name'][0]}'), // Display first letter of the name
+                          ),
+                          title: Text('${snapdata['name']}', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17)),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('${snapdata['qualification']}', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12)),
+                              Text('${snapdata['designation']}', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12)),
+                            ],
+                          ),
+                          trailing: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditRep(
+                                    uniqueID: snapdata['uniqueId'],
+                                    userID: snapdata['id'],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: SizedBox(
+                              width: 25,
+                              height: 25,
+                              child: Image.asset('assets/icons/edit.png'),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 10,),
-                    TabBar(
-                      tabs: _tabs,
-                      labelColor: Colors.black,
-                      indicatorColor: Colors.green,
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        children: _pages,
-                      ),
-                    ),
-                  ],
-                );
-              }
-            return Center(child: Text('Some error occured , Please restart your application !'),);
-            }
-          ),
-        ),
+                        const SizedBox(height: 10),
+                        TabBar(
+                          tabs: _tabs,
+                          labelColor: Colors.black,
+                          indicatorColor: Colors.green,
+                        ),
+                        Expanded(
+                          child: TabBarView(
+                            children: _pages,
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    // In case of an unexpected data structure
+                    return Center(child: Text('Unexpected data format.'));
+                  }
+                }
+                return Center(child: Text('No data found.'));
+              },
+            ),
+          )
+
       ),
     );
   }

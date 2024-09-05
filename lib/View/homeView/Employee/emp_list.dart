@@ -191,13 +191,13 @@ class _EmpListState extends State<EmpList> {
       //     ),
       //   ],
       // ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primaryColor,
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => AddRep(),));
-        },
-        child: Icon(Icons.add, color: AppColors.whiteColor,),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: AppColors.primaryColor,
+      //   onPressed: () {
+      //     Navigator.push(context, MaterialPageRoute(builder: (context) => AddRep(),));
+      //   },
+      //   child: Icon(Icons.add, color: AppColors.whiteColor,),
+      // ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -273,7 +273,7 @@ class _EmpListState extends State<EmpList> {
                               onSelected: (String result) {
                                 if (result == 'edit') {
                                   print('Edit action');
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => EditRep(uniqueID: employee['unique_id'], userID: employee['id'],),));
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => EditRep(uniqueID: employee['uniqueId'], userID: employee['id'],),));
                                 } else if (result == 'delete') {
                                   _showDeleteConfirmationDialog(context, '${employee['name']}', '${employee['id']}');
                                 }

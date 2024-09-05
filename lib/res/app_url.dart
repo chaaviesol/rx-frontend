@@ -91,4 +91,6 @@ class AppUrl{
 
   static var gettingapproval_doctors = '$baseUrl/user/doctorForApproval';
 
+  static var approving_doctors = '$baseUrl/user/approveDoctors';
+
 }

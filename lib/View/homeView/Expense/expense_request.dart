@@ -62,7 +62,7 @@ class _ExpenseRequestPageState extends State<ExpenseRequestPage> {
     String? uniqueId = preferences.getString('uniqueID');
     String url = AppUrl.getdoctors;
     Map<String, dynamic> data = {"rep_UniqueId": uniqueId};
-
+print('id is ${uniqueId}');
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -76,7 +76,7 @@ class _ExpenseRequestPageState extends State<ExpenseRequestPage> {
         var responseData = jsonDecode(response.body);
         Map<String, int> doctorsMap = {};
         for (var doctor in responseData['data']) {
-          doctorsMap[doctor['doc_name']] = doctor['id'];
+          doctorsMap[doctor['firstName']] = doctor['id'];
         }
         return doctorsMap;
       } else {
@@ -333,7 +333,7 @@ class _ExpenseRequestPageState extends State<ExpenseRequestPage> {
                                       );
                                     }
                                     return Text(
-                                        "Please restart your application");
+                                        "Please restart your application.");
                                   },
                                 ),
                               ),

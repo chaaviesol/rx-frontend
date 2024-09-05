@@ -19,9 +19,9 @@ class _My_listState extends State<My_list> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   final List<Widget> _tabs = [
-    const Tab(text: 'Doctor list'),
-    const Tab(text: 'Employee list'),
-    const Tab(text: 'Chemist list'),
+    const Tab(text: 'Doctor'),
+    const Tab(text: 'Employee'),
+    const Tab(text: 'Chemist'),
   ];
 
   List<Widget> _pages = [
@@ -45,20 +45,20 @@ class _My_listState extends State<My_list> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(automaticallyImplyLeading: false,
         backgroundColor: AppColors.whiteColor,
-        leading: IconButton(
-          icon: CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back_ios_rounded,
-              color: AppColors.primaryColor,
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        // leading: IconButton(
+        //   icon: CircleAvatar(
+        //     backgroundColor: Colors.white,
+        //     child: Icon(
+        //       Icons.arrow_back_ios_rounded,
+        //       color: AppColors.primaryColor,
+        //     ),
+        //   ),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        // ),
         title: Text(
           'My List',
           style: text40016black,

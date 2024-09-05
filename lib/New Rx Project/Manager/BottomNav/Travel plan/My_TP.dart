@@ -50,18 +50,19 @@ class _Mngr_T_PState extends State<Mngr_T_P> with SingleTickerProviderStateMixin
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
-        leading: IconButton(
-          icon: CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back_ios_rounded,
-              color: AppColors.primaryColor,
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        // leading: IconButton(
+        //   icon: CircleAvatar(
+        //     backgroundColor: Colors.white,
+        //     child: Icon(
+        //       Icons.arrow_back_ios_rounded,
+        //       color: AppColors.primaryColor,
+        //     ),
+        //   ),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        // ),
+        automaticallyImplyLeading: false,
         title: Text(
           'Travel Plan',
           style: text40016black,

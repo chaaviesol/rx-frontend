@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // _initPackageInfo();
     _navigateToHome();
   }
-  //
+
   // Future<void> _initPackageInfo() async {
   //   final info = await PackageInfo.fromPlatform();
   //   setState(() {

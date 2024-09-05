@@ -337,11 +337,22 @@ class _HomepageManagerState extends State<HomepageManager> {
                   //   left: MediaQuery.of(context).size.width/3,
                   //   bottom: MediaQuery.of(context).size.height/7.9,
                   //   child:
-                    ElevatedButton(style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor),
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => MyLeaveandexpense(),));
-                      }, child: Text('MY Leave And Expense',style: text50012,),),
+                  SizedBox(height: 10,),
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor),
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => MyLeaveandexpense(),));
+                          }, child: Text('Leave & Expense',style: text50012,),),
+                        ElevatedButton(style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor),
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => MyLeaveandexpense(),));
+                          }, child: Text('Reports',style: text50012,),),
+
+                      ],
+                    ),
                   // ),
                 ],
               ),

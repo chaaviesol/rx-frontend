@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -65,9 +64,15 @@ class _MyApprovalDoctorState extends State<MyApprovalDoctor>
         }
 
         setState(() {
-          pendingDoctors = doctorList.where((doc) => doc['approvalStatus'] == 'Pending').toList();
-          rejectedDoctors = doctorList.where((doc) => doc['approvalStatus'] == 'Rejected').toList();
-          acceptedDoctors = doctorList.where((doc) => doc['approvalStatus'] == 'Accepted').toList();
+          pendingDoctors = doctorList
+              .where((doc) => doc['approvalStatus'] == 'Pending')
+              .toList();
+          rejectedDoctors = doctorList
+              .where((doc) => doc['approvalStatus'] == 'Rejected')
+              .toList();
+          acceptedDoctors = doctorList
+              .where((doc) => doc['approvalStatus'] == 'Accepted')
+              .toList();
           isLoading = false;
         });
       } else {
@@ -82,6 +87,29 @@ class _MyApprovalDoctorState extends State<MyApprovalDoctor>
         errorMessage = 'An error occurred: $e';
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> approveDoctor(int doctorId, String status) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://52.66.145.37:3004/user/approveDoctors'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({"dr_id": doctorId, "status": status}),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        setState(() {
+          fetchDoctorData(); // Refresh the doctor data after approval/rejection
+        });
+      } else {
+        print('Failed to update doctor status');
+      }
+    } catch (e) {
+      print('Error while approving doctor: $e');
     }
   }
 
@@ -106,9 +134,18 @@ class _MyApprovalDoctorState extends State<MyApprovalDoctor>
                 : TabBarView(
               controller: _tabController,
               children: [
-                DoctorList(doctors: pendingDoctors, showActions: true),
-                DoctorList(doctors: rejectedDoctors, showActions: false),
-                DoctorList(doctors: acceptedDoctors, showActions: false),
+                DoctorList(
+                    doctors: pendingDoctors,
+                    showActions: true,
+                    onApproveDoctor: approveDoctor),
+                DoctorList(
+                    doctors: rejectedDoctors,
+                    showActions: false,
+                    onApproveDoctor: approveDoctor),
+                DoctorList(
+                    doctors: acceptedDoctors,
+                    showActions: false,
+                    onApproveDoctor: approveDoctor),
               ],
             ),
           ),
@@ -121,8 +158,13 @@ class _MyApprovalDoctorState extends State<MyApprovalDoctor>
 class DoctorList extends StatelessWidget {
   final List<dynamic> doctors;
   final bool showActions;
+  final Function(int, String) onApproveDoctor;
 
-  const DoctorList({required this.doctors, required this.showActions});
+  const DoctorList({
+    required this.doctors,
+    required this.showActions,
+    required this.onApproveDoctor, // Add this parameter
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +199,8 @@ class DoctorList extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${doctor['firstName']} ${doctor['lastName']}',
+                              Text(
+                                  '${doctor['firstName']} ${doctor['lastName']}',
                                   style: text60014black),
                               Text(doctor['specialization'],
                                   style: TextStyle(
@@ -196,29 +239,46 @@ class DoctorList extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                if (doctor['id'] != null) {
+                                  onApproveDoctor(doctor['id'], 'Accepted');
+                                } else {
+                                  print('Doctor ID is null');
+                                }
+                              },
                               child: Container(
-                                  width: MediaQuery.of(context).size.width / 3,
-                                  decoration: BoxDecoration(
-                                      color: AppColors.whiteColor,
-                                      borderRadius: BorderRadius.circular(6)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Center(child: Text('Accept')),
-                                  )),
+                                width: MediaQuery.of(context).size.width / 3,
+                                decoration: BoxDecoration(
+                                  color: AppColors.whiteColor,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text('Accept')),
+                                ),
+                              ),
                             ),
                             InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                if (doctor['id'] != null) {
+                                  onApproveDoctor(doctor['id'], 'Rejected');
+                                } else {
+                                  print('Doctor ID is null');
+                                }
+                              },
                               child: Container(
-                                  width: MediaQuery.of(context).size.width / 3,
-                                  decoration: BoxDecoration(
-                                      color: AppColors.whiteColor,
-                                      borderRadius: BorderRadius.circular(6)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Center(child: Text('Reject')),
-                                  )),
+                                width: MediaQuery.of(context).size.width / 3,
+                                decoration: BoxDecoration(
+                                  color: AppColors.whiteColor,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: Text('Reject')),
+                                ),
+                              ),
                             ),
+
                           ],
                         ),
                     ],

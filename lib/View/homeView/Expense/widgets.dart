@@ -437,7 +437,7 @@ class ExpenseApprovalsWidgets{
                                                       padding: EdgeInsets.only(top: 12.0),
                                                       child: Text('${snapdata[index]['amount']}',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 16),),
                                                     ),
-                                                    Text('cash',style: TextStyle(
+                                                    Text('cash ',style: TextStyle(
                                                         fontWeight: FontWeight.w400,
                                                         color: AppColors.borderColor,
                                                         fontSize: 12),),
