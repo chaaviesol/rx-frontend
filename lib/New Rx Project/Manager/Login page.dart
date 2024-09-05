@@ -73,6 +73,7 @@ class _LoginPageNewState extends State<LoginPageNew> {
 
   final FocusNode useridNode = FocusNode();
   final FocusNode passwordNode = FocusNode();
+  final FocusNode loginButtonNode = FocusNode();
 
 
 
@@ -287,7 +288,7 @@ class _LoginPageNewState extends State<LoginPageNew> {
                           controller: password,
                           focusNode: passwordNode,
                           onFieldSubmitted: (value){
-                            Utils.fieldFocusChange(context, passwordNode, passwordNode);
+                            Utils.fieldFocusChange(context, passwordNode, loginButtonNode);
                           },
                           obscureText: !_passwordVisible,
                           validator: (value) {
@@ -331,6 +332,7 @@ class _LoginPageNewState extends State<LoginPageNew> {
                 ),
                 Center(
                   child: InkWell(
+                    focusNode: loginButtonNode,
                     onTap: () {
                       if (_formKey.currentState!.validate()) {
                         setState(() {

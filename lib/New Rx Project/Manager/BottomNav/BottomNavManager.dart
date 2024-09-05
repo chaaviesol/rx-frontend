@@ -65,42 +65,49 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          PageView(
-            controller: _pageController,
-            onPageChanged: _onPageChanged,
-            children: pages,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 400,
           ),
-          if (_showButtons)
-            Positioned(
-              bottom: MediaQuery.of(context).padding.bottom + 56 + 16, // Adjust for bottom padding and nav bar height
-              right: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  _buildActionButton('Add Doctor', Add_doctor_mngr()),
-                  SizedBox(height: 10),
-                  _buildActionButton('Add Chemist', Adding_chemistmngr()),
-                  SizedBox(height: 10),
-                  _buildActionButton('Add Employee', Adding_employee_mngr()),
-                  SizedBox(height: 80),
-                ],
+          child: Stack(
+            children: [
+              PageView(
+                controller: _pageController,
+                onPageChanged: _onPageChanged,
+                children: pages,
               ),
-            ),
-          buildBottomNavigationBar(),
-          if (currentIndex == 0) // Only show the plus button on the home page
-            Positioned(
-              bottom: MediaQuery.of(context).padding.bottom + 56 + 30, // Adjust for bottom padding and nav bar height
-              right: 20,
-              child: FloatingActionButton(
-                backgroundColor: AppColors.primaryColor,
-                onPressed: _toggleButtons,
-                shape: CircleBorder(), // Ensures the button is circular
-                child: Icon(Icons.add, color: Colors.white),
-              ),
-            ),
-        ],
+              if (_showButtons)
+                Positioned(
+                  bottom: MediaQuery.of(context).padding.bottom + 56 + 16, // Adjust for bottom padding and nav bar height
+                  right: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _buildActionButton('Add Doctor', Add_doctor_mngr()),
+                      SizedBox(height: 10),
+                      _buildActionButton('Add Chemist', Adding_chemistmngr()),
+                      SizedBox(height: 10),
+                      _buildActionButton('Add Employee', Adding_employee_mngr()),
+                      SizedBox(height: 80),
+                    ],
+                  ),
+                ),
+              buildBottomNavigationBar(),
+              if (currentIndex == 0) // Only show the plus button on the home page
+                Positioned(
+                  bottom: MediaQuery.of(context).padding.bottom + 56 + 30, // Adjust for bottom padding and nav bar height
+                  right: 20,
+                  child: FloatingActionButton(
+                    backgroundColor: AppColors.primaryColor,
+                    onPressed: _toggleButtons,
+                    shape: CircleBorder(), // Ensures the button is circular
+                    child: Icon(Icons.add, color: Colors.white),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

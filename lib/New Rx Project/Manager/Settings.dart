@@ -70,80 +70,87 @@ class _SettingsPageState extends State<SettingsPage> {
           style: text40016black,
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 20),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  color: AppColors.primaryColor,
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height / 5.5,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          child: Text(name.isNotEmpty ? name[0] : 'A'),
-                        ),
-                        const SizedBox(width: 20),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 400,
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      color: AppColors.primaryColor,
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height / 5.5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
                           children: [
-                            Text(
-                              name.isNotEmpty ? name : 'Manager',
-                              style: text60017,
+                            CircleAvatar(
+                              radius: 40,
+                              child: Text(name.isNotEmpty ? name[0] : 'A'),
                             ),
-                            Text(qualification.isNotEmpty ? qualification : 'Qualification', style: text40012),
-                            Text(email.isNotEmpty ? email : 'email@example.com', style: text40012),
+                            const SizedBox(width: 20),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  name.isNotEmpty ? name : 'Manager',
+                                  style: text60017,
+                                ),
+                                Text(qualification.isNotEmpty ? qualification : 'Qualification', style: text40012),
+                                Text(email.isNotEmpty ? email : 'email@example.com', style: text40012),
+                              ],
+                            ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                  SizedBox(height: 20),
+                  _buildListTile(
+                    icon: Icons.edit,
+                    title: 'Edit Profile',
+                    onTap: () {
+                      // Handle Edit Profile action
+                    },
+                  ),
+                  _buildListTile(
+                    icon: Icons.notifications,
+                    title: 'Notification',
+                    onTap: () {
+                      // Handle Notification action
+                    },
+                  ),
+                  _buildListTile(
+                    icon: Icons.lock,
+                    title: 'Reset Password',
+                    onTap: () {
+                      // Handle Reset Password action
+                    },
+                  ),
+                  _buildListTile(
+                    icon: Icons.logout,
+                    title: 'Logout',
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginPageNew(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-              _buildListTile(
-                icon: Icons.edit,
-                title: 'Edit Profile',
-                onTap: () {
-                  // Handle Edit Profile action
-                },
-              ),
-              _buildListTile(
-                icon: Icons.notifications,
-                title: 'Notification',
-                onTap: () {
-                  // Handle Notification action
-                },
-              ),
-              _buildListTile(
-                icon: Icons.lock,
-                title: 'Reset Password',
-                onTap: () {
-                  // Handle Reset Password action
-                },
-              ),
-              _buildListTile(
-                icon: Icons.logout,
-                title: 'Logout',
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginPageNew(),
-                    ),
-                  );
-                },
-              ),
-            ],
+            ),
           ),
         ),
       ),
