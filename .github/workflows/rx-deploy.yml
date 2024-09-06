@@ -1,0 +1,60 @@
+name: Deploy Application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-frontend:
+    name: Build and Deploy Flutter Web Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Frontend Code
+      uses: actions/checkout@v3
+      with:
+        repository: chaaviesol/rx-frontend
+        path: rx-frontend
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.4' # Use the desired Flutter version
+
+    - name: Install Dependencies
+      run: flutter pub get
+      working-directory: rx-frontend # Adjust if necessary based on new repo structure
+
+    - name: Build Flutter Web
+      run: flutter build web
+      working-directory: rx-frontend # Adjust if necessary based on new repo structure
+
+    - name: Deploy to S3
+      env:
+        AWS_REGION: 'ap-south-1'
+        AWS_S3_BUCKET: 'rx-route'
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        aws s3 sync rx_frontend/build/web s3://$AWS_S3_BUCKET/ --region $AWS_REGION
+      working-directory: rx-frontend
+
+    - name: Checkout Backend Code
+      uses: actions/checkout@v3
+      with:
+        repository: chaaviesol/rx-backend
+        path: rx-backend
+
+    - name: Clone Backend Repository on EC2
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+      run: |
+        echo "${SSH_PRIVATE_KEY}" > private_key.pem
+        chmod 400 private_key.pem
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@52.66.145.37 << 'EOF'
+          git clone https://github.com/chaaviesol/rx-backend.git /home/ec2-user/rx-test-final
+        EOF
+
+    - name: Cleanup SSH Key
+      run: rm private_key.pem
