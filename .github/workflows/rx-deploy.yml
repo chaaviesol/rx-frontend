@@ -35,7 +35,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
-        aws s3 sync rx-frontend/build/web s3://$AWS_S3_BUCKET/ --region $AWS_REGION
+        aws s3 sync build/web s3://$AWS_S3_BUCKET/ --region $AWS_REGION
       working-directory: rx-frontend
 
     - name: Checkout Backend Code
