@@ -6,7 +6,10 @@ import 'package:provider/provider.dart';
 
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Manual/provider/eventProvider.dart';
+import 'package:rx_route_new/services/services.dart';
 
+import 'New Rx Project/Manager/BottomNav/Travel plan/Manual/provider/DynamicFormProvider.dart';
 import 'Util/Routes/routes.dart';
 import 'Util/Routes/routes_name.dart';
 import 'app_colors.dart';
@@ -22,12 +25,16 @@ Future<void> _requestPermissions() async {
 }
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  final apiService = ApiService(baseUrl:'http://52.66.145.37:3004' );
+
   // await AndroidAlarmManager.initialize();
   await _requestPermissions();
   // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_)=>LocaleNotifier(),),
+      ChangeNotifierProvider(create: (_)=>EventProvider(apiService: apiService)),
+      ChangeNotifierProvider(create: (_)=>DynamicFormProvider())
       // ChangeNotifierProvider(create: (_)=>AuthViewModel()),
     ],
       child: const MyApp()));
