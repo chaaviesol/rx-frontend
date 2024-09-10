@@ -279,7 +279,7 @@ class _LoginPageNewState extends State<LoginPageNew> {
                             return null;
                           },
                           decoration: InputDecoration(
-                            hintText: 'User ID',
+                            hintText: 'Musthafa',
                             prefixIcon: const Icon(Icons.person_2_outlined),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
