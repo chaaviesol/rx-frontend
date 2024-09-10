@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 application
-INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:2:5-33:19
+INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:6:5-37:19
 MERGED from [:geolocator_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-15:19
 MERGED from [:geolocator_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-15:19
 MERGED from [:url_launcher_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-14:19
@@ -30,11 +30,11 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\AS
 	android:name
 		INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml
 manifest
-ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-45:12
-INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-45:12
-INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-45:12
-INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-45:12
-MERGED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-45:12
+ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-49:12
+INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-49:12
+INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-49:12
+INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-49:12
+MERGED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-49:12
 MERGED from [:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-21:12
 MERGED from [:flutter_keyboard_visibility] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\flutter_keyboard_visibility\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-9:12
 MERGED from [:flutter_local_notifications] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\flutter_local_notifications\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-12:12
@@ -92,32 +92,50 @@ INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\deb
 INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\debug\AndroidManifest.xml:1:1-7:12
 	package
 		INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-45:12
+		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-49:12
 		INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\debug\AndroidManifest.xml
 	android:versionName
 		INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-45:12
+		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-49:12
 		INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\debug\AndroidManifest.xml
 	android:versionCode
 		INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-45:12
+		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:1-49:12
 		INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\debug\AndroidManifest.xml
 	xmlns:android
 		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:1:11-69
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:2:5-79
+	android:name
+		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:2:22-76
+uses-permission#android.permission.ACCESS_COARSE_LOCATION
+ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:3:5-81
+	android:name
+		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:3:22-78
+uses-permission#android.permission.ACCESS_BACKGROUND_LOCATION
+ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:4:5-85
+	android:name
+		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:4:22-82
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:5:5-66
+MERGED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:5:5-66
+MERGED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:5:5-66
+	android:name
+		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:5:22-64
 queries
-ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:39:5-44:15
+ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:43:5-48:15
 MERGED from [:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:13:5-19:15
 MERGED from [:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:13:5-19:15
 intent#action:name:android.intent.action.PROCESS_TEXT+data:mimeType:text/plain
-ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:40:9-43:18
+ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:44:9-47:18
 action#android.intent.action.PROCESS_TEXT
-ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:41:13-72
+ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:45:13-72
 	android:name
-		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:41:21-70
+		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:45:21-70
 data
-ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:42:13-50
+ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:46:13-50
 	android:mimeType
-		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:42:19-48
+		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:46:19-48
 uses-sdk
 INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml
@@ -234,10 +252,6 @@ INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\deb
 	android:minSdkVersion
 		INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml
 		INJECTED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\debug\AndroidManifest.xml
-uses-permission#android.permission.INTERNET
-ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\debug\AndroidManifest.xml:6:5-66
-	android:name
-		ADDED from C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\debug\AndroidManifest.xml:6:22-64
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
 ADDED from [:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-11:38
 	android:maxSdkVersion

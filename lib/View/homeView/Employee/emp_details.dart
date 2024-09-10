@@ -122,186 +122,188 @@ class _EmpDetailsState extends State<EmpDetails> with SingleTickerProviderStateM
     );
   }
   Widget PerformanceWidget(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 10,),
-        Center(
-          child: Text(
-            'Employee Analytics',
-            style: TextStyle(fontSize: 20,),
-          ),
-        ),
-        SizedBox(height: 20),
-        AspectRatio(
-          aspectRatio: 1.5,
-          child: BarChart(
-            BarChartData(
-              gridData: FlGridData(show: false), // Hide grid lines
-              titlesData: FlTitlesData(
-                topTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                rightTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) {
-                      const style = TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      );
-                      Widget text;
-                      switch (value.toInt()) {
-                        case 0:
-                          text = const Text('Jan', style: style);
-                          break;
-                        case 1:
-                          text = const Text('Feb', style: style);
-                          break;
-                        case 2:
-                          text = const Text('Mar', style: style);
-                          break;
-                        case 3:
-                          text = const Text('Apr', style: style);
-                          break;
-                        case 4:
-                          text = const Text('May', style: style);
-                          break;
-                        case 5:
-                          text = const Text('Jun', style: style);
-                          break;
-                        case 6:
-                          text = const Text('Jul', style: style);
-                          break;
-                        case 7:
-                          text = const Text('Aug', style: style);
-                          break;
-                        case 8:
-                          text = const Text('Sep', style: style);
-                          break;
-                        case 9:
-                          text = const Text('Oct', style: style);
-                          break;
-                        case 10:
-                          text = const Text('Nov', style: style);
-                          break;
-                        case 11:
-                          text = const Text('Dec', style: style);
-                          break;
-                        default:
-                          text = const Text('', style: style);
-                          break;
-                      }
-                      return SideTitleWidget(child: text, axisSide: meta.axisSide);
-                    },
-                    reservedSize: 30,
-                  ),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    interval: 10,
-                    getTitlesWidget: (value, meta) {
-                      const style = TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      );
-                      return SideTitleWidget(
-                        child: Text(value.toInt().toString(), style: style),
-                        axisSide: meta.axisSide,
-                      );
-                    },
-                    reservedSize: 40,
-                  ),
-                ),
-              ),
-              borderData: FlBorderData(
-                show: true,
-                border: Border.all(color: Colors.black, width: 1),
-              ),
-              barGroups: [
-                BarChartGroupData(
-                  x: 0,
-                  barRods: [
-                    BarChartRodData(toY: 10, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 1,
-                  barRods: [
-                    BarChartRodData(toY: 20, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 2,
-                  barRods: [
-                    BarChartRodData(toY: 30, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 3,
-                  barRods: [
-                    BarChartRodData(toY: 40, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 4,
-                  barRods: [
-                    BarChartRodData(toY: 50, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 5,
-                  barRods: [
-                    BarChartRodData(toY: 60, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 6,
-                  barRods: [
-                    BarChartRodData(toY: 70, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 7,
-                  barRods: [
-                    BarChartRodData(toY: 80, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 8,
-                  barRods: [
-                    BarChartRodData(toY: 90, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 9,
-                  barRods: [
-                    BarChartRodData(toY: 100, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 10,
-                  barRods: [
-                    BarChartRodData(toY: 90, color: Colors.blue),
-                  ],
-                ),
-                BarChartGroupData(
-                  x: 11,
-                  barRods: [
-                    BarChartRodData(toY: 80, color: Colors.blue),
-                  ],
-                ),
-              ],
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 10,),
+          Center(
+            child: Text(
+              'Employee Analytics',
+              style: TextStyle(fontSize: 20,),
             ),
           ),
-        ),
-      ],
+          SizedBox(height: 20),
+          AspectRatio(
+            aspectRatio: 1.5,
+            child: BarChart(
+              BarChartData(
+                gridData: FlGridData(show: false), // Hide grid lines
+                titlesData: FlTitlesData(
+                  topTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        const style = TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        );
+                        Widget text;
+                        switch (value.toInt()) {
+                          case 0:
+                            text = const Text('Jan', style: style);
+                            break;
+                          case 1:
+                            text = const Text('Feb', style: style);
+                            break;
+                          case 2:
+                            text = const Text('Mar', style: style);
+                            break;
+                          case 3:
+                            text = const Text('Apr', style: style);
+                            break;
+                          case 4:
+                            text = const Text('May', style: style);
+                            break;
+                          case 5:
+                            text = const Text('Jun', style: style);
+                            break;
+                          case 6:
+                            text = const Text('Jul', style: style);
+                            break;
+                          case 7:
+                            text = const Text('Aug', style: style);
+                            break;
+                          case 8:
+                            text = const Text('Sep', style: style);
+                            break;
+                          case 9:
+                            text = const Text('Oct', style: style);
+                            break;
+                          case 10:
+                            text = const Text('Nov', style: style);
+                            break;
+                          case 11:
+                            text = const Text('Dec', style: style);
+                            break;
+                          default:
+                            text = const Text('', style: style);
+                            break;
+                        }
+                        return SideTitleWidget(child: text, axisSide: meta.axisSide);
+                      },
+                      reservedSize: 30,
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 10,
+                      getTitlesWidget: (value, meta) {
+                        const style = TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        );
+                        return SideTitleWidget(
+                          child: Text(value.toInt().toString(), style: style),
+                          axisSide: meta.axisSide,
+                        );
+                      },
+                      reservedSize: 40,
+                    ),
+                  ),
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.all(color: Colors.black, width: 1),
+                ),
+                barGroups: [
+                  BarChartGroupData(
+                    x: 0,
+                    barRods: [
+                      BarChartRodData(toY: 10, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 1,
+                    barRods: [
+                      BarChartRodData(toY: 20, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 2,
+                    barRods: [
+                      BarChartRodData(toY: 30, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 3,
+                    barRods: [
+                      BarChartRodData(toY: 40, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 4,
+                    barRods: [
+                      BarChartRodData(toY: 50, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 5,
+                    barRods: [
+                      BarChartRodData(toY: 60, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 6,
+                    barRods: [
+                      BarChartRodData(toY: 70, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 7,
+                    barRods: [
+                      BarChartRodData(toY: 80, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 8,
+                    barRods: [
+                      BarChartRodData(toY: 90, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 9,
+                    barRods: [
+                      BarChartRodData(toY: 100, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 10,
+                    barRods: [
+                      BarChartRodData(toY: 90, color: Colors.blue),
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 11,
+                    barRods: [
+                      BarChartRodData(toY: 80, color: Colors.blue),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
   @override
@@ -356,7 +358,7 @@ class _EmpDetailsState extends State<EmpDetails> with SingleTickerProviderStateM
                   if (snapdata is Map<String, dynamic>) {
                     // List of pages you want to display in TabBarView
                     final List<Widget> _pages = [
-                      EmpDetailsWidgets.BasicInfo(empDetails),
+                      EmpDetailsWidgets.BasicInfo(snapshot.data),
                       PerformanceWidget(context),
                       EmployeeList(context),
                     ];

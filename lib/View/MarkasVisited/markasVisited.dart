@@ -14,7 +14,8 @@ import 'package:http/http.dart' as http;
 class MarkAsVisited extends StatefulWidget {
   int doctorID;
   List<dynamic> products;
-  MarkAsVisited({required this.doctorID,required this.products,Key? key}) : super(key: key);
+  int? tpid;
+  MarkAsVisited({required this.doctorID,required this.products,this.tpid,Key? key}) : super(key: key);
 
   @override
   State<MarkAsVisited> createState() => _MarkAsVisitedState();

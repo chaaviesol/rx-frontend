@@ -236,6 +236,12 @@ class _LoginPageNewState extends State<LoginPageNew> {
                 //   },
                 //   child: Text('New Travel plan'),
                 // ),
+                InkWell(
+                  onTap: (){
+                    getAvailableBiometrics();
+                    authenticate();
+                  },
+                    child: Icon(Icons.fingerprint,color: AppColors.primaryColor,size: 55,)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

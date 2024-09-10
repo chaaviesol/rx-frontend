@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/rx_route_new.iml" filepath="$PROJECT_DIR$/rx_route_new.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/rx_route_new_android.iml" filepath="$PROJECT_DIR$/android/rx_route_new_android.iml" />
     </modules>
   </component>
 </project>

@@ -11,8 +11,8 @@ import '../../../../../constants/styles.dart';
 
 class DoctorDetailsPage extends StatefulWidget {
   final int doctorId;
-
-  const DoctorDetailsPage({required this.doctorId, Key? key}) : super(key: key);
+  final int? tpid;
+   DoctorDetailsPage({this.tpid,required this.doctorId, Key? key}) : super(key: key);
 
   @override
   _DoctorDetailsPageState createState() => _DoctorDetailsPageState();

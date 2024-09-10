@@ -13,6 +13,11 @@ class _MyreportsState extends State<Myreports> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(' My reports'), automaticallyImplyLeading: false, ),
+      body: Column(
+        children: [
+          Text('Visit counts and visited details, visit history')
+        ],
+      ),
     );
   }
 }

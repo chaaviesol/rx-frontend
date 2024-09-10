@@ -127,6 +127,7 @@ class _EventsState extends State<Events> {
         child: SafeArea(
           child:Column(
             children: [
+              Text('Birthday\'s',style:text60017black),
               FutureBuilder(
                 future: getEvents(),
                 builder: (context,snapshot) {
@@ -142,7 +143,6 @@ class _EventsState extends State<Events> {
                           var snapdata = snapshot.data[0]['todayBirthday'];
                           return Column(
                             children: [
-                              Text('Birthday\'s',style:text60017black),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Stack(
@@ -171,7 +171,7 @@ class _EventsState extends State<Events> {
                                               ),
                                             ),
                                             Text(
-                                              'Its ${snapdata[index]['doc_name']}\'s Birthday !',
+                                              'Its ${snapdata[index]['firstName']}\'s Birthday !',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w500,
                                                 color: AppColors.whiteColor,
@@ -189,13 +189,13 @@ class _EventsState extends State<Events> {
                                             const SizedBox(height: 30),
                                             Row(
                                               children: [
-                                                CircleAvatar(radius: 25,child: Text('${snapdata[index]['doc_name'][0].toString().toUpperCase()}'),),
+                                                CircleAvatar(radius: 25,child: Text('${snapdata[index]['firstName'][3]}'),),
                                                 SizedBox(width: 10),
                                                 Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      '${snapdata[index]['doc_name']}',
+                                                      '${snapdata[index]['firstName']}',
                                                       style: TextStyle(
                                                         fontWeight: FontWeight.w500,
                                                         color: AppColors.whiteColor,
@@ -254,25 +254,25 @@ class _EventsState extends State<Events> {
                                         ),
                                       ),
                                     ),
-                                    Positioned(
-                                      right: 0,
-                                      top: 0,
-                                      child: Container(
-                                        height: 70,
-                                        width: 100,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.primaryColor2,
-                                          borderRadius: BorderRadius.only(
-                                            bottomLeft: Radius.circular(21),
-                                            topRight: Radius.circular(6),
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(15.0),
-                                          child: Image.asset('assets/icons/cake.png'),
-                                        ),
-                                      ),
-                                    )
+                                    // Positioned(
+                                    //   right: 0,
+                                    //   top: 0,
+                                    //   child: Container(
+                                    //     height: 70,
+                                    //     width: 100,
+                                    //     decoration: const BoxDecoration(
+                                    //       color: AppColors.primaryColor2,
+                                    //       borderRadius: BorderRadius.only(
+                                    //         bottomLeft: Radius.circular(21),
+                                    //         topRight: Radius.circular(6),
+                                    //       ),
+                                    //     ),
+                                    //     child: Padding(
+                                    //       padding: const EdgeInsets.all(15.0),
+                                    //       child: Image.asset('assets/icons/cake.png'),
+                                    //     ),
+                                    //   ),
+                                    // )
                                   ],
                                 ),
                               ),
@@ -280,13 +280,15 @@ class _EventsState extends State<Events> {
                           );
                         }
                     );
+                    return Text('${snapshot.data[0]['todayBirthday']}');
                   }else{
-                    return Center(child: Text('No Data'),);
+                    // return Center(child: Text('No Data'),);
                   }
                   return Center(child: Text('Some error occured !,Please restart your application.'),);
                 }
               ),
               SizedBox(height: 10,),
+              Text('Anniversary\'s',style:text60017black),
               FutureBuilder(
                   future: getEvents(),
                   builder: (context,snapshot) {
@@ -299,10 +301,9 @@ class _EventsState extends State<Events> {
                           shrinkWrap: true,
                           itemCount: snapshot.data[0]['todayAnniversary'].length,
                           itemBuilder: (context,index) {
-                            var snapdata = snapshot.data[0]['todayAnniversary'];
+                            var snapdata = snapshot.data[0]['todayAnniversary'][index];
                             return Column(
                               children: [
-                                Text('Anniversary\'s',style:text60017black),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Stack(
@@ -331,7 +332,7 @@ class _EventsState extends State<Events> {
                                                 ),
                                               ),
                                               Text(
-                                                'Its ${snapdata[index]['doc_name']}\'s Anniversary !',
+                                                'Its ${snapdata['firstName']}\'s Anniversary !',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                   color: AppColors.whiteColor,
@@ -349,13 +350,13 @@ class _EventsState extends State<Events> {
                                               const SizedBox(height: 30),
                                               Row(
                                                 children: [
-                                                  CircleAvatar(radius: 25,child: Text('${snapdata[index]['doc_name'][0].toString().toUpperCase()}'),),
+                                                  CircleAvatar(radius: 25,child: Text('${snapdata['firstName'][3].toString().toUpperCase()}'),),
                                                   SizedBox(width: 10),
                                                   Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
-                                                        '${snapdata[index]['doc_name']}',
+                                                        '${snapdata['firstName']}',
                                                         style: TextStyle(
                                                           fontWeight: FontWeight.w500,
                                                           color: AppColors.whiteColor,
@@ -363,7 +364,7 @@ class _EventsState extends State<Events> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        '${snapdata[index]['doc_qualification']}',
+                                                        '${snapdata['doc_qualification']}',
                                                         style: TextStyle(
                                                           fontWeight: FontWeight.w500,
                                                           color: AppColors.whiteColor,
@@ -377,7 +378,7 @@ class _EventsState extends State<Events> {
                                               const SizedBox(height: 10),
                                               InkWell(
                                                 onTap: ()async{
-        
+
                                                 },
                                                 child: SizedBox(
                                                   width: 130,

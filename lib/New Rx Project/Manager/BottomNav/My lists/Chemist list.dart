@@ -119,6 +119,7 @@ class _ChemistListState extends State<ChemistList> {
           itemCount: _chemists.length,
           itemBuilder: (context, index) {
             final chemist = _chemists[index];
+            print('chemist list is:$_chemists');
             return ListTile(
               title: Text(chemist['building_name'] ?? 'No Building Name',style: text50014black,),
               subtitle: Text(chemist['address'] ?? 'No Address',style: text50012black,),

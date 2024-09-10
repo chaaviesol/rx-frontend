@@ -1,99 +1,63 @@
 import 'package:flutter/material.dart';
 
-
 class EmpDetailsWidgets{
 
-  static Widget BasicInfo(List<dynamic> doctordetails) {
-    return  Padding(
+  static Widget BasicInfo(Map<String, dynamic> empDetails) {
+    return Padding(
       padding: EdgeInsets.all(25.0),
-      // child: Column(
-      //   crossAxisAlignment: CrossAxisAlignment.start,
-      //   children: [
-      //     Text('Basic Information'),
-      //     SizedBox(height: 10,),
-      //     Row(
-      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //       children: [
-      //       Column(
-      //         crossAxisAlignment: CrossAxisAlignment.start,
-      //         children: [
-      //           Column(
-      //             crossAxisAlignment: CrossAxisAlignment.start,
-      //             children: [
-      //               Text('Name',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12),),
-      //               Text('${doctordetails[0]['name']}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16),),
-      //             ],
-      //           ),
-      //           Column(
-      //             crossAxisAlignment: CrossAxisAlignment.start,
-      //             children: [
-      //               Text('Qualification',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12),),
-      //               Text('${doctordetails[0]['qualification'] ?? 'N/A'}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16),),
-      //             ],
-      //           ),
-      //
-      //         ],
-      //       ),
-      //       Column(
-      //         crossAxisAlignment: CrossAxisAlignment.start,
-      //         children: [
-      //           Column(
-      //             crossAxisAlignment: CrossAxisAlignment.start,
-      //             children: [
-      //               Text('Gender',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12),),
-      //               Text('${doctordetails[0]['gender'] ?? 'N/A'}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
-      //             ],
-      //           ),
-      //           Column(
-      //             crossAxisAlignment: CrossAxisAlignment.start,
-      //             children: [
-      //               Text('Date of birth',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12),),
-      //               Text('${doctordetails[0]['date_of_birth'] ?? 'N/A'}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
-      //             ],
-      //           ),
-      //         ],
-      //       ),
-      //         SizedBox(width: 10,),
-      //     ],),
-      //     Row(
-      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //       children: [
-      //         Column(
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           children: [
-      //             Text('Phone number',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12),),
-      //             Text('${doctordetails[0]['mobile'] ?? 'N/A'}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16),),
-      //           ],
-      //         ),
-      //         // Column(
-      //         //   crossAxisAlignment: CrossAxisAlignment.start,
-      //         //   children: [
-      //         //     Text('Designation',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12)),
-      //         //     Text('${doctordetails[0]['designation']}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
-      //         //   ],
-      //         // ),
-      //       ],
-      //     ),
-      //     Text('Email',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12),),
-      //     Text('${doctordetails[0]['email'] ?? "N/A"}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16),),
-      //     Text('Nationality',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12)),
-      //     Text('${doctordetails[0]['nationality'] ?? 'N/A'}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
-      //     Text('Address',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12)),
-      //     ListView.builder(
-      //       shrinkWrap: true,
-      //       itemCount: doctordetails[0]['addressDetail'].length,
-      //       itemBuilder: (context,index) {
-      //         return Text('${doctordetails[0]['addressDetail'][index][0]['address']['address'] ?? 'N/A'}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16));
-      //       }
-      //     ),
-      //     Text('Unique ID',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12)),
-      //     Text('${doctordetails[0]['unique_id'] ?? 'N/A'}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
-      //     Text('Password',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12)),
-      //     Text('${doctordetails[0]['password'] ?? 'N/A'}',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
-      //   ],
-      // ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Basic Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Name', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text(
+                '${empDetails['name']}',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                softWrap: true, // Allow wrapping at word boundaries
+                overflow: TextOverflow.visible, // Ensure no text is hidden
+              ),
+              SizedBox(height: 10),
+              Text('Qualification', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text('${empDetails['qualification'] ?? 'N/A'}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              SizedBox(height: 10),
+              Text('Gender', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text('${empDetails['gender'] ?? 'N/A'}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              SizedBox(height: 10),
+              Text('Date of Birth', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text('${empDetails['date_of_birth'] ?? 'N/A'}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Phone Number', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text('${empDetails['mobile'] ?? 'N/A'}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              SizedBox(height: 10),
+              Text('Email', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text('${empDetails['email'] ?? 'N/A'}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              SizedBox(height: 10),
+              Text('Address', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text('${empDetails['address'] ?? 'N/A'}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              SizedBox(height: 10),
+              Text('Unique ID', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text('${empDetails['uniqueId'] ?? 'N/A'}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              SizedBox(height: 10),
+              Text('Nationality', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text('${empDetails['nationality'] ?? 'N/A'}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              SizedBox(height: 10),
+              Text('Password', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12)),
+              Text('${empDetails['password'] ?? 'N/A'}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+            ],
+          ),
+        ],
+      ),
     );
   }
+
 
   static Widget Documents(List<dynamic> doctordetails) {
     return  Padding(
@@ -120,4 +84,6 @@ class EmpDetailsWidgets{
       ),
     );
   }
+
+
 }

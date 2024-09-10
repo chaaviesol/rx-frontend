@@ -20,6 +20,8 @@ class AppColors{
 
   static const Color dividerColor = Color.fromRGBO(177, 177, 177, 0.5);
 
-
+  static const Color tilecolor1 = Color.fromRGBO(255, 0, 0, 1);
+  static const Color tilecolor2 = Color.fromRGBO(7, 148, 223, 1.0);
+  static const Color tilecolor3 = Color.fromRGBO(255, 136, 0, 1.0);
 
 }

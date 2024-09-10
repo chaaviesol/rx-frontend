@@ -10,6 +10,7 @@ import '../app_colors.dart';
  const text40012 = TextStyle(fontWeight: FontWeight.w400,fontSize: 12,color: AppColors.whiteColor);
  const text40012bordercolor = TextStyle(fontWeight: FontWeight.w400,fontSize: 12,color: AppColors.borderColor);
  const text40014 = TextStyle(fontWeight: FontWeight.w400,fontSize: 14,color: AppColors.whiteColor);
+ const text40014black = TextStyle(fontWeight: FontWeight.w400,fontSize: 14,color: AppColors.blackColor);
  const text40014bordercolor = TextStyle(fontWeight: FontWeight.w400,fontSize: 14,color: AppColors.borderColor);
  const text40016 = TextStyle(fontWeight: FontWeight.w400,fontSize: 16,color: AppColors.primaryColor3);
  const text40016red = TextStyle(fontWeight: FontWeight.w400,fontSize: 16,color: AppColors.primaryColor5);

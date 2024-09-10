@@ -292,6 +292,7 @@ class _AddRepState extends State<AddRep> {
                             child: TextFormField(
                               controller: _qualificationController,
                               decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10),
                                 border: InputBorder.none,
                                 hintText: 'qualification',
                                 hintStyle: text50010tcolor2
@@ -896,34 +897,33 @@ class CustomDropdownHeadQrt extends StatelessWidget {
   final List<Headquarter> options;
   final Function(Headquarter?) onChanged;
   final Headquarter? selectedHeadquarter;
+  final String? hintText;
 
   const CustomDropdownHeadQrt({
     Key? key,
     required this.options,
     required this.onChanged,
     this.selectedHeadquarter,
+    this.hintText,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: DropdownButton<Headquarter>(
-        hint: Text('Select Headquarter'),
-        value: selectedHeadquarter,
-        items: options.map((Headquarter headquarter) {
-          return DropdownMenuItem<Headquarter>(
-            value: headquarter,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('${headquarter.headquarterName}  ${headquarter.subHeadquarter}'),
-                // Text('${headquarter.subHeadquarter}'),
-              ],
-            )
-          );
-        }).toList(),
-        onChanged: onChanged,
+    return DropdownButtonFormField<Headquarter>(
+      value: selectedHeadquarter,
+      hint: Text('${hintText ?? '--Select Headquarter--'}'),
+      items: options.map((Headquarter headquarter) {
+        return DropdownMenuItem<Headquarter>(
+          value: headquarter,
+          child: Text('${headquarter.headquarterName} ${headquarter.subHeadquarter}'),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      decoration: const InputDecoration(
+        hintText: 'Select',
+        hintStyle: text50010tcolor2, // Use your custom hint style here
+        contentPadding: EdgeInsets.symmetric(horizontal: 10),
+        border: InputBorder.none, // Customize the border style here
       ),
     );
   }

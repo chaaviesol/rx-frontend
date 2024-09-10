@@ -165,8 +165,7 @@ class _EmployeeDetailsPageState extends State<EmployeeDetailsPage>
                       children: [
                         CircleAvatar(
                           radius: 40,
-                          child: Text(_employeeDetails?['name'][0] ??
-                              ''),
+                          child: Text(_employeeDetails?['name'][0] ?? ''),
                         ),
                         const SizedBox(width: 20),
                         Column(

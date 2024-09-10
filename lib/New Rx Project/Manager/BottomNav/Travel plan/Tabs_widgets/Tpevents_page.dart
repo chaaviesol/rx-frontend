@@ -16,7 +16,7 @@ class _Events_pageState extends State<Events_page> {
         child: Column(
           children: [
             SizedBox(height: 10,),
-            Center(child: Text('Content for Eventsssssssssss')),
+            Center(child: Text('No Events')),
           ],
         ),
       ),

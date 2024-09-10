@@ -81,7 +81,6 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Container(

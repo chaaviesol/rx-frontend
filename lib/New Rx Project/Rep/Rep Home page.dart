@@ -1,16 +1,21 @@
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Settings.dart';
+import 'package:rx_route_new/Util/Utils.dart';
 import 'package:rx_route_new/View/profile/settings/settings.dart';
 import 'package:rx_route_new/app_colors.dart';
 import 'package:rx_route_new/res/app_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants/styles.dart';
+import '../../View/events/events.dart';
 import '../../View/events/upcoming_events.dart';
+import '../resetPassword.dart';
+import 'Bottom navigation rep/Bottomnavigationrep.dart';
 
 class RepHomepage extends StatefulWidget {
   const RepHomepage({Key? key}) : super(key: key);
@@ -25,8 +30,75 @@ class _RepHomepageState extends State<RepHomepage> {
   List<dynamic> myeventstoday = [];
   List<dynamic> myeventsupcoming = [];
   Map<String,dynamic> allevents = {};
+
+  Future<void> _checkPasswordStatus() async {
+    print('check called...');
+    final String apiUrl = 'http://52.66.145.37:3004/user/checkPassword';
+    print('checking :${Utils.userId}');
+    final Map<String, dynamic> body = {
+      "userId": int.parse('${Utils.userId.toString()}'), // Replace this with the actual userId if needed
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(body),
+      );
+      print('bdy:${jsonEncode(body)}');
+      print('sss:${response.statusCode}');
+      if (response.statusCode == 200) {
+
+        final data = json.decode(response.body);
+        if (data['success']) {
+          if (data['message'] == 'Password already modified') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => BottomNavigationRep()),
+            );
+          } else if (data['message'] == 'Modifie the password') {
+            setState(() {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ResetPasswordPage(userId:int.parse(Utils.userId.toString()) ), // Pass userId here
+                ),
+              );
+            });
+          }
+        } else {
+          _showErrorDialog('Failed to check password status');
+        }
+      } else {
+        _showErrorDialog('Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showErrorDialog('Exception: $e');
+    }
+  }
+
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title:  Text('${message}'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
+      // _checkPasswordStatus();
     super.initState();
     getEvents();
   }
@@ -49,17 +121,17 @@ class _RepHomepageState extends State<RepHomepage> {
       if (response.statusCode == 200) {
         // If the server returns a 200 OK response, parse the JSON
         var responseData = jsonDecode(response.body);
-        myeventstoday.clear();
-        myeventsupcoming.clear();
-        myeventstoday.addAll(responseData['todayEvents']);
-        myeventsupcoming.addAll(responseData['UpcomingEvents'][0]['AnniversaryNotification']);
-        allevents.clear();
-        allevents.addAll({'upcoming':myeventsupcoming,"todays":myeventstoday});
-        print('all events:$allevents');
-        print('myeventstoday:$myeventstoday');
-        print('myeventsupcoming:$myeventsupcoming');
+        // myeventstoday.clear();
+        // myeventsupcoming.clear();
+        // myeventstoday.addAll(responseData['todayEvents']);
+        // myeventsupcoming.addAll(responseData['UpcomingEvents'][0]['AnniversaryNotification']);
+        // allevents.clear();
+        // allevents.addAll({'upcoming':myeventsupcoming,"todays":myeventstoday});
+        // print('all events:$allevents');
+        // print('myeventstoday:$myeventstoday');
+        // print('myeventsupcoming:$myeventsupcoming');
         // return json.decode(response.body);
-        return allevents;
+        return responseData;
       } else {
         // If the server returns an error, throw an exception
         throw Exception('Failed to load data');
@@ -227,13 +299,13 @@ class _RepHomepageState extends State<RepHomepage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Todays Events',style: TextStyle(
+                  const Text('Events',style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
                   ),),
                   InkWell(
                     onTap: (){
-                      // Navigator.push(context, MaterialPageRoute(builder: (context) => Events(eventType: 'Todays Events'),));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Events(eventType: 'Todays Events'),));
                     },
                     child: const Text('See all',style: TextStyle(
                         color: AppColors.primaryColor,
@@ -245,174 +317,69 @@ class _RepHomepageState extends State<RepHomepage> {
               ),
               const SizedBox(height: 10,),
               FutureBuilder(
-                  future: getEvents(),
-                  builder: (context,snapshot) {
-                    if(snapshot.connectionState == ConnectionState.waiting){
-                      return Center(child: CircularProgressIndicator(),);
-                    }else if(snapshot.hasError){
-                      return Center(child: Text('Some error occured !'),);
-                    }else if(snapshot.hasData){
-                      if(snapshot.data['todays'][0]['todayBirthday'].length == 0){
-                        return Text('No Birthdays Today');
-                      }else{
-                        var eventdata = snapshot.data['todays'][0]['todayBirthday'][0];
-                        return Stack(
-                          children: [
-                            Container(
+                future: getEvents(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Some error occurred!'));
+                  } else if (snapshot.hasData) {
+                    print('event data:${snapshot.data}');
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height:100,
+                              width:MediaQuery.of(context).size.width/1.9,
                               decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  borderRadius: BorderRadius.circular(6)
+                                color: AppColors.primaryColor,
+                                borderRadius: BorderRadius.circular(9)
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 25.0,top: 10,bottom: 10,right: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Hey !',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12),),
-                                    Text('Its ${eventdata['doc_name']} Birthday !',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12),),
-                                    const Text('Wish an all the Best',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12)),
-                                    const SizedBox(height: 30,),
-                                    Row(
-                                      children: [
-                                        CircleAvatar(radius: 25,child: Text('${eventdata['doc_name'][0].toString().toUpperCase()}'),),
-                                        SizedBox(width: 10,),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('${eventdata['doc_name']}',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12)),
-                                            Text('${eventdata['doc_qualification']}',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 9)),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10,),
-                                    SizedBox(
-                                      width: 130,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: AppColors.primaryColor2,
-                                            borderRadius: BorderRadius.circular(6)
-                                        ),
-                                        child: const Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Text('Notify me',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12)),
-                                              SizedBox(width: 10,),
-                                              Icon(Icons.notifications_active,color: AppColors.whiteColor,),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Text('${snapshot.data['todays']}'),
+                                  Text('Todays Birthdays : ${snapshot.data['todayEvents'][0]['todayBirthday'].length}',style: TextStyle(color: AppColors.whiteColor),),
+                                  Text('Todays Anniversarys : ${snapshot.data['todayEvents'][0]['todayAnniversary'].length}',style: TextStyle(color: AppColors.whiteColor),),
+                                ],
                               ),
                             ),
-                            Positioned(
-                              right: 0,
-                              top: 0,
-                              child: Container(
-                                height: 70,
-                                width: 100,
-                                decoration: const BoxDecoration(
-                                    color:AppColors.primaryColor2,
-                                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(21),topRight: Radius.circular(6))
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(15.0),
-                                  child: Image.asset('assets/icons/cake.png'),
-                                ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height:100,
+                              width:MediaQuery.of(context).size.width/1.9,
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                borderRadius: BorderRadius.circular(9)
                               ),
-                            )
-                          ],
-                        );
-                      }
-                      // return Text('${snapshot.data['todays'][0]}');
-                      // if(snapshot.data['todays'][0]['todayBirthday'].length ==0 || snapshot.data['upcoming'][0]['UpcomingEvents'].length == 0){
-                      //   return Text('No Events Today');
-                      // }else{
-                      //   var eventdata = snapshot.data['todays'][0];
-                      //   // return Stack(
-                      //   //   children: [
-                      //   //     // Text('${eventdata}'),
-                      //   //     // Container(
-                      //   //     //   decoration: BoxDecoration(
-                      //   //     //       color: AppColors.primaryColor,
-                      //   //     //       borderRadius: BorderRadius.circular(6)
-                      //   //     //   ),
-                      //   //     //   child: Padding(
-                      //   //     //     padding: const EdgeInsets.only(left: 25.0,top: 10,bottom: 10,right: 10),
-                      //   //     //     child: Column(
-                      //   //     //       crossAxisAlignment: CrossAxisAlignment.start,
-                      //   //     //       children: [
-                      //   //     //         const Text('Hey !',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12),),
-                      //   //     //         Text('Its ${eventdata['doc_name']} Birthday !',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12),),
-                      //   //     //         const Text('Wish an all the Best',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12)),
-                      //   //     //         const SizedBox(height: 30,),
-                      //   //     //         Row(
-                      //   //     //           children: [
-                      //   //     //             CircleAvatar(radius: 25,child: Text('${eventdata['doc_name'][0].toString().toUpperCase()}'),),
-                      //   //     //             SizedBox(width: 10,),
-                      //   //     //             Column(
-                      //   //     //               crossAxisAlignment: CrossAxisAlignment.start,
-                      //   //     //               children: [
-                      //   //     //                 Text('${eventdata['doc_name']}',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12)),
-                      //   //     //                 Text('${eventdata['doc_qualification']}',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 9)),
-                      //   //     //               ],
-                      //   //     //             )
-                      //   //     //           ],
-                      //   //     //         ),
-                      //   //     //         const SizedBox(height: 10,),
-                      //   //     //         SizedBox(
-                      //   //     //           width: 130,
-                      //   //     //           child: Container(
-                      //   //     //             decoration: BoxDecoration(
-                      //   //     //                 color: AppColors.primaryColor2,
-                      //   //     //                 borderRadius: BorderRadius.circular(6)
-                      //   //     //             ),
-                      //   //     //             child: const Padding(
-                      //   //     //               padding: EdgeInsets.all(8.0),
-                      //   //     //               child: Row(
-                      //   //     //                 mainAxisAlignment: MainAxisAlignment.center,
-                      //   //     //                 children: [
-                      //   //     //                   Text('Notify me',style: TextStyle(fontWeight: FontWeight.w500,color: AppColors.whiteColor,fontSize: 12)),
-                      //   //     //                   SizedBox(width: 10,),
-                      //   //     //                   Icon(Icons.notifications_active,color: AppColors.whiteColor,),
-                      //   //     //                 ],
-                      //   //     //               ),
-                      //   //     //             ),
-                      //   //     //           ),
-                      //   //     //         )
-                      //   //     //       ],
-                      //   //     //     ),
-                      //   //     //   ),
-                      //   //     // ),
-                      //   //     // Positioned(
-                      //   //     //   right: 0,
-                      //   //     //   top: 0,
-                      //   //     //   child: Container(
-                      //   //     //     height: 70,
-                      //   //     //     width: 100,
-                      //   //     //     decoration: const BoxDecoration(
-                      //   //     //         color:AppColors.primaryColor2,
-                      //   //     //         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(21),topRight: Radius.circular(6))
-                      //   //     //     ),
-                      //   //     //     child: Padding(
-                      //   //     //       padding: const EdgeInsets.all(15.0),
-                      //   //     //       child: Image.asset('assets/icons/cake.png'),
-                      //   //     //     ),
-                      //   //     //   ),
-                      //   //     // )
-                      //   //   ],
-                      //   // );
-                      //   return Text('data');
-                      // }
-                    }
-                    return Center(child: Text('Some error occured , Please restart your application !'),);
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Text('${snapshot.data['todays']}'),
+                                  Text('Upcoming Birthdays : ${snapshot.data['UpcomingEvents'][0]['BirthdayNotification'].length}',style: TextStyle(color: AppColors.whiteColor),),
+                                  Text('Upcoming Anniversarys : ${snapshot.data['UpcomingEvents'][0]['AnniversaryNotification'].length}',style: TextStyle(color: AppColors.whiteColor),),
+                                ],
+                              ),
+                            ),
+                          ),
+
+
+                        ],
+                      ),
+                    );
+
                   }
+                  return Center(child: Text('Some error occurred, Please restart your application!'));
+                },
               ),
+
               const SizedBox(height: 20,),
 
               // Row(
@@ -524,6 +491,7 @@ class _RepHomepageState extends State<RepHomepage> {
               //     }
               // ),
               // const SizedBox(height: 70,)
+
 
             ],
           ),

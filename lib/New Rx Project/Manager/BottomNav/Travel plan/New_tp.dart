@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'My_TP.dart'; // Ensure this import is correct and matches your project structure
@@ -39,10 +40,12 @@ class _NewTravelPlanState extends State<NewTravelPlan> {
   }
 
   Future<void> _loadAreas() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    int? userId = int.parse(preferences.getString('userId').toString());
     try {
       final response = await http.post(
         Uri.parse('http://52.66.145.37:3004/user/listArea'),
-        body: json.encode({"userId": 1}),
+        body: json.encode({"userId":userId }),
         headers: {"Content-Type": "application/json"},
       );
 
