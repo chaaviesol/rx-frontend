@@ -326,7 +326,7 @@ class _HomeViewRepState extends State<HomeViewRep> {
                               print('navigate to home search rep');
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => HomesearchRep()),
+                                MaterialPageRoute(builder: (context) => HomesearchRep(searachString: _searchController.text,)),
                               );
                             },
                             child: Container(

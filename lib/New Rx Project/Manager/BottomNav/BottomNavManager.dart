@@ -5,6 +5,7 @@ import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20Approvals
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20lists/My_list.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/TpDoctorListPage.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Doctors_mngr/Add%20Doctor.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Rep/Bottom%20navigation%20rep/Leave%20and%20expense/Leave%20and%20expense.dart';
 import 'package:rx_route_new/app_colors.dart';
 
 import '../../../constants/styles.dart';
@@ -90,7 +91,9 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
                       _buildActionButton('Add Chemist', Adding_chemistmngr()),
                       SizedBox(height: 10),
                       _buildActionButton('Add Employee', Adding_employee_mngr()),
-                      SizedBox(height: 80),
+                      SizedBox(height: 10),
+                      _buildActionButton('Leave & Expense', MyLeaveandexpense()),
+                      SizedBox(height: 80,)
                     ],
                   ),
                 ),

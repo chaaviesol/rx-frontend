@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rx_route_new/res/app_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../app_colors.dart';
 import '../../../../constants/styles.dart';
 import 'Doctor_details/doctor_detials.dart';
 
@@ -160,14 +161,19 @@ class _DoctorListState extends State<DoctorList> {
                 );
               },
               leading: CircleAvatar(
-                child: Text(doctor['firstName'][0]),
+                backgroundColor: doctor['visit_type'] == 'core'
+                    ? AppColors.tilecolor2
+                    : doctor['visit_type'] == 'supercore'
+                    ? AppColors.tilecolor1
+                    : AppColors.tilecolor3,
+                child: Text(doctor['firstName'][3],style: TextStyle(color: AppColors.whiteColor),),
               ),
               title: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 5,
-                    backgroundColor: _getVisitTypeColor(visitType),
-                  ),
+                  // CircleAvatar(
+                  //   radius: 5,
+                  //   backgroundColor: _getVisitTypeColor(visitType),
+                  // ),
                   const SizedBox(width: 10),
                   Text('${doctor['firstName']} ${doctor['lastName']}', style: text50014black),
                 ],

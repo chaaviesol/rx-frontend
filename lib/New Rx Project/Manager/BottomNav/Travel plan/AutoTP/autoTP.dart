@@ -52,55 +52,56 @@ class _AutotpState extends State<Autotp> {
       ),
       body: Column(
         children: [
-          // TableCalendar widget
-          TableCalendar(
-            focusedDay: _selectedDate,
-            firstDay: DateTime.utc(2023, 1, 1),
-            lastDay: DateTime.utc(2030, 12, 31),
-            selectedDayPredicate: (day) => isSameDay(day, _selectedDate),
-            eventLoader: (day) => _events[day] ?? [],
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDate = selectedDay;
-              });
-              _updateSelectedDoctors(selectedDay);
-            },
-            calendarFormat: CalendarFormat.month,
-            calendarStyle: const CalendarStyle(
-              todayDecoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-              selectedDecoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-              markerDecoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-            ),
-            headerStyle: const HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Display list of doctors for the selected date
-          Expanded(
-            child: _selectedDoctors.isNotEmpty
-                ? ListView.builder(
-              itemCount: _selectedDoctors.length,
-              itemBuilder: (context, index) {
-                return Text('${_selectedDoctors}');
-                // var doctor = _selectedDoctors[index];
-                // return Card(
-                //   margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                //   child: ListTile(
-                //     leading: CircleAvatar(
-                //       backgroundColor: Colors.blue,
-                //       child: Text(doctor['doctor'][0]), // First letter of doctor name
-                //     ),
-                //     title: Text(doctor['doctor']),
-                //     subtitle: Text(doctor['address']['address']),
-                //     trailing: Text(doctor['category']),
-                //   ),
-                // );
-              },
-            )
-                : const Center(child: Text('No doctors for the selected date')),
-          ),
+          Text('${widget.data}')
+          // // TableCalendar widget
+          // TableCalendar(
+          //   focusedDay: _selectedDate,
+          //   firstDay: DateTime.utc(2023, 1, 1),
+          //   lastDay: DateTime.utc(2030, 12, 31),
+          //   selectedDayPredicate: (day) => isSameDay(day, _selectedDate),
+          //   eventLoader: (day) => _events[day] ?? [],
+          //   onDaySelected: (selectedDay, focusedDay) {
+          //     setState(() {
+          //       _selectedDate = selectedDay;
+          //     });
+          //     _updateSelectedDoctors(selectedDay);
+          //   },
+          //   calendarFormat: CalendarFormat.month,
+          //   calendarStyle: const CalendarStyle(
+          //     todayDecoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+          //     selectedDecoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+          //     markerDecoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+          //   ),
+          //   headerStyle: const HeaderStyle(
+          //     formatButtonVisible: false,
+          //     titleCentered: true,
+          //   ),
+          // ),
+          // const SizedBox(height: 16),
+          // // Display list of doctors for the selected date
+          // Expanded(
+          //   child: _selectedDoctors.isNotEmpty
+          //       ? ListView.builder(
+          //     itemCount: _selectedDoctors.length,
+          //     itemBuilder: (context, index) {
+          //       return Text('${_selectedDoctors}');
+          //       // var doctor = _selectedDoctors[index];
+          //       // return Card(
+          //       //   margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          //       //   child: ListTile(
+          //       //     leading: CircleAvatar(
+          //       //       backgroundColor: Colors.blue,
+          //       //       child: Text(doctor['doctor'][0]), // First letter of doctor name
+          //       //     ),
+          //       //     title: Text(doctor['doctor']),
+          //       //     subtitle: Text(doctor['address']['address']),
+          //       //     trailing: Text(doctor['category']),
+          //       //   ),
+          //       // );
+          //     },
+          //   )
+          //       : const Center(child: Text('No doctors for the selected date')),
+          // ),
         ],
       ),
     );

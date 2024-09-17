@@ -95,4 +95,7 @@ class AppUrl{
 
   static var doctorsInTp = '$baseUrl/user/doctorsInTp';
 
+  //travelplan
+
+
 }

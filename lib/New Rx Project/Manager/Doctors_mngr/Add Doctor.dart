@@ -39,6 +39,9 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   final TextEditingController _headQuaters = TextEditingController();
   final TextEditingController _exstation = TextEditingController();
 
+  bool basicInfo = true;
+  bool workInfo = true;
+
 
   late Future<ProductResponse> _futureProducts;
   TextEditingController _textProductController = TextEditingController();
@@ -192,132 +195,151 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
         padding: const EdgeInsets.all(15.0),
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10,),
-              Text('Basic Information ',style: text50014black,),
+              InkWell(
+                onTap: (){
+                  setState(() {
+                    basicInfo = !basicInfo;
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Basic Information ',style: text50014black,),
+                   basicInfo ? Icon(Icons.arrow_drop_up) : Icon(Icons.arrow_drop_down),
+                  ],
+                ),
+              ),
               SizedBox(height: 10,),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Name',style: text50012black,),
-                  SizedBox(height: 10,),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: AppColors.textfiedlColor,
-                        borderRadius: BorderRadius.circular(6)
-                    ),
-                    child: TextFormField(
-                      controller: _nameController,
+                  basicInfo ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     Text('Name',style: text50012black,),
+                     SizedBox(height: 10,),
+                     Container(
+                       decoration: BoxDecoration(
+                           color: AppColors.textfiedlColor,
+                           borderRadius: BorderRadius.circular(6)
+                       ),
+                       child: TextFormField(
+                         controller: _nameController,
 
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.only(left: 10),
-                          hintText: 'Name',
-                          hintStyle: text50010tcolor2,
-                          counterText: ''
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10,),
+                         decoration: InputDecoration(
+                             border: InputBorder.none,
+                             contentPadding: EdgeInsets.only(left: 10),
+                             hintText: 'Name',
+                             hintStyle: text50010tcolor2,
+                             counterText: ''
+                         ),
+                       ),
+                     ),
+                     SizedBox(height: 10,),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Mobile',style: text50012black,),
-                            SizedBox(height: 10,),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: AppColors.textfiedlColor,
-                                  borderRadius: BorderRadius.circular(6)
-                              ),
-                              child: TextFormField(
-                                controller: _mobileController,
-                                keyboardType: TextInputType.phone,
-                                maxLength: 10,
-                                decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 10),
-                                    border: InputBorder.none,
-                                    hintText: 'Mobile Number',
-                                    hintStyle: text50010tcolor2,
-                                    counterText: ''
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 10,),
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Gender',style: text50012black,),
-                            SizedBox(height: 10,),
-                            Container(
-                                decoration: BoxDecoration(
-                                    color: AppColors.textfiedlColor,
-                                    borderRadius: BorderRadius.circular(6)
-                                ),
-                                child: CustomDropdown(
-                                  options: ['Male','Female','Other'],
-                                  onChanged: (value) {
-                                    _gender = value.toString();
-                                  },
-                                )
-                            ),
+                     Row(
+                       children: [
+                         Expanded(
+                           flex: 3,
+                           child: Column(
+                             crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               Text('Mobile',style: text50012black,),
+                               SizedBox(height: 10,),
+                               Container(
+                                 decoration: BoxDecoration(
+                                     color: AppColors.textfiedlColor,
+                                     borderRadius: BorderRadius.circular(6)
+                                 ),
+                                 child: TextFormField(
+                                   controller: _mobileController,
+                                   keyboardType: TextInputType.phone,
+                                   maxLength: 10,
+                                   decoration: InputDecoration(
+                                       contentPadding: EdgeInsets.only(left: 10),
+                                       border: InputBorder.none,
+                                       hintText: 'Mobile Number',
+                                       hintStyle: text50010tcolor2,
+                                       counterText: ''
+                                   ),
+                                 ),
+                               )
+                             ],
+                           ),
+                         ),
+                         SizedBox(width: 10,),
+                         Expanded(
+                           flex: 3,
+                           child: Column(
+                             crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               Text('Gender',style: text50012black,),
+                               SizedBox(height: 10,),
+                               Container(
+                                   decoration: BoxDecoration(
+                                       color: AppColors.textfiedlColor,
+                                       borderRadius: BorderRadius.circular(6)
+                                   ),
+                                   child: CustomDropdown(
+                                     options: ['Male','Female','Other'],
+                                     onChanged: (value) {
+                                       _gender = value.toString();
+                                     },
+                                   )
+                               ),
 
-                          ],
-                        ),
-                      ),
+                             ],
+                           ),
+                         ),
 
-                    ],
-                  ),
-                  SizedBox(height: 10,),
+                       ],
+                     ),
+                     SizedBox(height: 10,),
 
-                  Text('Specialistaion',style: text50012black,),
-                  SizedBox(height: 10,),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: AppColors.textfiedlColor,
-                        borderRadius: BorderRadius.circular(6)
-                    ),
-                    child: TextFormField(
-                       controller: _specialistaionController,
+                     Text('Specialistaion',style: text50012black,),
+                     SizedBox(height: 10,),
+                     Container(
+                       decoration: BoxDecoration(
+                           color: AppColors.textfiedlColor,
+                           borderRadius: BorderRadius.circular(6)
+                       ),
+                       child: TextFormField(
+                         controller: _specialistaionController,
 
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.only(left: 10),
-                          hintText: 'Specialistaion',
-                          hintStyle: text50010tcolor2,
-                          counterText: ''
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10,),
-                  Text('Qualification',style: text50012black,),
-                  SizedBox(height: 10,),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: AppColors.textfiedlColor,
-                        borderRadius: BorderRadius.circular(6)
-                    ),
-                    child: TextFormField(
-                      controller: _qualificationController,
+                         decoration: InputDecoration(
+                             border: InputBorder.none,
+                             contentPadding: EdgeInsets.only(left: 10),
+                             hintText: 'Specialistaion',
+                             hintStyle: text50010tcolor2,
+                             counterText: ''
+                         ),
+                       ),
+                     ),
+                     SizedBox(height: 10,),
+                     Text('Qualification',style: text50012black,),
+                     SizedBox(height: 10,),
+                     Container(
+                       decoration: BoxDecoration(
+                           color: AppColors.textfiedlColor,
+                           borderRadius: BorderRadius.circular(6)
+                       ),
+                       child: TextFormField(
+                         controller: _qualificationController,
 
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.only(left: 10),
-                          hintText: 'Qualification',
-                          hintStyle: text50010tcolor2,
-                          counterText: ''
-                      ),
-                    ),
-                  ),
+                         decoration: InputDecoration(
+                             border: InputBorder.none,
+                             contentPadding: EdgeInsets.only(left: 10),
+                             hintText: 'Qualification',
+                             hintStyle: text50010tcolor2,
+                             counterText: ''
+                         ),
+                       ),
+                     ),
+                   ],
+                 ):Text(''),
                   SizedBox(height: 10,),
                   Text('Work information ',style: text50014black,),
                   SizedBox(height: 10,),
@@ -329,9 +351,9 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildVisitBox(label: 'Important', value: 4, color: Colors.yellow),
-                          _buildVisitBox(label: 'Core', value: 8, color: Colors.green),
-                          _buildVisitBox(label: 'Super Core', value: 12, color: Colors.red),
+                          _buildVisitBox(label: 'Important', value: 4, color: AppColors.tilecolor1),
+                          _buildVisitBox(label: 'Core', value: 8, color: AppColors.tilecolor2),
+                          _buildVisitBox(label: 'Super Core', value: 12, color: AppColors.tilecolor3),
                         ],
                       ),
                     ],
@@ -560,6 +582,14 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
     ],
     ),
     ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Products',style: text50012black,),
+                          SizedBox(height: 10,),
+                          productwidget1(context),
+                        ],
+                      ),
 
                       SizedBox(height: 10),
                       Text('Areas', style: text50012black),
@@ -652,23 +682,26 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                         crossAxisAlignment: CrossAxisAlignment.center, // Align children in the center vertically
                         children: [
                           // Button on the left side
-                          SizedBox(
-                            height: 50, // Set the height of the button
-                            width: 50,  // Set the width of the button
-                            child: ElevatedButton(
+                          Padding(
+                            padding: const EdgeInsets.only(top: 25.0),
+                            child: SizedBox(
+                              height: 50, // Set the height of the button
+                              width: 50,  // Set the width of the button
+                              child: ElevatedButton(
 
-                              onPressed:  _getCurrentLocation,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.textfiedlColor, // Button color
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6), // Adjust button corner radius
+                                onPressed:  _getCurrentLocation,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.textfiedlColor, // Button color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6), // Adjust button corner radius
+                                  ),
+                                  padding: EdgeInsets.zero, // Remove default padding
                                 ),
-                                padding: EdgeInsets.zero, // Remove default padding
-                              ),
-                              child: Icon(
-                                CupertinoIcons.location_solid,
-                                color: AppColors.primaryColor,
-                                size: 24, // Adjust icon size
+                                child: Icon(
+                                  CupertinoIcons.location_solid,
+                                  color: AppColors.primaryColor,
+                                  size: 24, // Adjust icon size
+                                ),
                               ),
                             ),
                           ),
@@ -793,7 +826,6 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
     return GestureDetector(
       onTap: () => _setSelectedVisits(value),
       child: Container(
-
         height: 50,
         width: MediaQuery.of(context).size.width/3.5,
         decoration: BoxDecoration(
@@ -804,18 +836,138 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
             width: 2,
           ),
         ),
-        child: Center(
-          child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              CircleAvatar(radius: 5,backgroundColor: color,),
-              Text(
-                label,
-                style: text50012black
-              ),
-            ],
-          ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(0),
+              child: Container(
+                width: 20,
+                decoration: BoxDecoration(
+                color: color,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(6),bottomLeft: Radius.circular(6))
+              ),),
+            ),
+            SizedBox(width: 10,),
+            Text(
+              label,
+              style: text50012black
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  @override
+  Widget productwidget1(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () {
+            _showProductSelectionDialog(context);
+          },
+          child: IgnorePointer(
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.textfiedlColor,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Select Products',
+                  hintStyle: text50010tcolor2,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                ),
+                controller: _textProductController,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 16),
+        Wrap(
+          spacing: 8.0,
+          children: _selectedProducts.map((product) {
+            return Chip(
+              label: Text(product.productName.first.name),
+              onDeleted: () {
+                setState(() {
+                  _selectedProducts.remove(product);
+                  _updateSelectedProductsText();
+                });
+              },
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+  void _showProductSelectionDialog(BuildContext context) async {
+    ProductResponse productResponse = await _futureProducts;
+
+    List<ProductData> result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, setState) {
+            return AlertDialog(
+              title: Text('Select Products'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: productResponse.data.map((product) {
+                    final isSelected = _selectedProducts.contains(product);
+                    return ListTile(
+                      title: Text(product.productName.first.name),
+                      leading: isSelected
+                          ? Icon(Icons.check_circle, color: Colors.green)
+                          : Icon(Icons.circle_outlined, color: Colors.grey),
+                      onTap: () {
+                        setState(() {
+                          if (isSelected) {
+                            _selectedProducts.remove(product);
+                          } else {
+                            _selectedProducts.add(product);
+                          }
+                          _updateSelectedProductsText();
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(null);
+                  },
+                  child: Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(_selectedProducts);
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedProducts = result;
+        _updateSelectedProductsText();
+      });
+    }
+  }
+  void _updateSelectedProductsText() {
+    setState(() {
+      _selectedProductsText = _selectedProducts.map((c) => c.productName.first.name).join(', ');
+      _textProductController.text = _selectedProductsText;
+    });
+    // This function is kept empty as we are not using the text directly.
   }
 }

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:rx_route_new/constants/styles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChemistList extends StatefulWidget {
   const ChemistList({super.key});
@@ -68,30 +69,59 @@ class _ChemistListState extends State<ChemistList> {
   }
 
   Future<void> _fetchChemists() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+    var requestData = {
+      "userId": uniqueID
+    };
+    final url = 'http://52.66.145.37:3004/user/addedChemist';
 
-    final url = 'http://52.66.145.37:3004/rep/get_chemist';
-    final response = await http.get(Uri.parse(url));
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: jsonEncode(requestData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data['success']) {
-        setState(() {
-          _chemists = List<Map<String, dynamic>>.from(data['data']);
-          _isLoading = false;
-        });
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == true) {
+          List<Map<String, dynamic>> parsedChemists = [];
+
+          // Flatten the data list, extracting each chemist entry
+          for (var chemistList in responseData['data']) {
+            for (var chemist in chemistList) {
+              parsedChemists.add(chemist);
+            }
+          }
+
+          setState(() {
+            _chemists = parsedChemists;
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _errorMessage = responseData['message'];
+            _isLoading = false;
+          });
+        }
       } else {
         setState(() {
-          _errorMessage = data['message'];
+          _errorMessage = 'Failed to load data';
           _isLoading = false;
         });
       }
-    } else {
+    } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to load data';
+        _errorMessage = 'An error occurred: $e';
         _isLoading = false;
       });
     }
   }
+
 
   void _handleMenuAction(String action, dynamic chemist) {
     switch (action) {
@@ -121,8 +151,10 @@ class _ChemistListState extends State<ChemistList> {
             final chemist = _chemists[index];
             print('chemist list is:$_chemists');
             return ListTile(
-              title: Text(chemist['building_name'] ?? 'No Building Name',style: text50014black,),
-              subtitle: Text(chemist['address'] ?? 'No Address',style: text50012black,),
+              // title: Text(chemist['building_name'] ?? 'No Building Name',style: text50014black,),
+              title: Text(chemist['chemist'][0]['address'] ?? 'No Building Name',style: text50014black,),
+              // subtitle: Text(chemist['address'] ?? 'No Address',style: text50012black,),
+              subtitle: Text(chemist['chemist'][0]['pincode'] ?? 'No Address',style: text50012black,),
               trailing: PopupMenuButton<String>(
                 onSelected: (action) => _handleMenuAction(action, chemist),
                 itemBuilder: (BuildContext context) {

@@ -48,7 +48,7 @@ class _MyLeaveandexpenseState extends State<MyLeaveandexpense> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false,
+      appBar: AppBar(automaticallyImplyLeading: true,
         backgroundColor: AppColors.whiteColor,
         // leading: IconButton(
         //   icon: CircleAvatar(

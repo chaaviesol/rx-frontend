@@ -94,10 +94,12 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
     if (response.statusCode == 200) {
       // Successful response
       var responseData = jsonDecode(response.body);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: '${responseData}',),));
-      Utils.flushBarErrorMessage('${responseData['data']['message']}', context);
+      // Utils.flushBarErrorMessage('${responseData['data']['message']}', context);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: '${responseData['data']['data']}',),));
+      // Utils.flushBarErrorMessage('${responseData['data']['message']}', context);
       print('Response data: ${response.body}');
-      return responseData;
+      print('Response datas: ${responseData['data']['data']}');
+      return responseData['data'];
       // Handle successful response here
     } else {
       var responseData = jsonDecode(response.body);
@@ -203,6 +205,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
         // Dismiss loader
         Navigator.of(context).pop(); // Close the loader dialog
         // Show success message and return to the previous page
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: '${data}',),));
         Flushbar(
           message: "Travel plan generated successfully for $selectedMonth!",
           icon: Icon(

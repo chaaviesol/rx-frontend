@@ -10,13 +10,15 @@ import '../../../res/app_url.dart';
 import '../Doctor/doctor_details.dart';
 
 class HomesearchRep extends StatefulWidget {
-  const HomesearchRep({super.key});
+  String? searachString;
+  HomesearchRep({this.searachString,super.key});
 
   @override
   State<HomesearchRep> createState() => _HomesearchRepState();
 }
 
 class _HomesearchRepState extends State<HomesearchRep> {
+
 
   final List<Color> pastelColors = [
     Color(0xFFB39DDB), // Light Purple
@@ -131,6 +133,7 @@ class _HomesearchRepState extends State<HomesearchRep> {
   @override
   void initState() {
     super.initState();
+    _searchController.text = widget.searachString.toString();
     _searchController.addListener(_onSearchChanged);
     getdoctors(); // Fetch the initial list of doctors
     WidgetsBinding.instance.addPostFrameCallback((_){
@@ -220,17 +223,17 @@ class _HomesearchRepState extends State<HomesearchRep> {
                           var doctor = list_of_doctors[index];
                           return InkWell(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(
-                                builder: (context) => DoctorDetails(doctorID: doctor['id']),
-                              ));
+                              // Navigator.push(context, MaterialPageRoute(
+                              //   builder: (context) => DoctorDetails(doctorID: doctor['id']),
+                              // ));
                             },
                             child: ListTile(
                               leading: CircleAvatar(
-                                backgroundColor: getPastelColor(doctor['doc_name']),
-                                child: Text("${doctor['doc_name'][0]}"),
+                                backgroundColor: pastelColors[index],
+                                child: Text('${doctor['firstName'][3]}'),
                               ),
-                              title: Text(doctor['doc_name']),
-                              subtitle: Text(doctor['specialization']),
+                              title: Text('${doctor['firstName']}'),
+                              // subtitle: Text(doctor['specialization']),
                             ),
                           );
                         },

@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:rx_route_new/New%20Rx%20Project/Manager/Doctors_mngr/Add%20Doctor.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Rep/Rep%20Home%20page.dart';
+import 'package:rx_route_new/View/homeView/Doctor/add_doctor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Util/Routes/routes_name.dart';
@@ -259,6 +261,11 @@ class _LoginPageNewState extends State<LoginPageNew> {
                     ),
                   ],
                 ),
+                InkWell(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => AddDoctor(),));
+                  },
+                    child: Text('data')),
                 const SizedBox(height: 10),
                 Form(
                   key: _formKey,
