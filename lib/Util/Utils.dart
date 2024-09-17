@@ -133,6 +133,19 @@ class Utils{
       throw 'Could not launch $launchUri';
     }
   }
+// //web credential storing
+//   static void saveLoginState(String token) {
+//     window.localStorage['token'] = token; // Store token in localStorage
+//   }
+//
+//   static bool isLoggedIn() {
+//     String? token = window.localStorage['token'];
+//     return token != null;
+//   }
+//
+//   static void logout() {
+//     window.localStorage.remove('token');
+//   }
 
 
 }

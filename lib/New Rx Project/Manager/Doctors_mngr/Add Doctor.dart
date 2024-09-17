@@ -7,10 +7,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:rx_route_new/app_colors.dart';
 import 'package:http/http.dart' as http;
+import 'package:rx_route_new/model/scheduleModel.dart';
 
 import '../../../View/homeView/Doctor/add_doctor.dart';
 import '../../../constants/styles.dart';
 import '../../../defaultButton.dart';
+import '../../../model/doctorModel.dart';
 import '../../../res/app_url.dart';
 import '../../../widgets/customDropDown.dart';
 
@@ -23,11 +25,14 @@ class Add_doctor_mngr extends StatefulWidget {
 
 class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   @override
+  //schedule section
+  List<ScheduleNew> schedules = [ScheduleNew()];
   String _gender = '';
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _qualificationController = TextEditingController();
+  final TextEditingController _qualificationController =
+      TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _nationalityController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
@@ -35,19 +40,18 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   final TextEditingController _designationController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _specialistaionController = TextEditingController();
+  final TextEditingController _specialistaionController =
+      TextEditingController();
   final TextEditingController _headQuaters = TextEditingController();
   final TextEditingController _exstation = TextEditingController();
 
   bool basicInfo = true;
   bool workInfo = true;
 
-
   late Future<ProductResponse> _futureProducts;
   TextEditingController _textProductController = TextEditingController();
   List<ProductData> _selectedProducts = [];
   String _selectedProductsText = '';
-
 
   Future<ProductResponse> _fetchProducts() async {
     String url = AppUrl.list_products;
@@ -56,15 +60,14 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       if (response.statusCode == 200) {
         return ProductResponse.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception('Failed to load data (status code: ${response.statusCode})');
+        throw Exception(
+            'Failed to load data (status code: ${response.statusCode})');
       }
     } catch (e) {
       print('Error fetching products: $e');
       throw Exception('Failed to load data: $e');
     }
   }
-
-
 
   final TextEditingController _weddingDateController = TextEditingController();
 
@@ -80,6 +83,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       _visitsController.text = value.toString();
     });
   }
+
   final TextEditingController _latitudeController = TextEditingController();
   final TextEditingController _longitudeController = TextEditingController();
 
@@ -90,11 +94,41 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
     super.dispose();
   }
 
-
   List<Map<String, dynamic>> _headquartersData = [];
   Map<String, List<String>> _headquartersMap = {};
   String? _selectedHeadquarters;
   bool _isLoading = true;
+  List<String> _specializations = [];
+
+  Future<dynamic> fetchSpecializations(String query) async {
+    if (query.isEmpty) return;
+    setState(() {
+      _isLoading = true;
+    });
+    String? url = AppUrl.specialisation;
+    try {
+      var response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data'] as List;
+        setState(() {
+          _specializations =
+              data.map((item) => item['department'] as String).toList();
+        });
+      } else {
+        setState(() {
+          _specializations = [];
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _specializations.clear();
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -103,7 +137,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   }
 
   Future<void> _fetchHeadquarters() async {
-    final response = await http.get(Uri.parse('http://52.66.145.37:3004/rep/get_headquarters'));
+    final response = await http
+        .get(Uri.parse('http://52.66.145.37:3004/rep/get_headquarters'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -112,7 +147,10 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
           _headquartersData = List<Map<String, dynamic>>.from(data['data']);
           _headquartersMap = {
             for (var item in _headquartersData)
-              item['headquarter_name']: (item['sub_headquarter'] as String).split('\n').where((sub) => sub.isNotEmpty).toList(),
+              item['headquarter_name']: (item['sub_headquarter'] as String)
+                  .split('\n')
+                  .where((sub) => sub.isNotEmpty)
+                  .toList(),
           };
           _isLoading = false;
         });
@@ -124,24 +162,17 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
 
   List<String> _areasList = ['palakkad'];
 
-
-
   void _addArea() {
     setState(() {
       _areasList.add('');
     });
   }
 
-
-
   void _removeArea(int index) {
     setState(() {
       _areasList.removeAt(index);
     });
   }
-
-
-
 
   Future<void> _getCurrentLocation() async {
     try {
@@ -183,23 +214,36 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(leading: IconButton(
-        icon: CircleAvatar(backgroundColor: Colors.white,child: Icon(Icons.arrow_back_ios_rounded,color: AppColors.primaryColor,)), // Replace with your desired icon
-        onPressed: () {
-          // Handle the button press
-          Navigator.pop(context);
-        },
-      ),centerTitle: true,title: Text('Add Doctor',style: text40016black,),),
-
+      appBar: AppBar(
+        leading: IconButton(
+          icon: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                color: AppColors.primaryColor,
+              )), // Replace with your desired icon
+          onPressed: () {
+            // Handle the button press
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        title: Text(
+          'Add Doctor',
+          style: text40016black,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
               InkWell(
-                onTap: (){
+                onTap: () {
                   setState(() {
                     basicInfo = !basicInfo;
                   });
@@ -207,142 +251,221 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Basic Information ',style: text50014black,),
-                   basicInfo ? Icon(Icons.arrow_drop_up) : Icon(Icons.arrow_drop_down),
+                    Text(
+                      'Basic Information ',
+                      style: text50014black,
+                    ),
+                    basicInfo
+                        ? Icon(Icons.arrow_drop_up)
+                        : Icon(Icons.arrow_drop_down),
                   ],
                 ),
               ),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  basicInfo ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                   children: [
-                     Text('Name',style: text50012black,),
-                     SizedBox(height: 10,),
-                     Container(
-                       decoration: BoxDecoration(
-                           color: AppColors.textfiedlColor,
-                           borderRadius: BorderRadius.circular(6)
-                       ),
-                       child: TextFormField(
-                         controller: _nameController,
-
-                         decoration: InputDecoration(
-                             border: InputBorder.none,
-                             contentPadding: EdgeInsets.only(left: 10),
-                             hintText: 'Name',
-                             hintStyle: text50010tcolor2,
-                             counterText: ''
-                         ),
-                       ),
-                     ),
-                     SizedBox(height: 10,),
-
-                     Row(
-                       children: [
-                         Expanded(
-                           flex: 3,
-                           child: Column(
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                             children: [
-                               Text('Mobile',style: text50012black,),
-                               SizedBox(height: 10,),
-                               Container(
-                                 decoration: BoxDecoration(
-                                     color: AppColors.textfiedlColor,
-                                     borderRadius: BorderRadius.circular(6)
-                                 ),
-                                 child: TextFormField(
-                                   controller: _mobileController,
-                                   keyboardType: TextInputType.phone,
-                                   maxLength: 10,
-                                   decoration: InputDecoration(
-                                       contentPadding: EdgeInsets.only(left: 10),
-                                       border: InputBorder.none,
-                                       hintText: 'Mobile Number',
-                                       hintStyle: text50010tcolor2,
-                                       counterText: ''
-                                   ),
-                                 ),
-                               )
-                             ],
-                           ),
-                         ),
-                         SizedBox(width: 10,),
-                         Expanded(
-                           flex: 3,
-                           child: Column(
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                             children: [
-                               Text('Gender',style: text50012black,),
-                               SizedBox(height: 10,),
-                               Container(
-                                   decoration: BoxDecoration(
-                                       color: AppColors.textfiedlColor,
-                                       borderRadius: BorderRadius.circular(6)
-                                   ),
-                                   child: CustomDropdown(
-                                     options: ['Male','Female','Other'],
-                                     onChanged: (value) {
-                                       _gender = value.toString();
-                                     },
-                                   )
-                               ),
-
-                             ],
-                           ),
-                         ),
-
-                       ],
-                     ),
-                     SizedBox(height: 10,),
-
-                     Text('Specialistaion',style: text50012black,),
-                     SizedBox(height: 10,),
-                     Container(
-                       decoration: BoxDecoration(
-                           color: AppColors.textfiedlColor,
-                           borderRadius: BorderRadius.circular(6)
-                       ),
-                       child: TextFormField(
-                         controller: _specialistaionController,
-
-                         decoration: InputDecoration(
-                             border: InputBorder.none,
-                             contentPadding: EdgeInsets.only(left: 10),
-                             hintText: 'Specialistaion',
-                             hintStyle: text50010tcolor2,
-                             counterText: ''
-                         ),
-                       ),
-                     ),
-                     SizedBox(height: 10,),
-                     Text('Qualification',style: text50012black,),
-                     SizedBox(height: 10,),
-                     Container(
-                       decoration: BoxDecoration(
-                           color: AppColors.textfiedlColor,
-                           borderRadius: BorderRadius.circular(6)
-                       ),
-                       child: TextFormField(
-                         controller: _qualificationController,
-
-                         decoration: InputDecoration(
-                             border: InputBorder.none,
-                             contentPadding: EdgeInsets.only(left: 10),
-                             hintText: 'Qualification',
-                             hintStyle: text50010tcolor2,
-                             counterText: ''
-                         ),
-                       ),
-                     ),
-                   ],
-                 ):Text(''),
-                  SizedBox(height: 10,),
-                  Text('Work information ',style: text50014black,),
-                  SizedBox(height: 10,),
+                  basicInfo
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Name',
+                              style: text50012black,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: AppColors.textfiedlColor,
+                                  borderRadius: BorderRadius.circular(6)),
+                              child: TextFormField(
+                                controller: _nameController,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.only(left: 10),
+                                    hintText: 'Name',
+                                    hintStyle: text50010tcolor2,
+                                    counterText: ''),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Mobile',
+                                        style: text50012black,
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: AppColors.textfiedlColor,
+                                            borderRadius:
+                                                BorderRadius.circular(6)),
+                                        child: TextFormField(
+                                          controller: _mobileController,
+                                          keyboardType: TextInputType.phone,
+                                          maxLength: 10,
+                                          decoration: InputDecoration(
+                                              contentPadding:
+                                                  EdgeInsets.only(left: 10),
+                                              border: InputBorder.none,
+                                              hintText: 'Mobile Number',
+                                              hintStyle: text50010tcolor2,
+                                              counterText: ''),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Gender',
+                                        style: text50012black,
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                          decoration: BoxDecoration(
+                                              color: AppColors.textfiedlColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(6)),
+                                          child: CustomDropdown(
+                                            options: [
+                                              'Male',
+                                              'Female',
+                                              'Other'
+                                            ],
+                                            onChanged: (value) {
+                                              _gender = value.toString();
+                                            },
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Specialisation', style: text50012black),
+                                SizedBox(height: 10),
+                                Autocomplete<String>(
+                                  optionsBuilder:
+                                      (TextEditingValue textEditingValue) {
+                                    if (textEditingValue.text.isEmpty) {
+                                      return const Iterable<String>.empty();
+                                    } else {
+                                      fetchSpecializations(
+                                          textEditingValue.text);
+                                      return _specializations.where((option) {
+                                        return option.toLowerCase().contains(
+                                            textEditingValue.text
+                                                .toLowerCase());
+                                      });
+                                    }
+                                  },
+                                  onSelected: (String selection) {
+                                    _specialistaionController.text = selection;
+                                  },
+                                  fieldViewBuilder: (context, controller,
+                                      focusNode, onEditingComplete) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color: AppColors.textfiedlColor,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: TextFormField(
+                                        controller: controller,
+                                        focusNode: focusNode,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          contentPadding:
+                                              EdgeInsets.only(left: 10),
+                                          hintText: 'Specialisation',
+                                          hintStyle: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.grey[600]),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter a specialization';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                                if (_isLoading)
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 8.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              'Qualification',
+                              style: text50012black,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: AppColors.textfiedlColor,
+                                  borderRadius: BorderRadius.circular(6)),
+                              child: TextFormField(
+                                controller: _qualificationController,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.only(left: 10),
+                                    hintText: 'Qualification',
+                                    hintStyle: text50010tcolor2,
+                                    counterText: ''),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Text(''),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Work information ',
+                    style: text50014black,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -351,16 +474,25 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildVisitBox(label: 'Important', value: 4, color: AppColors.tilecolor1),
-                          _buildVisitBox(label: 'Core', value: 8, color: AppColors.tilecolor2),
-                          _buildVisitBox(label: 'Super Core', value: 12, color: AppColors.tilecolor3),
+                          _buildVisitBox(
+                              label: 'Important',
+                              value: 4,
+                              color: AppColors.tilecolor1),
+                          _buildVisitBox(
+                              label: 'Core',
+                              value: 8,
+                              color: AppColors.tilecolor2),
+                          _buildVisitBox(
+                              label: 'Super Core',
+                              value: 12,
+                              color: AppColors.tilecolor3),
                         ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 10,),
-
-
+                  SizedBox(
+                    height: 10,
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -368,13 +500,17 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Date of birth',style: text50012black,),
-                            SizedBox(height: 10,),
+                            Text(
+                              'Date of birth',
+                              style: text50012black,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
                             Container(
                               decoration: BoxDecoration(
                                   color: AppColors.textfiedlColor,
-                                  borderRadius: BorderRadius.circular(6)
-                              ),
+                                  borderRadius: BorderRadius.circular(6)),
                               child: TextFormField(
                                 style: const TextStyle(
                                   color: Colors.black,
@@ -385,7 +521,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                   hintText: 'Birth day',
                                   hintStyle: text50010tcolor2,
                                   isDense: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(10, 10, 20, 0),
+                                  contentPadding:
+                                      const EdgeInsets.fromLTRB(10, 10, 20, 0),
                                   filled: true,
                                   fillColor: Colors.grey.shade100,
                                   border: OutlineInputBorder(
@@ -402,21 +539,29 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                 onTap: () async {
                                   DateTime currentDate = DateTime.now();
                                   DateTime firstDate = DateTime(1900);
-                                  DateTime initialDate = DateTime(currentDate.year, currentDate.month - 1, currentDate.day - 1);
-                                  DateTime lastDate = currentDate; // Last day of the next month
+                                  DateTime initialDate = DateTime(
+                                      currentDate.year,
+                                      currentDate.month - 1,
+                                      currentDate.day - 1);
+                                  DateTime lastDate =
+                                      currentDate; // Last day of the next month
 
                                   DateTime? pickedDate = await showDatePicker(
                                     context: context,
                                     firstDate: firstDate,
                                     initialDate: currentDate,
                                     lastDate: lastDate,
-                                    builder: (BuildContext context, Widget? child) {
+                                    builder:
+                                        (BuildContext context, Widget? child) {
                                       return Theme(
                                         data: ThemeData.light().copyWith(
                                           primaryColor: AppColors.primaryColor,
                                           hintColor: AppColors.primaryColor,
-                                          colorScheme: const ColorScheme.light(primary: AppColors.primaryColor),
-                                          buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                                          colorScheme: const ColorScheme.light(
+                                              primary: AppColors.primaryColor),
+                                          buttonTheme: const ButtonThemeData(
+                                              textTheme:
+                                                  ButtonTextTheme.primary),
                                         ),
                                         child: child!,
                                       );
@@ -425,14 +570,16 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
 
                                   if (pickedDate != null) {
                                     // Change the format of the date here
-                                    String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+                                    String formattedDate =
+                                        DateFormat('dd-MM-yyyy')
+                                            .format(pickedDate);
                                     setState(() {
                                       _dobController.text = formattedDate;
                                     });
                                   }
                                 },
                                 validator: (value) {
-                                  if(value! == null && value.isEmpty){
+                                  if (value! == null && value.isEmpty) {
                                     // Utils.flushBarErrorMessage('Select date first', context, lightColor);
                                   }
                                   return null;
@@ -443,19 +590,25 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(
+                        width: 10,
+                      ),
                       Expanded(
                         flex: 3,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Wedding Date',style: text50012black,),
-                            SizedBox(height: 10,),
+                            Text(
+                              'Wedding Date',
+                              style: text50012black,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
                             Container(
                               decoration: BoxDecoration(
                                   color: AppColors.textfiedlColor,
-                                  borderRadius: BorderRadius.circular(6)
-                              ),
+                                  borderRadius: BorderRadius.circular(6)),
                               child: TextFormField(
                                 style: const TextStyle(
                                   color: Colors.black,
@@ -466,7 +619,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                   hintText: 'Wedding date',
                                   hintStyle: text50010tcolor2,
                                   isDense: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(10, 10, 20, 0),
+                                  contentPadding:
+                                      const EdgeInsets.fromLTRB(10, 10, 20, 0),
                                   filled: true,
                                   fillColor: Colors.grey.shade100,
                                   border: OutlineInputBorder(
@@ -483,21 +637,29 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                 onTap: () async {
                                   DateTime currentDate = DateTime.now();
                                   DateTime firstDate = DateTime(1500);
-                                  DateTime initialDate = DateTime(currentDate.year, currentDate.month - 1, currentDate.day - 1);
-                                  DateTime lastDate = currentDate; // Last day of the next month
+                                  DateTime initialDate = DateTime(
+                                      currentDate.year,
+                                      currentDate.month - 1,
+                                      currentDate.day - 1);
+                                  DateTime lastDate =
+                                      currentDate; // Last day of the next month
 
                                   DateTime? pickedDate = await showDatePicker(
                                     context: context,
                                     firstDate: firstDate,
                                     initialDate: currentDate,
                                     lastDate: lastDate,
-                                    builder: (BuildContext context, Widget? child) {
+                                    builder:
+                                        (BuildContext context, Widget? child) {
                                       return Theme(
                                         data: ThemeData.light().copyWith(
                                           primaryColor: AppColors.primaryColor,
                                           hintColor: AppColors.primaryColor,
-                                          colorScheme: const ColorScheme.light(primary: AppColors.primaryColor),
-                                          buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                                          colorScheme: const ColorScheme.light(
+                                              primary: AppColors.primaryColor),
+                                          buttonTheme: const ButtonThemeData(
+                                              textTheme:
+                                                  ButtonTextTheme.primary),
                                         ),
                                         child: child!,
                                       );
@@ -506,14 +668,17 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
 
                                   if (pickedDate != null) {
                                     // Change the format of the date here
-                                    String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+                                    String formattedDate =
+                                        DateFormat('dd-MM-yyyy')
+                                            .format(pickedDate);
                                     setState(() {
-                                      _weddingDateController.text = formattedDate;
+                                      _weddingDateController.text =
+                                          formattedDate;
                                     });
                                   }
                                 },
                                 validator: (value) {
-                                  if(value! == null && value.isEmpty){
+                                  if (value! == null && value.isEmpty) {
                                     // Utils.flushBarErrorMessage('Select date first', context, lightColor);
                                   }
                                   return null;
@@ -526,71 +691,324 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                       )
                     ],
                   ),
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Schedule',style: text50014black,),
-                      SizedBox(height: 10,),
-                      Text('HeadQuaters',style: text50012black,),
-                      SizedBox(height: 10,),
-
-
-             _isLoading
-            ? Center(child: CircularProgressIndicator())
-          : Container(
-    decoration: BoxDecoration(
-    color: AppColors.textfiedlColor,
-      borderRadius: BorderRadius.circular(6),
-    ),
-    child: Column(
-    children: [
-    Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-    child: DropdownButton<String>(
-    hint: Text("Select Headquarters"),
-    value: _selectedHeadquarters,
-    items: _headquartersData
-        .map((item) => DropdownMenuItem<String>(
-    value: item['sub_headquarter'],
-    child: Text(item['sub_headquarter']),
-    ))
-        .toList(),
-    onChanged: (value) {
-    setState(() {
-    _selectedHeadquarters = value;
-    });
-    },
-    ),
-    ),
-    if (_selectedHeadquarters != null)
-    Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-    child: DropdownButton<String>(
-    hint: Text("Select Sub-Headquarters"),
-    items: _headquartersMap[_selectedHeadquarters]
-        ?.map((sub) => DropdownMenuItem(
-    value: sub,
-    child: Text(sub),
-    ))
-        .toList(),
-    onChanged: (value) {
-    // Handle sub-headquarters selection
-    },
-    ),
-    ),
-    ],
-    ),
-    ),
+                      Text(
+                        'HeadQuaters',
+                        style: text50012black,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      _isLoading
+                          ? Center(child: CircularProgressIndicator())
+                          : Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.textfiedlColor,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0, horizontal: 16.0),
+                                    child: DropdownButton<String>(
+                                      hint: Text("Select Headquarters"),
+                                      value: _selectedHeadquarters,
+                                      items: _headquartersData
+                                          .map((item) =>
+                                              DropdownMenuItem<String>(
+                                                value: item['headquarter_name'],
+                                                child: Text(
+                                                    item['headquarter_name']),
+                                              ))
+                                          .toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedHeadquarters = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  if (_selectedHeadquarters != null)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8.0, horizontal: 16.0),
+                                      child: DropdownButton<String>(
+                                        hint: Text("Select Sub-Headquarters"),
+                                        items: _headquartersMap[
+                                                _selectedHeadquarters]
+                                            ?.map((sub) => DropdownMenuItem(
+                                                  value: sub,
+                                                  child: Text(sub),
+                                                ))
+                                            .toList(),
+                                        onChanged: (value) {
+                                          // Handle sub-headquarters selection
+                                        },
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            ...schedules.asMap().entries.map((entry) {
+                              int index = entry.key;
+                              ScheduleNew schedulenew = entry.value;
+                              return Container(
+                                // margin: EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                    // border: Border.all()
+                                    ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('Create Schedule',
+                                            style: text50012black),
+                                        if (schedules.length > 1)
+                                          CircleAvatar(
+                                            child: IconButton(
+                                              icon: Icon(Icons.delete,
+                                                  color: Colors.black),
+                                              onPressed: () {
+                                                setState(() {
+                                                  schedules.removeAt(index);
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        CircleAvatar(
+                                          child: IconButton(
+                                            icon: Icon(Icons.add,
+                                                color: Colors.black),
+                                            onPressed: () {
+                                              setState(() {
+                                                schedules.add(ScheduleNew());
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text('SubHeadQuarters',
+                                        style: text50012black),
+                                    SizedBox(height: 10),
+                                    _isLoading
+                                        ? Center(
+                                            child: CircularProgressIndicator())
+                                        : Container(
+                                            decoration: BoxDecoration(
+                                              color: AppColors.textfiedlColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                DropdownButton<String>(
+                                                  value: schedulenew
+                                                      .selectedSubHeadquarter,
+                                                  hint: Text(
+                                                      'Select a sub-headquarter'),
+                                                  items: _headquartersData
+                                                      .expand((item) {
+                                                    return (item[
+                                                                'sub_headquarter']
+                                                            as String)
+                                                        .split('\n')
+                                                        .where((sub) =>
+                                                            sub.isNotEmpty)
+                                                        .map((sub) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: sub,
+                                                        child: Text(sub),
+                                                      );
+                                                    }).toList();
+                                                  }).toList(),
+                                                  onChanged:
+                                                      (selectedSubHeadquarter) {
+                                                    setState(() {
+                                                      schedulenew
+                                                              .selectedSubHeadquarter =
+                                                          selectedSubHeadquarter;
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                    SizedBox(height: 20),
+                                    dayTimeSelector(schedulenew),
+                                    Text(
+                                      'Address',
+                                      style: text50012black,
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          color: AppColors.textfiedlColor,
+                                          borderRadius:
+                                              BorderRadius.circular(6)),
+                                      child: TextFormField(
+                                        controller: _addressController,
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            contentPadding:
+                                                EdgeInsets.only(left: 10),
+                                            hintText: 'Address',
+                                            hintStyle: text50010tcolor2,
+                                            counterText: ''),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .start, // Align all children to the start
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .center, // Align children in the center vertically
+                                      children: [
+                                        // Button on the left side
+                                        Column(
+                                          children: [
+                                            Text(''),
+                                            SizedBox(
+                                              height:
+                                                  50, // Set the height of the button
+                                              width:
+                                                  50, // Set the width of the button
+                                              child: ElevatedButton(
+                                                onPressed: _getCurrentLocation,
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: AppColors
+                                                      .textfiedlColor, // Button color
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(
+                                                        6), // Adjust button corner radius
+                                                  ),
+                                                  padding: EdgeInsets
+                                                      .zero, // Remove default padding
+                                                ),
+                                                child: Icon(
+                                                  CupertinoIcons.location_solid,
+                                                  color: AppColors.primaryColor,
+                                                  size: 24, // Adjust icon size
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(width: 20), // Space between the button and the fields
+                                        Expanded(
+                                          flex: 2,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text('Latitude',
+                                                  style: text50012black),
+                                              SizedBox(height: 10),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      AppColors.textfiedlColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: TextFormField(
+                                                  controller:
+                                                      _latitudeController,
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                    contentPadding:
+                                                        EdgeInsets.only(
+                                                            left: 10),
+                                                    hintText: 'Latitude',
+                                                    hintStyle: text50010tcolor2,
+                                                    counterText: '',
+                                                  ),
+                                                  readOnly: true,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            width:
+                                                20), // Space between the latitude and longitude fields
+                                        Expanded(
+                                          flex: 2,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text('Longitude',
+                                                  style: text50012black),
+                                              SizedBox(height: 10),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      AppColors.textfiedlColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: TextFormField(
+                                                  controller:
+                                                      _longitudeController,
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                    contentPadding:
+                                                        EdgeInsets.only(
+                                                            left: 10),
+                                                    hintText: 'Longitude',
+                                                    hintStyle: text50010tcolor2,
+                                                    counterText: '',
+                                                  ),
+                                                  readOnly: true,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ],
+                        ),
+                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Products',style: text50012black,),
-                          SizedBox(height: 10,),
+                          Text(
+                            'Products',
+                            style: text50012black,
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
                           productwidget1(context),
                         ],
                       ),
-
                       SizedBox(height: 10),
                       Text('Areas', style: text50012black),
                       SizedBox(height: 10),
@@ -603,9 +1021,11 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                           children: [
                             for (int i = 0; i < _areasList.length; i++)
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 16.0),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: TextFormField(
@@ -621,15 +1041,16 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                       ),
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.delete, color: Colors.red),
+                                      icon:
+                                          Icon(Icons.delete, color: Colors.red),
                                       onPressed: () => _removeArea(i),
                                     ),
                                   ],
                                 ),
                               ),
-
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
                               child: Row(
                                 children: [
                                   Expanded(
@@ -640,7 +1061,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                         border: InputBorder.none,
                                       ),
                                       onChanged: (value) {
-                                        if (_areasList.isEmpty || _areasList.last.isNotEmpty) {
+                                        if (_areasList.isEmpty ||
+                                            _areasList.last.isNotEmpty) {
                                           _addArea();
                                         }
                                       },
@@ -656,46 +1078,53 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                           ],
                         ),
                       ),
-                      Text('Address',style: text50012black,),
-                      SizedBox(height: 10,),
+                      Text(
+                        'Address',
+                        style: text50012black,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Container(
                         decoration: BoxDecoration(
                             color: AppColors.textfiedlColor,
-                            borderRadius: BorderRadius.circular(6)
-                        ),
+                            borderRadius: BorderRadius.circular(6)),
                         child: TextFormField(
                           controller: _addressController,
-
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.only(left: 10),
                               hintText: 'Address',
                               hintStyle: text50010tcolor2,
-                              counterText: ''
-                          ),
+                              counterText: ''),
                         ),
                       ),
-                      SizedBox(height: 10,),
-
+                      SizedBox(
+                        height: 10,
+                      ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start, // Align all children to the start
-                        crossAxisAlignment: CrossAxisAlignment.center, // Align children in the center vertically
+                        mainAxisAlignment: MainAxisAlignment
+                            .start, // Align all children to the start
+                        crossAxisAlignment: CrossAxisAlignment
+                            .center, // Align children in the center vertically
                         children: [
                           // Button on the left side
                           Padding(
                             padding: const EdgeInsets.only(top: 25.0),
                             child: SizedBox(
                               height: 50, // Set the height of the button
-                              width: 50,  // Set the width of the button
+                              width: 50, // Set the width of the button
                               child: ElevatedButton(
-
-                                onPressed:  _getCurrentLocation,
+                                onPressed: _getCurrentLocation,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.textfiedlColor, // Button color
+                                  backgroundColor:
+                                      AppColors.textfiedlColor, // Button color
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6), // Adjust button corner radius
+                                    borderRadius: BorderRadius.circular(
+                                        6), // Adjust button corner radius
                                   ),
-                                  padding: EdgeInsets.zero, // Remove default padding
+                                  padding:
+                                      EdgeInsets.zero, // Remove default padding
                                 ),
                                 child: Icon(
                                   CupertinoIcons.location_solid,
@@ -705,7 +1134,9 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                               ),
                             ),
                           ),
-                          SizedBox(width: 20), // Space between the button and the fields
+                          SizedBox(
+                              width:
+                                  20), // Space between the button and the fields
                           Expanded(
                             flex: 2,
                             child: Column(
@@ -726,13 +1157,16 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                       hintText: 'Latitude',
                                       hintStyle: text50010tcolor2,
                                       counterText: '',
-                                    ), readOnly: true,
+                                    ),
+                                    readOnly: true,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(width: 20), // Space between the latitude and longitude fields
+                          SizedBox(
+                              width:
+                                  20), // Space between the latitude and longitude fields
                           Expanded(
                             flex: 2,
                             child: Column(
@@ -762,10 +1196,9 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                           ),
                         ],
                       ),
-
-                      SizedBox(height: 10,),
-
-
+                      SizedBox(
+                        height: 10,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -791,7 +1224,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                             ),
                           ),
                           InkWell(
-                            onTap: (){
+                            onTap: () {
                               Navigator.pop(context);
                             },
                             child: SizedBox(
@@ -799,7 +1232,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                               child: Defaultbutton(
                                 text: 'Cancel',
                                 bgColor: AppColors.whiteColor,
-                                bordervalues: Border.all(width: 1, color: AppColors.primaryColor),
+                                bordervalues: Border.all(
+                                    width: 1, color: AppColors.primaryColor),
                                 textstyle: const TextStyle(
                                   color: AppColors.primaryColor,
                                   fontSize: 14,
@@ -809,25 +1243,27 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                           ),
                         ],
                       ),
-
                     ],
                   ),
-
                 ],
               ),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
             ],
           ),
         ),
       ),
     );
   }
-  Widget _buildVisitBox({required String label, required int value, required Color color}) {
+
+  Widget _buildVisitBox(
+      {required String label, required int value, required Color color}) {
     return GestureDetector(
       onTap: () => _setSelectedVisits(value),
       child: Container(
         height: 50,
-        width: MediaQuery.of(context).size.width/3.5,
+        width: MediaQuery.of(context).size.width / 3.5,
         decoration: BoxDecoration(
           color: AppColors.textfiedlColor,
           borderRadius: BorderRadius.circular(6),
@@ -836,22 +1272,24 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
             width: 2,
           ),
         ),
-        child: Row(mainAxisAlignment: MainAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.all(0),
               child: Container(
                 width: 20,
                 decoration: BoxDecoration(
-                color: color,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(6),bottomLeft: Radius.circular(6))
-              ),),
+                    color: color,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(6),
+                        bottomLeft: Radius.circular(6))),
+              ),
             ),
-            SizedBox(width: 10,),
-            Text(
-              label,
-              style: text50012black
+            SizedBox(
+              width: 10,
             ),
+            Text(label, style: text50012black),
           ],
         ),
       ),
@@ -903,6 +1341,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       ],
     );
   }
+
   void _showProductSelectionDialog(BuildContext context) async {
     ProductResponse productResponse = await _futureProducts;
 
@@ -963,11 +1402,123 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       });
     }
   }
+
   void _updateSelectedProductsText() {
     setState(() {
-      _selectedProductsText = _selectedProducts.map((c) => c.productName.first.name).join(', ');
+      _selectedProductsText =
+          _selectedProducts.map((c) => c.productName.first.name).join(', ');
       _textProductController.text = _selectedProductsText;
     });
     // This function is kept empty as we are not using the text directly.
+  }
+
+  //schedule widgets
+  Widget dayTimeSelector(ScheduleNew schedulenew) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ...schedulenew.timeSlots.expand((slot) {
+          return [
+            Row(
+              children: [
+                Expanded(
+                  child: dayDropdown(slot, schedulenew),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: timeField(
+                    context,
+                    slot.startTime ?? 'Select time',
+                    (selectedTime) {
+                      setState(() {
+                        slot.startTime = selectedTime;
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: timeField(
+                    context,
+                    slot.endTime ?? 'Select time',
+                    (selectedTime) {
+                      setState(() {
+                        slot.endTime = selectedTime;
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(width: 10),
+                CircleAvatar(
+                  child: IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      setState(() {
+                        schedulenew.timeSlots.add(TimeSlot(
+                            day: 'Mon')); // Default day for new TimeSlot
+                      });
+                    },
+                  ),
+                ),
+                if (schedulenew.timeSlots.length > 1)
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      setState(() {
+                        if (schedulenew.timeSlots.length > 1) {
+                          schedulenew.timeSlots.remove(slot);
+                        }
+                      });
+                    },
+                  ),
+              ],
+            ),
+          ];
+        }).toList(),
+        SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget dayDropdown(TimeSlot slot, ScheduleNew schedulenew) {
+    return DropdownButton<String>(
+      value: slot.day, // Use the day of the current slot
+      items: schedulenew.days.map((String day) {
+        return DropdownMenuItem<String>(
+          value: day,
+          child: Text(day),
+        );
+      }).toList(),
+      onChanged: (String? newValue) {
+        setState(() {
+          slot.day = newValue!; // Update the day for this specific slot
+        });
+      },
+    );
+  }
+
+  Widget timeField(
+      BuildContext context, String time, Function(String) onTimeSelected) {
+    return GestureDetector(
+      onTap: () async {
+        TimeOfDay? selectedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        );
+        if (selectedTime != null) {
+          final formattedTime = selectedTime.format(context);
+          onTimeSelected(formattedTime);
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Text(time.isNotEmpty ? time : 'Select time',
+            style: TextStyle(fontSize: 16)),
+      ),
+    );
   }
 }

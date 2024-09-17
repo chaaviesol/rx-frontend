@@ -1,9 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
+import 'package:rx_route_new/Util/Utils.dart';
+import 'package:rx_route_new/app_colors.dart';
+import 'package:rx_route_new/res/app_url.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class Autotp extends StatefulWidget {
-  final dynamic data; // The data containing doctors by date
-  const Autotp({required this.data, super.key});
+  var data; // The data containing doctors by date
+  Autotp({required this.data, super.key});
 
   @override
   State<Autotp> createState() => _AutotpState();
@@ -12,20 +19,67 @@ class Autotp extends StatefulWidget {
 class _AutotpState extends State<Autotp> {
   DateTime _selectedDate = DateTime.now(); // Store the selected date
   List<dynamic> _selectedDoctors = []; // List of doctors for the selected day
-  Map<DateTime, List<dynamic>> _events = {}; // Events mapped by date
+  Map<DateTime, List<dynamic>> _events = {};
+
+  Future<void> submitAutoTp() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    int? userID = int.parse(preferences.getString('userID').toString());
+    String url = AppUrl.submitAutoTP;
+
+    var data = {
+      "user_id": userID,
+      "data": "${widget.data}"
+    };
+
+    try {
+      print('auto tp submit try...');
+      var response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          // Add any other headers as needed
+        },
+        body: jsonEncode(data),
+      );
+      print('st code is:${response.statusCode}');
+      print('passing body:${data}');
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        Utils.flushBarErrorMessage('${responseData['message']}', context);
+      } else {
+        // Error in API call
+        var responseData = jsonDecode(response.body);
+        Utils.flushBarErrorMessage('${responseData['message']}', context);
+        print('Failed to post data: ${response.statusCode}');
+        throw Exception('Failed to post data');
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _populateEvents(); // Populate events on calendar
+    print('widget data is:${widget.data}');
+    _populateEvents(); // Populate events
     _updateSelectedDoctors(_selectedDate); // Initialize with current date's doctors
   }
 
   // Convert the data from the backend to events for the calendar
   void _populateEvents() {
-    widget.data["data"]["data"].forEach((dateString, doctorsList) {
-      DateTime date = DateTime.parse(dateString.split('-').reversed.join('-'));
-      _events[date] = doctorsList;
+    print('populate called..');
+    final DateFormat formatter = DateFormat('dd-MM-yyyy'); // Define the date format
+    widget.data["data"].forEach((dateString, doctorsList) {
+      try {
+        DateTime date = formatter.parse(dateString); // Parse the date using the specified format
+        if (_events[date] == null) {
+          _events[date] = [];
+        }
+        _events[date] = doctorsList;
+      } catch (e) {
+        print('Error parsing date: $e');
+      }
     });
   }
 
@@ -39,6 +93,25 @@ class _AutotpState extends State<Autotp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor),
+            onPressed: () {
+              submitAutoTp();
+            },
+            child: Text('Continue', style: TextStyle(color: AppColors.whiteColor)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor),
+            onPressed: () {},
+            child: Text('Cancel', style: TextStyle(color: AppColors.whiteColor)),
+          )
+        ],
+      ),
       appBar: AppBar(
         title: const Text('Auto Generated TP'),
         actions: [
@@ -52,56 +125,37 @@ class _AutotpState extends State<Autotp> {
       ),
       body: Column(
         children: [
-          Text('${widget.data}')
-          // // TableCalendar widget
-          // TableCalendar(
-          //   focusedDay: _selectedDate,
-          //   firstDay: DateTime.utc(2023, 1, 1),
-          //   lastDay: DateTime.utc(2030, 12, 31),
-          //   selectedDayPredicate: (day) => isSameDay(day, _selectedDate),
-          //   eventLoader: (day) => _events[day] ?? [],
-          //   onDaySelected: (selectedDay, focusedDay) {
-          //     setState(() {
-          //       _selectedDate = selectedDay;
-          //     });
-          //     _updateSelectedDoctors(selectedDay);
-          //   },
-          //   calendarFormat: CalendarFormat.month,
-          //   calendarStyle: const CalendarStyle(
-          //     todayDecoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-          //     selectedDecoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-          //     markerDecoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-          //   ),
-          //   headerStyle: const HeaderStyle(
-          //     formatButtonVisible: false,
-          //     titleCentered: true,
-          //   ),
-          // ),
-          // const SizedBox(height: 16),
-          // // Display list of doctors for the selected date
-          // Expanded(
-          //   child: _selectedDoctors.isNotEmpty
-          //       ? ListView.builder(
-          //     itemCount: _selectedDoctors.length,
-          //     itemBuilder: (context, index) {
-          //       return Text('${_selectedDoctors}');
-          //       // var doctor = _selectedDoctors[index];
-          //       // return Card(
-          //       //   margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          //       //   child: ListTile(
-          //       //     leading: CircleAvatar(
-          //       //       backgroundColor: Colors.blue,
-          //       //       child: Text(doctor['doctor'][0]), // First letter of doctor name
-          //       //     ),
-          //       //     title: Text(doctor['doctor']),
-          //       //     subtitle: Text(doctor['address']['address']),
-          //       //     trailing: Text(doctor['category']),
-          //       //   ),
-          //       // );
-          //     },
-          //   )
-          //       : const Center(child: Text('No doctors for the selected date')),
-          // ),
+          // Display the selected date
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Selected Date: ${DateFormat('dd MMMM yyyy').format(_selectedDate)}',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          // Display list of doctors for the selected date
+          Expanded(
+            child: _selectedDoctors.isNotEmpty
+                ? ListView.builder(
+              itemCount: _selectedDoctors.length,
+              itemBuilder: (context, index) {
+                var doctor = _selectedDoctors[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue,
+                      child: Text(doctor['doctor'][0]), // First letter of doctor name
+                    ),
+                    title: Text(doctor['doctor']),
+                    subtitle: Text(doctor['address']['address']),
+                    trailing: Text(doctor['category']),
+                  ),
+                );
+              },
+            )
+                : const Center(child: Text('No doctors for the selected date')),
+          ),
         ],
       ),
     );

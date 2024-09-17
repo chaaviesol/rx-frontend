@@ -97,5 +97,7 @@ class AppUrl{
 
   //travelplan
 
+  static var submitAutoTP = '$baseUrl/user/SubmitAutomaticTp';
+
 
 }

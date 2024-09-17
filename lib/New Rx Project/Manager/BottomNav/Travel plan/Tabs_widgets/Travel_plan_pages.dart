@@ -57,20 +57,21 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
     }
   }
 
-  Map<String, String> monthNames = {
-    'January': '01',
-    'February': '02',
-    'March': '03',
-    'April': '04',
-    'May': '05',
-    'June': '06',
-    'July': '07',
-    'August': '08',
-    'September': '09',
-    'October': '10',
-    'November': '11',
-    'December': '12',
+  Map<String, int> monthNames = {
+    'January': 1,
+    'February': 2,
+    'March': 3,
+    'April': 4,
+    'May': 5,
+    'June': 6,
+    'July': 7,
+    'August': 8,
+    'September': 9,
+    'October': 10,
+    'November': 11,
+    'December': 12,
   };
+
 
   Future<dynamic> sendPostRequest(String userId, String month) async {
     final Uri url = Uri.parse('http://52.66.145.37:3004/generate-visit-plan'); // Replace with your API URL
@@ -114,6 +115,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
   Future<void> _selectMonthAndGenerateTP() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? uniqueId = preferences.getString('uniqueID');
+
     final selectedMonth = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
@@ -146,15 +148,15 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                 itemCount: monthNames.length,
                 itemBuilder: (context, index) {
                   final monthName = monthNames.keys.elementAt(index);
+                  final monthNumber = monthNames[monthName];
                   return GestureDetector(
                     onTap: () {
-                      final monthNumber = monthNames[monthName];
                       final formattedMonth = '$monthNumber-${DateTime.now().year}';
                       Navigator.of(context).pop(formattedMonth); // Pass the selected month
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                       color: AppColors.primaryColor,
+                        color: AppColors.primaryColor,
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: [
                           BoxShadow(
@@ -194,31 +196,47 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
     );
 
     if (selectedMonth != null) {
-      // _showLoaderDialog(context); // Show loader dialog
+      _showLoaderDialog(context); // Show loader dialog
 
       try {
-        var data = await sendPostRequest('${uniqueId}', selectedMonth); // Call your API request here
-        print('auto data :$data');
-        // Wait a moment to ensure the loader is properly dismissed before showing Flushbar
+        // Call your API request here
+        var data = await sendPostRequest('${uniqueId}', selectedMonth);
+        print('auto data: $data');
+
+        // Wait to ensure the loader is properly dismissed before navigating
         await Future.delayed(Duration(milliseconds: 200));
 
-        // Dismiss loader
+        // Dismiss the loader dialog
         Navigator.of(context).pop(); // Close the loader dialog
-        // Show success message and return to the previous page
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: '${data}',),));
-        Flushbar(
-          message: "Travel plan generated successfully for $selectedMonth!",
-          icon: Icon(
-            Icons.check_circle,
-            size: 28.0,
-            color: Colors.green,
-          ),
-          duration: Duration(seconds: 3),
-          leftBarIndicatorColor: Colors.green,
-        );
+
+        // Ensure the response data is valid before navigating
+        if (data != null) {
+          // Navigate to the Autotp page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Autotp(data: '${data['data']}',),
+            ),
+          );
+
+          // Optionally show success message after navigation
+          Flushbar(
+            message: "Travel plan generated successfully for $selectedMonth!",
+            icon: Icon(
+              Icons.check_circle,
+              size: 28.0,
+              color: Colors.green,
+            ),
+            duration: Duration(seconds: 3),
+            leftBarIndicatorColor: Colors.green,
+          ).show(context);
+        } else {
+          throw Exception("No data returned from the API");
+        }
       } catch (e) {
-        // Dismiss loader
+        // Dismiss the loader in case of an error
         Navigator.of(context).pop(); // Close the loader dialog
+
         // Show error message
         Flushbar(
           message: "Error generating travel plan. Please try again.",
@@ -233,6 +251,8 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
       }
     }
   }
+
+
 // Function to show a loader dialog
   void _showLoaderDialog(BuildContext context) {
     showDialog(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/BottomNavManager.dart';
 import 'package:rx_route_new/Util/Routes/routes_name.dart';
+import 'package:rx_route_new/Util/Utils.dart';
 
 
 import '../../New Rx Project/Manager/Login page.dart';
@@ -60,12 +61,8 @@ class Routes{
 
 
       default:
-        return MaterialPageRoute(builder: (_){
-          return const Scaffold(
-            body: Center(child: Text('No Route defined',style: text60024black,),
-            ),
-          );
-        });
+        return MaterialPageRoute(builder: (BuildContext context) => const LoginPageNew());
+
     }
   }
 }
