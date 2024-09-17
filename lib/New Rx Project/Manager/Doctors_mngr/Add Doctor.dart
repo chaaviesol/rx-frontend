@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'package:intl/intl.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Manager/Doctors_mngr/Add_chemist.dart';
 import 'package:rx_route_new/app_colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:rx_route_new/model/scheduleModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../View/homeView/Doctor/add_doctor.dart';
 import '../../../constants/styles.dart';
@@ -53,6 +55,10 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   List<ProductData> _selectedProducts = [];
   String _selectedProductsText = '';
 
+  TextEditingController _textChemistController = TextEditingController();
+  List<Chemist> _selectedChemists = [];
+  String _selectedChemistsText = '';
+
   Future<ProductResponse> _fetchProducts() async {
     String url = AppUrl.list_products;
     try {
@@ -68,6 +74,43 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       throw Exception('Failed to load data: $e');
     }
   }
+
+  Future<List<Chemist>> fetchChemists() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = await preferences.getString('uniqueID');
+    print('called fetch chemist');
+    String url = AppUrl.get_chemists; // Replace with your actual API URL
+
+    // // Example headers and body parameters
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      // Add other headers if needed
+    };
+    //
+    Map<String, dynamic> body = {
+      // Add any necessary body parameters here
+      "uniqueId":uniqueID
+    };
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode(body),
+    );
+
+    print('${response.statusCode}');
+    print('resp:${jsonDecode(response.body)}');
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      var chemistsJson = data['data'] as List;
+      List<Chemist> chemists = chemistsJson.map((chemist) => Chemist.fromJson(chemist)).toList();
+      return chemists;
+    } else {
+      throw Exception('Failed to load chemists');
+    }
+  }
+
 
   final TextEditingController _weddingDateController = TextEditingController();
 
@@ -134,6 +177,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   void initState() {
     super.initState();
     _fetchHeadquarters();
+    fetchChemists();
+    _fetchProducts();
   }
 
   Future<void> _fetchHeadquarters() async {
@@ -174,43 +219,64 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
     });
   }
 
-  Future<void> _getCurrentLocation() async {
-    try {
-      // Request location permission
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        // Handle location services disabled
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse &&
-            permission != LocationPermission.always) {
-          // Handle permissions denied
-          return;
-        }
-      }
-
-      // Fetch current location
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      // Update the TextEditingControllers with the current location
-      setState(() {
-        _latitudeController.text = position.latitude.toString();
-        _longitudeController.text = position.longitude.toString();
-
-        print('latitude is :${_latitudeController.text}');
-        print('longitude is :${_longitudeController.text}');
-      });
-    } catch (e) {
-      // Handle errors (e.g., location services disabled or permissions denied)
-      print(e);
+  Future<Position> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
     }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location permissions are permanently denied.');
+      } else if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied.');
+      }
+    }
+
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
   }
+
+  // Future<void> _getCurrentLocation() async {
+  //   try {
+  //     // Request location permission
+  //     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //     if (!serviceEnabled) {
+  //       // Handle location services disabled
+  //       return;
+  //     }
+  //
+  //     LocationPermission permission = await Geolocator.checkPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       permission = await Geolocator.requestPermission();
+  //       if (permission != LocationPermission.whileInUse &&
+  //           permission != LocationPermission.always) {
+  //         // Handle permissions denied
+  //         return;
+  //       }
+  //     }
+  //
+  //     // Fetch current location
+  //     Position position = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high,
+  //     );
+  //
+  //     // Update the TextEditingControllers with the current location
+  //     setState(() {
+  //       _latitudeController.text = position.latitude.toString();
+  //       _longitudeController.text = position.longitude.toString();
+  //
+  //       print('latitude is :${_latitudeController.text}');
+  //       print('longitude is :${_longitudeController.text}');
+  //     });
+  //   } catch (e) {
+  //     // Handle errors (e.g., location services disabled or permissions denied)
+  //     print(e);
+  //   }
+  // }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -698,6 +764,29 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
+                        'Products',
+                        style: text50012black,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      productwidget1(context),
+                    ],
+                  ),
+                  SizedBox(height: 10,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Chemists',style: text50012black,),
+                      SizedBox(height: 10,),
+                      chemistwidget1(context),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                         'HeadQuaters',
                         style: text50012black,
                       ),
@@ -763,13 +852,15 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                               int index = entry.key;
                               ScheduleNew schedulenew = entry.value;
                               return Container(
-                                // margin: EdgeInsets.only(bottom: 20),
+                                margin: EdgeInsets.only(bottom: 20),
                                 decoration: BoxDecoration(
                                     // border: Border.all()
                                     ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Divider(height: 1,color: AppColors.blackColor,),
+                                    SizedBox(height: 20,),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -866,7 +957,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                           borderRadius:
                                               BorderRadius.circular(6)),
                                       child: TextFormField(
-                                        controller: _addressController,
+                                        controller: schedulenew.address,
+                                        // _addressController,
                                         decoration: InputDecoration(
                                             border: InputBorder.none,
                                             contentPadding:
@@ -879,6 +971,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                     SizedBox(
                                       height: 10,
                                     ),
+
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment
                                           .start, // Align all children to the start
@@ -888,20 +981,33 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                         // Button on the left side
                                         Column(
                                           children: [
-                                            Text(''),
+                                            SizedBox(height: 25,),
                                             SizedBox(
                                               height:
                                                   50, // Set the height of the button
                                               width:
                                                   50, // Set the width of the button
                                               child: ElevatedButton(
-                                                onPressed: _getCurrentLocation,
+                                                onPressed:()async{
+                                                  try {
+                                                    Position position = await _getCurrentLocation();
+                                                    setState(() {
+                                                      schedulenew.latitude.text = position.latitude.toString();
+                                                      schedulenew.longitude.text = position.longitude.toString();
+                                                    });
+                                                    print('Latitude: ${schedulenew.latitude}, Longitude: ${schedulenew.longitude}');
+                                                  } catch (e) {
+                                                    print('Error fetching location: $e');
+                                                  }
+                                                },
                                                 style: ElevatedButton.styleFrom(
+                                                  elevation: 0,
                                                   backgroundColor: AppColors
                                                       .textfiedlColor, // Button color
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(
-                                                        6), // Adjust button corner radius
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6), // Adjust button corner radius
                                                   ),
                                                   padding: EdgeInsets
                                                       .zero, // Remove default padding
@@ -915,7 +1021,9 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                             ),
                                           ],
                                         ),
-                                        SizedBox(width: 20), // Space between the button and the fields
+                                        SizedBox(
+                                            width:
+                                                20), // Space between the button and the fields
                                         Expanded(
                                           flex: 2,
                                           child: Column(
@@ -934,7 +1042,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                                 ),
                                                 child: TextFormField(
                                                   controller:
-                                                      _latitudeController,
+                                                      schedulenew.latitude,
                                                   decoration: InputDecoration(
                                                     border: InputBorder.none,
                                                     contentPadding:
@@ -971,7 +1079,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                                 ),
                                                 child: TextFormField(
                                                   controller:
-                                                      _longitudeController,
+                                                      schedulenew.longitude,
                                                   decoration: InputDecoration(
                                                     border: InputBorder.none,
                                                     contentPadding:
@@ -996,206 +1104,203 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                           ],
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Products',
-                            style: text50012black,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          productwidget1(context),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Text('Areas', style: text50012black),
-                      SizedBox(height: 10),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.textfiedlColor,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Column(
-                          children: [
-                            for (int i = 0; i < _areasList.length; i++)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        initialValue: _areasList[i],
-                                        decoration: InputDecoration(
-                                          hintText: 'Area',
-                                          hintStyle: text50010tcolor2,
-                                          border: InputBorder.none,
-                                        ),
-                                        onChanged: (value) {
-                                          _areasList[i] = value;
-                                        },
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon:
-                                          Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () => _removeArea(i),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 16.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      decoration: InputDecoration(
-                                        hintText: 'Add new area',
-                                        hintStyle: text50010tcolor2,
-                                        border: InputBorder.none,
-                                      ),
-                                      onChanged: (value) {
-                                        if (_areasList.isEmpty ||
-                                            _areasList.last.isNotEmpty) {
-                                          _addArea();
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.add, color: Colors.green),
-                                    onPressed: _addArea,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        'Address',
-                        style: text50012black,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: AppColors.textfiedlColor,
-                            borderRadius: BorderRadius.circular(6)),
-                        child: TextFormField(
-                          controller: _addressController,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.only(left: 10),
-                              hintText: 'Address',
-                              hintStyle: text50010tcolor2,
-                              counterText: ''),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment
-                            .start, // Align all children to the start
-                        crossAxisAlignment: CrossAxisAlignment
-                            .center, // Align children in the center vertically
-                        children: [
-                          // Button on the left side
-                          Padding(
-                            padding: const EdgeInsets.only(top: 25.0),
-                            child: SizedBox(
-                              height: 50, // Set the height of the button
-                              width: 50, // Set the width of the button
-                              child: ElevatedButton(
-                                onPressed: _getCurrentLocation,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      AppColors.textfiedlColor, // Button color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        6), // Adjust button corner radius
-                                  ),
-                                  padding:
-                                      EdgeInsets.zero, // Remove default padding
-                                ),
-                                child: Icon(
-                                  CupertinoIcons.location_solid,
-                                  color: AppColors.primaryColor,
-                                  size: 24, // Adjust icon size
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                              width:
-                                  20), // Space between the button and the fields
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Latitude', style: text50012black),
-                                SizedBox(height: 10),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.textfiedlColor,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: TextFormField(
-                                    controller: _latitudeController,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.only(left: 10),
-                                      hintText: 'Latitude',
-                                      hintStyle: text50010tcolor2,
-                                      counterText: '',
-                                    ),
-                                    readOnly: true,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                              width:
-                                  20), // Space between the latitude and longitude fields
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Longitude', style: text50012black),
-                                SizedBox(height: 10),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.textfiedlColor,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: TextFormField(
-                                    controller: _longitudeController,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.only(left: 10),
-                                      hintText: 'Longitude',
-                                      hintStyle: text50010tcolor2,
-                                      counterText: '',
-                                    ),
-                                    readOnly: true,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+
+
+
+
+
+
+                      // Text('Areas', style: text50012black),
+                      // SizedBox(height: 10),
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     color: AppColors.textfiedlColor,
+                      //     borderRadius: BorderRadius.circular(6),
+                      //   ),
+                      //   child: Column(
+                      //     children: [
+                      //       for (int i = 0; i < _areasList.length; i++)
+                      //         Padding(
+                      //           padding: const EdgeInsets.symmetric(
+                      //               vertical: 8.0, horizontal: 16.0),
+                      //           child: Row(
+                      //             mainAxisAlignment:
+                      //                 MainAxisAlignment.spaceBetween,
+                      //             children: [
+                      //               Expanded(
+                      //                 child: TextFormField(
+                      //                   initialValue: _areasList[i],
+                      //                   decoration: InputDecoration(
+                      //                     hintText: 'Area',
+                      //                     hintStyle: text50010tcolor2,
+                      //                     border: InputBorder.none,
+                      //                   ),
+                      //                   onChanged: (value) {
+                      //                     _areasList[i] = value;
+                      //                   },
+                      //                 ),
+                      //               ),
+                      //               IconButton(
+                      //                 icon:
+                      //                     Icon(Icons.delete, color: Colors.red),
+                      //                 onPressed: () => _removeArea(i),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       Padding(
+                      //         padding: const EdgeInsets.symmetric(
+                      //             vertical: 8.0, horizontal: 16.0),
+                      //         child: Row(
+                      //           children: [
+                      //             Expanded(
+                      //               child: TextFormField(
+                      //                 decoration: InputDecoration(
+                      //                   hintText: 'Add new area',
+                      //                   hintStyle: text50010tcolor2,
+                      //                   border: InputBorder.none,
+                      //                 ),
+                      //                 onChanged: (value) {
+                      //                   if (_areasList.isEmpty ||
+                      //                       _areasList.last.isNotEmpty) {
+                      //                     _addArea();
+                      //                   }
+                      //                 },
+                      //               ),
+                      //             ),
+                      //             IconButton(
+                      //               icon: Icon(Icons.add, color: Colors.green),
+                      //               onPressed: _addArea,
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // Text(
+                      //   'Address',
+                      //   style: text50012black,
+                      // ),
+                      // SizedBox(
+                      //   height: 10,
+                      // ),
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //       color: AppColors.textfiedlColor,
+                      //       borderRadius: BorderRadius.circular(6)),
+                      //   child: TextFormField(
+                      //     controller: _addressController,
+                      //     decoration: InputDecoration(
+                      //         border: InputBorder.none,
+                      //         contentPadding: EdgeInsets.only(left: 10),
+                      //         hintText: 'Address',
+                      //         hintStyle: text50010tcolor2,
+                      //         counterText: ''),
+                      //   ),
+                      // ),
+                      // SizedBox(
+                      //   height: 10,
+                      // ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment
+                      //       .start, // Align all children to the start
+                      //   crossAxisAlignment: CrossAxisAlignment
+                      //       .center, // Align children in the center vertically
+                      //   children: [
+                      //     // Button on the left side
+                      //     Padding(
+                      //       padding: const EdgeInsets.only(top: 25.0),
+                      //       child: SizedBox(
+                      //         height: 50, // Set the height of the button
+                      //         width: 50, // Set the width of the button
+                      //         child: ElevatedButton(
+                      //           onPressed: _getCurrentLocation,
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor:
+                      //                 AppColors.textfiedlColor, // Button color
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(
+                      //                   6), // Adjust button corner radius
+                      //             ),
+                      //             padding:
+                      //                 EdgeInsets.zero, // Remove default padding
+                      //           ),
+                      //           child: Icon(
+                      //             CupertinoIcons.location_solid,
+                      //             color: AppColors.primaryColor,
+                      //             size: 24, // Adjust icon size
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     SizedBox(
+                      //         width:
+                      //             20), // Space between the button and the fields
+                      //     Expanded(
+                      //       flex: 2,
+                      //       child: Column(
+                      //         crossAxisAlignment: CrossAxisAlignment.start,
+                      //         children: [
+                      //           Text('Latitude', style: text50012black),
+                      //           SizedBox(height: 10),
+                      //           Container(
+                      //             decoration: BoxDecoration(
+                      //               color: AppColors.textfiedlColor,
+                      //               borderRadius: BorderRadius.circular(6),
+                      //             ),
+                      //             child: TextFormField(
+                      //               controller: _latitudeController,
+                      //               decoration: InputDecoration(
+                      //                 border: InputBorder.none,
+                      //                 contentPadding: EdgeInsets.only(left: 10),
+                      //                 hintText: 'Latitude',
+                      //                 hintStyle: text50010tcolor2,
+                      //                 counterText: '',
+                      //               ),
+                      //               readOnly: true,
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //     SizedBox(
+                      //         width:
+                      //             20), // Space between the latitude and longitude fields
+                      //     Expanded(
+                      //       flex: 2,
+                      //       child: Column(
+                      //         crossAxisAlignment: CrossAxisAlignment.start,
+                      //         children: [
+                      //           Text('Longitude', style: text50012black),
+                      //           SizedBox(height: 10),
+                      //           Container(
+                      //             decoration: BoxDecoration(
+                      //               color: AppColors.textfiedlColor,
+                      //               borderRadius: BorderRadius.circular(6),
+                      //             ),
+                      //             child: TextFormField(
+                      //               controller: _longitudeController,
+                      //               decoration: InputDecoration(
+                      //                 border: InputBorder.none,
+                      //                 contentPadding: EdgeInsets.only(left: 10),
+                      //                 hintText: 'Longitude',
+                      //                 hintStyle: text50010tcolor2,
+                      //                 counterText: '',
+                      //               ),
+                      //               readOnly: true,
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+
+
+
+
+
                       SizedBox(
                         height: 10,
                       ),
@@ -1412,6 +1517,141 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
     // This function is kept empty as we are not using the text directly.
   }
 
+  void _showChemistSelectionDialog(BuildContext context) async {
+    List<Chemist> chemistResponse = await fetchChemists();
+
+    List<Chemist> result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, setState) {
+            return AlertDialog(
+              title: Text('Select Chemists'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    ...chemistResponse.map((chemist) {
+                      final isSelected = _selectedChemists.contains(chemist);
+                      return ListTile(
+                        title: Text(chemist.buildingName),
+                        leading: isSelected
+                            ? Icon(Icons.check_circle, color: Colors.green)
+                            : Icon(Icons.circle_outlined, color: Colors.grey),
+                        onTap: () {
+                          setState(() {
+                            if (isSelected) {
+                              _selectedChemists.remove(chemist);
+                            } else {
+                              _selectedChemists.add(chemist);
+                            }
+                            _updateSelectedChemistsText();
+                          });
+                        },
+                      );
+                    }).toList(),
+                    ListTile(
+                      title: Text('Add New Chemist'),
+                      leading: Icon(Icons.add, color: Colors.blue),
+                      onTap: () async {
+                        Chemist newChemist = await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => Adding_chemistmngr(),
+                          ),
+                        );
+                        if (newChemist != null) {
+                          setState(() {
+                            chemistResponse.add(newChemist);
+                            _selectedChemists.add(newChemist);
+                            _updateSelectedChemistsText();
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(null);
+                  },
+                  child: Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(_selectedChemists);
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedChemists = result;
+        _updateSelectedChemistsText();
+      });
+    }
+  }
+
+  void _updateSelectedChemistsText() {
+    setState(() {
+      _selectedChemistsText = _selectedChemists.map((c) => c.buildingName).join(', ');
+      _textChemistController.text = _selectedChemistsText;
+    });
+  }
+
+
+  @override
+  Widget chemistwidget1(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () {
+            _showChemistSelectionDialog(context);
+          },
+          child: IgnorePointer(
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.textfiedlColor,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Select Chemists',
+                  hintStyle: text50010tcolor2,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                ),
+                controller: _textChemistController,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 16),
+        Wrap(
+          spacing: 8.0,
+          children: _selectedChemists.map((chemist) {
+            return Chip(
+              label: Text(chemist.buildingName),
+              onDeleted: () {
+                setState(() {
+                  _selectedChemists.remove(chemist);
+                  _updateSelectedChemistsText();
+                });
+              },
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
   //schedule widgets
   Widget dayTimeSelector(ScheduleNew schedulenew) {
     return Column(
@@ -1426,21 +1666,23 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                 ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: timeField(
-                    context,
-                    slot.startTime ?? 'Select time',
-                    (selectedTime) {
-                      setState(() {
-                        slot.startTime = selectedTime;
-                      });
-                    },
+                  child: Container(
+                    child: timeField(
+                      context,
+                      slot.startTime ?? '00:00',
+                      (selectedTime) {
+                        setState(() {
+                          slot.startTime = selectedTime;
+                        });
+                      },
+                    ),
                   ),
                 ),
                 SizedBox(width: 10),
                 Expanded(
                   child: timeField(
                     context,
-                    slot.endTime ?? 'Select time',
+                    slot.endTime ?? '00:00',
                     (selectedTime) {
                       setState(() {
                         slot.endTime = selectedTime;
@@ -1473,6 +1715,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                   ),
               ],
             ),
+            SizedBox(height: 10,)
           ];
         }).toList(),
         SizedBox(height: 20),
@@ -1481,19 +1724,28 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   }
 
   Widget dayDropdown(TimeSlot slot, ScheduleNew schedulenew) {
-    return DropdownButton<String>(
-      value: slot.day, // Use the day of the current slot
-      items: schedulenew.days.map((String day) {
-        return DropdownMenuItem<String>(
-          value: day,
-          child: Text(day),
-        );
-      }).toList(),
-      onChanged: (String? newValue) {
-        setState(() {
-          slot.day = newValue!; // Update the day for this specific slot
-        });
-      },
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.textfiedlColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10.0),
+        child: DropdownButton<String>(
+          value: slot.day, // Use the day of the current slot
+          items: schedulenew.days.map((String day) {
+            return DropdownMenuItem<String>(
+              value: day,
+              child: Text(day),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              slot.day = newValue!; // Update the day for this specific slot
+            });
+          },
+        ),
+      ),
     );
   }
 
@@ -1513,11 +1765,11 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
+          color: AppColors.textfiedlColor,
           borderRadius: BorderRadius.circular(5),
         ),
-        child: Text(time.isNotEmpty ? time : 'Select time',
-            style: TextStyle(fontSize: 16)),
+        child: Text(time.isNotEmpty ? time : '00:00',
+            style: TextStyle(fontSize: 12)),
       ),
     );
   }

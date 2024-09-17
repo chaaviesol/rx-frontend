@@ -1,5 +1,10 @@
+import 'package:flutter/cupertino.dart';
+
 class ScheduleNew {
   String? selectedSubHeadquarter;
+  TextEditingController address = TextEditingController();
+  TextEditingController latitude = TextEditingController();
+  TextEditingController longitude = TextEditingController();
   List<TimeSlot> timeSlots = [
     TimeSlot(day: 'Mon'),
   ];

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:rx_route_new/Util/Utils.dart';
+import 'package:rx_route_new/res/app_url.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../app_colors.dart';
 import '../../../constants/styles.dart';
@@ -40,21 +42,24 @@ class _Adding_chemistmngrState extends State<Adding_chemistmngr> {
   }
 
   Future<void> _submitForm() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+    int? userID = int.parse(preferences.getString('userID').toString());
+    print('uniq id/usid:${uniqueID}'+'${userID}');
     if (_formKey.currentState!.validate()) {
-      final url = Uri.parse('http://192.168.1.10:3004/rep/add_chemist');
 
       final response = await http.post(
-        url,
+        Uri.parse(AppUrl.add_chemist),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'created_by': 5,
+          'created_by': userID,
           'building_name': _pharmacynameController.text,
           'mobile': _mobileController.text,
           'email': _emailController.text,
           'lisence_no': _licencenumberController.text,
           'address': _addressController.text,
           'date_of_birth': _dateOfBirthController.text,
-          'uniqueId': Utils.uniqueID, // Update this as needed
+          'uniqueId': uniqueID, // Update this as needed
         }),
       );
 

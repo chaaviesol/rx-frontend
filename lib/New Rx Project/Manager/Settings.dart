@@ -122,6 +122,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     },
                   ),
                   _buildListTile(
+                    icon: Icons.color_lens,
+                    title: 'Theme',
+                    onTap: () {
+                      // Handle Edit Profile action
+                    },
+                  ),
+                  _buildListTile(
                     icon: Icons.notifications,
                     title: 'Notification',
                     onTap: () {
