@@ -21,9 +21,13 @@ class AppColors{
   // static const Color tilecolor2 = Color.fromRGBO(30, 136, 229, 1);
   // static const Color tilecolor3 = Color.fromRGBO(144, 202, 249,1);
 
-  static const Color tilecolor1 = Color.fromRGBO(3, 4, 94, 1);
-  static const Color tilecolor2 = Color.fromRGBO(0, 150, 199, 1);
-  static const Color tilecolor3 = Color.fromRGBO(72, 202, 228, 1);
+  // static const Color tilecolor1 = Color.fromRGBO(3, 4, 94, 1);
+  // static const Color tilecolor2 = Color.fromRGBO(0, 150, 199, 1);
+  // static const Color tilecolor3 = Color.fromRGBO(72, 202, 228, 1);
+
+  static const Color tilecolor3 = Color.fromRGBO(229, 115, 115, 1);
+  static const Color tilecolor2 = Color.fromRGBO(255, 205, 210, 1);
+  static const Color tilecolor1 = Color.fromRGBO(174, 213, 100, 1);
 
   static const Color dividerColor = Color.fromRGBO(177, 177, 177, 0.5);
 //core

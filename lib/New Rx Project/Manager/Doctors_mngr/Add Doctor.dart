@@ -140,7 +140,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   List<Map<String, dynamic>> _headquartersData = [];
   Map<String, List<String>> _headquartersMap = {};
   String? _selectedHeadquarters;
-  bool _isLoading = true;
+  bool _isLoading = false;
   List<String> _specializations = [];
 
   Future<dynamic> fetchSpecializations(String query) async {
@@ -178,7 +178,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
     super.initState();
     _fetchHeadquarters();
     fetchChemists();
-    _fetchProducts();
+    _futureProducts = _fetchProducts();
   }
 
   Future<void> _fetchHeadquarters() async {

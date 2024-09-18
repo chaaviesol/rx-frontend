@@ -37,7 +37,13 @@ void main() async{
       ChangeNotifierProvider(create: (_)=>DynamicFormProvider())
       // ChangeNotifierProvider(create: (_)=>AuthViewModel()),
     ],
-      child: const MyApp()));
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 400
+          ),
+            child: const MyApp()),
+      )));
 }
 
 class MyApp extends StatelessWidget {
@@ -71,10 +77,12 @@ class MyApp extends StatelessWidget {
               return supportedLocales.first;
             },
           title: 'RXROUTE',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
             fontFamily: 'Inter',
             useMaterial3: true,
+            scaffoldBackgroundColor: AppColors.whiteColor
           ),
           initialRoute: RoutesName.splash,
           onGenerateRoute: Routes.generateRoute,

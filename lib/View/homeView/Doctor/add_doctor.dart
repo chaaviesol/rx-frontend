@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../../../New Rx Project/Manager/BottomNav/Travel plan/Manual/ManualTP.dart';
 import '../../../Util/Routes/routes_name.dart';
 import '../../../Util/Utils.dart';
 import '../../../app_colors.dart';
@@ -221,6 +222,7 @@ class _AddDoctorState extends State<AddDoctor> {
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
+        print('product ge tsucc');
         return ProductResponse.fromJson(jsonDecode(response.body));
       } else {
         throw Exception('Failed to load data (status code: ${response.statusCode})');
@@ -269,16 +271,16 @@ class _AddDoctorState extends State<AddDoctor> {
 
 
 
-  // Future<List<HeadQuart>> fetchHeadQuarts() async {
-  //   final response = await http.get(Uri.parse(AppUrl.abiip));
-  //
-  //   if (response.statusCode == 200) {
-  //     final List<dynamic> data = jsonDecode(response.body)['data'];
-  //     return data.map((json) => HeadQuart.fromJson(json)).toList();
-  //   } else {
-  //     throw Exception('Failed to load headquarters');
-  //   }
-  // }
+  Future<List<HeadQuart>> fetchHeadQuarts() async {
+    final response = await http.get(Uri.parse(AppUrl.list_headqrts));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body)['data'];
+      return data.map((json) => HeadQuart.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load headquarters');
+    }
+  }
 
   //address widgets
   final List<FieldEntry> fields = [FieldEntry()];

@@ -58,8 +58,6 @@ class Routes{
       case RoutesName.addTp:
         return MaterialPageRoute(builder: (BuildContext context) => const AddTravelPlan(),);
 
-
-
       default:
         return MaterialPageRoute(builder: (BuildContext context) => const LoginPageNew());
 

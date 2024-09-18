@@ -1,61 +1,44 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20lists/Doctor_details/doctor_detials.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../../Util/Utils.dart';
 import '../../../app_colors.dart';
 import '../../../res/app_url.dart';
-import '../Doctor/doctor_details.dart';
 
 class HomesearchRep extends StatefulWidget {
   String? searachString;
-  HomesearchRep({this.searachString,super.key});
+  HomesearchRep({this.searachString, super.key});
 
   @override
   State<HomesearchRep> createState() => _HomesearchRepState();
 }
 
 class _HomesearchRepState extends State<HomesearchRep> {
-
-
-  final List<Color> pastelColors = [
-    Color(0xFFB39DDB), // Light Purple
-    Color(0xFF81D4FA), // Light Blue
-    Color(0xFFAED581), // Light Green
-    Color(0xFFFFF176), // Light Yellow
-    Color(0xFFFFAB91), // Light Orange
-    Color(0xFFE57373), // Light Red
-    Color(0xFFFFF9C4), // Light Cream
-    Color(0xFFD1C4E9), // Light Lavender
-    Color(0xFFFFCDD2), // Light Pink
-  ];
-  Color getPastelColor(String name) {
-    final int hash = name.codeUnits.fold(0, (int sum, int char) => sum + char);
-    return pastelColors[hash % pastelColors.length];
-  }
-
   List<dynamic> list_of_doctors = [];
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  bool _isLoading = true; // To handle loading state
-  bool _isSearching = false; // To handle searching state
-
+  bool _isLoading = true;
+  bool _isSearching = false;
 
   Future<void> getdoctors() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String? uniqueId = preferences.getString('uniqueID');
     String url = AppUrl.getdoctors;
     Map<String, dynamic> data = {
-      "rep_UniqueId": uniqueId
+      "rep_UniqueId": uniqueId,
     };
 
     try {
-      if (preferences.getString('uniqueID')!.isEmpty) {
+      if (uniqueId == null || uniqueId.isEmpty) {
         Utils.flushBarErrorMessage('Please login again!', context);
+        setState(() {
+          _isLoading = false;
+        });
         return;
       }
+
       final response = await http.post(
         Uri.parse(url),
         headers: {
@@ -63,22 +46,22 @@ class _HomesearchRepState extends State<HomesearchRep> {
         },
         body: jsonEncode(data),
       );
-      print('$data');
 
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        print('doctors list : $responseData');
+        print('Full Doctor List: ${responseData['data']}');
+
         setState(() {
-          list_of_doctors = responseData['data'];
+          list_of_doctors = responseData['data'] ?? [];
           _isLoading = false;
         });
       } else {
         var responseData = jsonDecode(response.body);
         Utils.flushBarErrorMessage('${responseData['message']}', context);
         setState(() {
+          list_of_doctors = [];
           _isLoading = false;
         });
-        throw Exception('Failed to load data (status code: ${response.statusCode})');
       }
     } catch (e) {
       setState(() {
@@ -93,10 +76,15 @@ class _HomesearchRepState extends State<HomesearchRep> {
     String? uniqueId = preferences.getString('uniqueID');
     String url = AppUrl.searchdoctors;
     Map<String, dynamic> data = {
-      "requesterUniqueId":uniqueId,
-      "searchData": _searchController.text
+      "requesterUniqueId": uniqueId,
+      "searchData": _searchController.text,
     };
+
     try {
+      setState(() {
+        _isLoading = true;
+      });
+
       final response = await http.post(
         Uri.parse(url),
         headers: {
@@ -107,17 +95,23 @@ class _HomesearchRepState extends State<HomesearchRep> {
 
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        print('filtered list : $responseData');
+        print('Search Results: ${responseData['data']}');
+
         setState(() {
-          list_of_doctors = responseData['data'];
+          list_of_doctors = responseData['data'] ?? [];
+          _isLoading = false;
           _isSearching = true;
         });
-        if (responseData['data'].isEmpty) {
-          getdoctors();
-        }
       } else {
+        setState(() {
+          _isLoading = false;
+          list_of_doctors = [];
+        });
       }
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       throw Exception('Failed to load data: $e');
     }
   }
@@ -133,22 +127,23 @@ class _HomesearchRepState extends State<HomesearchRep> {
   @override
   void initState() {
     super.initState();
-    _searchController.text = widget.searachString.toString();
+    print('Search String: ${widget.searachString}');
+    _searchController.text = widget.searachString ?? '';
     _searchController.addListener(_onSearchChanged);
-    getdoctors(); // Fetch the initial list of doctors
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    getdoctors();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchFocusNode.requestFocus();
     });
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -211,35 +206,38 @@ class _HomesearchRepState extends State<HomesearchRep> {
                 ],
               ),
               Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: _isLoading ? Center(child: CircularProgressIndicator()) : ListView.builder(
-                        itemCount: list_of_doctors.length,
-                        itemBuilder: (context, index) {
-                          // return Text('${list_of_doctors[0]['addedBy_']}');
-                          var doctor = list_of_doctors[index];
-                          return InkWell(
-                            onTap: () {
-                              // Navigator.push(context, MaterialPageRoute(
-                              //   builder: (context) => DoctorDetails(doctorID: doctor['id']),
-                              // ));
-                            },
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: pastelColors[index],
-                                child: Text('${doctor['firstName'][3]}'),
-                              ),
-                              title: Text('${doctor['firstName']}'),
-                              // subtitle: Text(doctor['specialization']),
-                            ),
-                          );
-                        },
+                child: _isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : list_of_doctors.isEmpty
+                    ? Center(child: Text("No doctors found"))
+                    : ListView.builder(
+                  itemCount: list_of_doctors.length,
+                  itemBuilder: (context, index) {
+                    var doctor = list_of_doctors[index];
+                    String firstName = doctor['firstName'] + doctor['lastName'] ?? 'Unknown';
+                    String spec = doctor['specialization'] ?? 'Unknown';
+                    Color avatarColor = list_of_doctors[index]['visit_type'] == 'core'
+                        ? AppColors.tilecolor2
+                        : list_of_doctors[index]['visit_type'] == 'supercore'
+                        ? AppColors.tilecolor1
+                        : AppColors.tilecolor3;
+
+                    String avatarLetter = firstName.isNotEmpty ? firstName[0].toUpperCase() : '?';
+
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => DoctorDetailsPage(doctorId: doctor['id']),));
+                      },
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: avatarColor,
+                          child: Text(avatarLetter),
+                        ),
+                        title: Text(firstName),
+                        subtitle: Text(spec),
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],

@@ -136,94 +136,101 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
         ),
         centerTitle: true,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-          ? Center(child: Text(_errorMessage!))
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      color: AppColors.primaryColor,
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.height / 5.5,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 40,
-                              child: Text(_doctorDetails?['firstName'][0] ?? ''),
-                            ),
-                            const SizedBox(width: 20),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${_doctorDetails!['firstName']} ${_doctorDetails!['lastName']}',
-                                  style: text60017,
-                                ),
-                                Text('${_doctorDetails!['doc_qualification']}', style: text40012),
-                                Text('${_doctorDetails!['specialization']}', style: text40012),
-                              ],
-                            ),
-                          ],
+      body: Center(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _errorMessage != null
+            ? Center(child: Text(_errorMessage!))
+            : Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        color:_doctorDetails?['visit_type'] == 'core'
+                            ? AppColors.tilecolor2
+                            : _doctorDetails?['visit_type'] == 'supercore'
+                            ? AppColors.tilecolor1
+                            : AppColors.tilecolor3,
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height / 5.5,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 40,
+                                backgroundColor: AppColors.whiteColor,
+                                child: Text(_doctorDetails?['firstName'][0] ?? '',),
+                              ),
+                              const SizedBox(width: 20),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${_doctorDetails!['firstName']} ${_doctorDetails!['lastName']}',
+                                    style: text60017black,
+                                  ),
+                                  Text('${_doctorDetails!['doc_qualification']}', style: text40012black),
+                                  Text('${_doctorDetails!['specialization']}', style: text40012black),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text('Basic Information', style: text50014black),
-                  const SizedBox(height: 10),
-                  TabBar(
-                    tabAlignment: TabAlignment.start,
-                    isScrollable: true,
-                    controller: _tabController,
-                    labelColor: AppColors.primaryColor,
-                    unselectedLabelColor: Colors.black54,
-                    indicatorColor: AppColors.primaryColor,
-                    tabs: const [
-                      Tab(text: 'Schedule'),
-                      Tab(text: 'Overview'),
-                      Tab(text: 'Tagged'),
-                      Tab(text: 'Visit History'),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 400, // Adjust the height based on your content
-                    child: TabBarView(
+                    const SizedBox(height: 10),
+                    Text('Basic Information', style: text50014black),
+                    const SizedBox(height: 10),
+                    TabBar(
+                      tabAlignment: TabAlignment.start,
+                      isScrollable: true,
                       controller: _tabController,
-                      children: [
-                        _buildScheduleTab(),
-                        _buildOverviewTab(),
-                        _buildTaggedTab(),
-                        _buildVisitHistoryTab(),
+                      labelColor: AppColors.primaryColor,
+                      unselectedLabelColor: Colors.black54,
+                      indicatorColor: AppColors.primaryColor,
+                      tabs: const [
+                        Tab(text: 'Schedule'),
+                        Tab(text: 'Overview'),
+                        Tab(text: 'Tagged'),
+                        Tab(text: 'Visit History'),
                       ],
                     ),
-                  ),
-                ],
+                    SizedBox(
+                      height: 400, // Adjust the height based on your content
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          _buildScheduleTab(),
+                          _buildOverviewTab(),
+                          _buildTaggedTab(),
+                          _buildVisitHistoryTab(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Positioned(
-              left: MediaQuery.of(context).size.width/4,
-              bottom: MediaQuery.of(context).size.height/14.9,
-              child: ElevatedButton(style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor),
-                onPressed: () {
-                print('00000${_doctorDetails!["addressDetail"][0][0]['product']}');
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(doctorID: widget.doctorId, products: _doctorDetails!["addressDetail"][0][0]['product'],),));
+              Positioned(
+                left: MediaQuery.of(context).size.width/4,
+                bottom: MediaQuery.of(context).size.height/14.9,
+                child: ElevatedButton(style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor),
+                  onPressed: () {
+                  print('00000${_doctorDetails!["addressDetail"][0][0]['product']}');
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(doctorID: widget.doctorId, products: _doctorDetails!["addressDetail"][0][0]['product'],),));
 
-                }, child: Text('Mark As Visited',style: text50012,),),
-            ),
-          ],
+                  }, child: Text('Mark As Visited',style: text50012,),),
+              ),
+            ],
+          ),
         ),
       ),
     );

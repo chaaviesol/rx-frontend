@@ -38,6 +38,8 @@ class _RepHomepageState extends State<RepHomepage> {
   var locationdata;
   bool _locationEnabled = false;
 
+  TextEditingController _searchText = TextEditingController();
+
   Future<void> _checkPasswordStatus() async {
     print('check called...');
     final String apiUrl = 'http://52.66.145.37:3004/user/checkPassword';
@@ -256,12 +258,15 @@ class _RepHomepageState extends State<RepHomepage> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: TextFormField(
-                          readOnly: true,
+                          controller: _searchText,
                           decoration: const InputDecoration(
                             hintText: 'Search',
                             prefixIcon: Icon(Icons.search),
                             border: InputBorder.none,
                           ),
+                          onFieldSubmitted: (value){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => HomesearchRep(searachString: _searchText.text,),));
+                          },
                         ),
                       ),
                     ),

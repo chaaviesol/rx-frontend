@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:rx_route_new/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -144,7 +145,8 @@ class _EmployeeListState extends State<EmployeeList> {
             final employee = _employees[index];
             return ListTile(
               leading: CircleAvatar(
-                child: Text(employee['name']?.substring(0, 1) ?? '?'),
+                backgroundColor: AppColors.primaryColor,
+                child: Text(employee['name']?.substring(0, 1) ?? '?',style: TextStyle(color: AppColors.whiteColor),),
               ),
               title: Text(employee['name'] ?? 'No Name',
                   style: text50014black),

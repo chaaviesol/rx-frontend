@@ -96,7 +96,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
       // Successful response
       var responseData = jsonDecode(response.body);
       // Utils.flushBarErrorMessage('${responseData['data']['message']}', context);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: '${responseData['data']['data']}',),));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: responseData['data']['data'],),));
       // Utils.flushBarErrorMessage('${responseData['data']['message']}', context);
       print('Response data: ${response.body}');
       print('Response datas: ${responseData['data']['data']}');
@@ -203,19 +203,14 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
         var data = await sendPostRequest('${uniqueId}', selectedMonth);
         print('auto data: $data');
 
-        // Wait to ensure the loader is properly dismissed before navigating
-        await Future.delayed(Duration(milliseconds: 200));
-
-        // Dismiss the loader dialog
-        Navigator.of(context).pop(); // Close the loader dialog
-
         // Ensure the response data is valid before navigating
         if (data != null) {
           // Navigate to the Autotp page
+          print('sending data to next page :${data['data']}');
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Autotp(data: '${data['data']}',),
+              builder: (context) => Autotp(data: data['data'],),
             ),
           );
 

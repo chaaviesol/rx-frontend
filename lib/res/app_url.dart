@@ -55,7 +55,7 @@ class AppUrl{
 
   static var list_headqrts = '$baseUrl/rep/get_headquarters';
 
-  static var list_products = '$baseUrl/user/get_product';
+  static var list_products = '$baseUrl/rep/get_product';
 
   static var generate_tp = '$baseUrl/rep/travel_plan';
 
