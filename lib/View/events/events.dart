@@ -842,7 +842,7 @@ class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2, // Number of nested tabs
+      length: 1, // Number of nested tabs
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 0,
