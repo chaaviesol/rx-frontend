@@ -3,7 +3,7 @@ class AppUrl{
 
   static const hostedip = '52.66.145.37';
 
-  // static const abiip = '192.168.1.10';
+  // static const localip = '192.168.1.10';
 
   static var baseUrl = 'http://${hostedip}:${port}';
 
@@ -48,6 +48,8 @@ class AppUrl{
   static var add_chemist = '$baseUrl/rep/add_chemist';
 
   static var get_chemists = '$baseUrl/rep/get_chemist';
+
+  static var getaddedChemist = '$baseUrl/user/addedChemist';
 
   static var search_chemists = '$baseUrl/rep/search_chemist';
 
@@ -98,6 +100,14 @@ class AppUrl{
   //travelplan
 
   static var submitAutoTP = '$baseUrl/user/SubmitAutomaticTp';
+
+  static var getTravelPlans = '$baseUrl/user/userAddedTP';
+
+  static var generateautoTP = '$baseUrl/generate-visit-plan';
+
+  //userperformance
+  // get doctor visit data
+  static var getuserPerformance = '$baseUrl/user/Performance';
 
 
 }

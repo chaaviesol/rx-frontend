@@ -18,7 +18,7 @@ class Autotp extends StatefulWidget   {
 }
 
 class _AutotpState extends State<Autotp> {
-  bool _loading = true; // Loading state variable
+  // bool _loading = true; // Loading state variable
   String selectedDate = '';
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
@@ -69,17 +69,17 @@ class _AutotpState extends State<Autotp> {
 
   // Submit AutoTP to backend
   Future<void> submitAutoTp() async {
-    setState(() {
-      _loading = true; // Show loader when submitting
-    });
+    print('auto submit ');
+    // setState(() {
+    //   _loading = true; // Show loader when submitting
+    // });
 
     SharedPreferences preferences = await SharedPreferences.getInstance();
     int? userID = int.parse(preferences.getString('userID').toString());
     String url = AppUrl.submitAutoTP;
-
     var data = {
       "user_id": userID,
-      "data": "${widget.data}"
+      "data": [widget.data]
     };
 
     try {
@@ -90,15 +90,23 @@ class _AutotpState extends State<Autotp> {
         },
         body: jsonEncode(data),
       );
-      var responseData = jsonDecode(response.body);
-      Utils.flushBarErrorMessage('${responseData['message']}', context);
+      print('${response.statusCode}');
+      print('${response.body}');
+
+      if(response.statusCode == 200){
+        var responseData = jsonDecode(response.body);
+        Utils.flushBarErrorMessage('${responseData['message']}', context);
+      }else{
+        Utils.flushBarErrorMessage('error aan mone', context);
+      }
+
     } catch (e) {
       print('Error: $e');
       Utils.flushBarErrorMessage('Failed to submit AutoTP', context);
     } finally {
-      setState(() {
-        _loading = false; // Stop loading after submission
-      });
+      // setState(() {
+      //   _loading = false; // Stop loading after submission
+      // });
     }
   }
 
@@ -134,7 +142,9 @@ class _AutotpState extends State<Autotp> {
           )
         ],
       ),
-      body: Column(
+      body:
+      // _loading ? Center(child: CircularProgressIndicator(),):
+      Column(
         children: [
           // Dropdown for selecting date
           // Calendar view
@@ -173,10 +183,31 @@ class _AutotpState extends State<Autotp> {
               itemCount: widget.data[formatDate(_selectedDay)]?.length ?? 0,
               itemBuilder: (context, index) {
                 final doctor = widget.data[formatDate(_selectedDay)]![index];
-                return ListTile(
-                  title: Text(doctor['doctor']),
-                  subtitle: Text('${doctor['category']} - ${doctor['day']}'),
-                  trailing: Text(doctor['address']['address']),
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(9),
+                      border: Border.all(
+                        width: 1,color:doctor['visit_type'] == 'core'
+                          ? AppColors.tilecolor2
+                          : doctor['visit_type'] == 'supercore'
+                          ? AppColors.tilecolor1
+                          : AppColors.tilecolor3, )
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        child: Text('${doctor['doctor'][3]}',style: TextStyle(color: AppColors.whiteColor),),
+                        backgroundColor:  doctor['visit_type'] == 'core'
+                            ? AppColors.tilecolor2
+                            : doctor['visit_type'] == 'supercore'
+                            ? AppColors.tilecolor1
+                            : AppColors.tilecolor3,
+                      ),
+                      title: Text(doctor['doctor']),
+                      // subtitle: Text('${doctor['category']} - ${doctor['day']}'),
+                      trailing: Text(doctor['address']['address']),
+                    ),
+                  ),
                 );
               },
             ),

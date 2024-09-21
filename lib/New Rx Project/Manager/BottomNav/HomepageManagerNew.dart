@@ -11,8 +11,11 @@ import 'package:rx_route_new/View/homeView/search/home_search_rep.dart';
 import 'package:rx_route_new/View/profile/settings/settings.dart';
 import 'package:rx_route_new/app_colors.dart';
 import 'package:rx_route_new/res/app_url.dart';
+import 'package:rx_route_new/widgets/HomeTileWidget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Util/Utils.dart';
+import '../../../View/events/events.dart';
 import '../../../constants/styles.dart';
 import '../../resetPassword.dart';
 
@@ -26,7 +29,8 @@ class HomepageManager extends StatefulWidget {
 class _HomepageManagerState extends State<HomepageManager> {
   List<dynamic> todayAnniversaries = [];
   List<dynamic> upcomingBirthdays = [];
-  bool isLoading = true;String _locationName = "Fetching location...";
+  bool isLoading = false;
+  String _locationName = "Fetching location...";
   bool _locationEnabled = false;
 
   TextEditingController _searchText = TextEditingController();
@@ -177,36 +181,49 @@ class _HomepageManagerState extends State<HomepageManager> {
     // _checkPasswordStatus();
     super.initState();
     _checkLocationPermission();
-    fetchEvents();
+    getEvents();
   }
 
-  Future<void> fetchEvents() async {
-    final url = Uri.parse(AppUrl.getEvents); // Replace with your API URL
+  Future<dynamic> getEvents() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+    print('get events called...');
+    final url = Uri.parse(AppUrl.getEvents);
+    var data = {
+      "requesterUniqueId":uniqueID
+    };
     try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({"requesterUniqueId": "MUS854"}),
+      final response = await http.post(url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
       );
-
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          todayAnniversaries = data['todayEvents'][0]['todayAnniversary'];
-          upcomingBirthdays = data['UpcomingEvents'][0]['BirthdayNotification'];
-          isLoading = false;
-        });
+        // If the server returns a 200 OK response, parse the JSON
+        var responseData = jsonDecode(response.body);
+        // myeventstoday.clear();
+        // myeventsupcoming.clear();
+        // myeventstoday.addAll(responseData['todayEvents']);
+        // myeventsupcoming.addAll(responseData['UpcomingEvents'][0]['AnniversaryNotification']);
+        // allevents.clear();
+        // allevents.addAll({'upcoming':myeventsupcoming,"todays":myeventstoday});
+        // print('all events:$allevents');
+        // print('myeventstoday:$myeventstoday');
+        // print('myeventsupcoming:$myeventsupcoming');
+        // return json.decode(response.body);
+        return responseData;
       } else {
-        setState(() {
-          isLoading = false; // Stop loading if error
-        });
+        // If the server returns an error, throw an exception
+        throw Exception('Failed to load data');
       }
     } catch (e) {
-      setState(() {
-        isLoading = false; // Stop loading if exception
-      });
+      // Handle any exceptions that occur during the request
+      throw Exception('Failed to load data: $e');
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -343,181 +360,269 @@ class _HomepageManagerState extends State<HomepageManager> {
                             scrollDirection: Axis.horizontal,
                             child: Row(
                               children: [
-                                Container(
-                                  width:MediaQuery.of(context).size.width/1.9,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: EdgeInsets.all(8.0),
-                                  height: MediaQuery.of(context).size.height / 6,
-                                  child: Row(
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 20,
-                                        child: IconButton(
-                                          onPressed: () {},
-                                          icon: Icon(Icons.call, color: AppColors.primaryColor),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 20),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Calls',
-                                            style: text60012,
-                                          ),
-                                          Text('Missed: 5', style: text40012),
-                                          Text('14-08-2024', style: text40012),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                Hometilewidget(),
                                 SizedBox(width: 10,),
-                                Container(
-                                  width:MediaQuery.of(context).size.width/1.9,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: EdgeInsets.all(8.0),
-                                  height: MediaQuery.of(context).size.height / 6,
-                                  child: Row(
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 20,
-                                        child: IconButton(
-                                          onPressed: () {},
-                                          icon: Icon(Icons.call, color: AppColors.primaryColor),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 20),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Total Calls',
-                                            style: text60012,
-                                          ),
-                                          Text('1800', style: text40012),
-                                          Text('14-08-2024', style: text40012),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                Hometilewidget(),
+                                SizedBox(width: 10,),
+                                Hometilewidget()
+                                // Container(
+                                //   width:MediaQuery.of(context).size.width/1.9,
+                                //   decoration: BoxDecoration(
+                                //     color: AppColors.primaryColor,
+                                //     borderRadius: BorderRadius.circular(20),
+                                //   ),
+                                //   padding: EdgeInsets.all(8.0),
+                                //   height: MediaQuery.of(context).size.height / 6,
+                                //   child: Row(
+                                //     children: [
+                                //       CircleAvatar(
+                                //         radius: 20,
+                                //         child: IconButton(
+                                //           onPressed: () {},
+                                //           icon: Icon(Icons.call, color: AppColors.primaryColor),
+                                //         ),
+                                //       ),
+                                //       const SizedBox(width: 20),
+                                //       Column(
+                                //         mainAxisAlignment: MainAxisAlignment.center,
+                                //         crossAxisAlignment: CrossAxisAlignment.start,
+                                //         children: [
+                                //           Text(
+                                //             'Calls',
+                                //             style: text60012,
+                                //           ),
+                                //           Text('Missed: 5', style: text40012),
+                                //           Text('14-08-2024', style: text40012),
+                                //         ],
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
+                                // SizedBox(width: 10,),
+                                // Container(
+                                //   width:MediaQuery.of(context).size.width/1.9,
+                                //   decoration: BoxDecoration(
+                                //     color: AppColors.primaryColor,
+                                //     borderRadius: BorderRadius.circular(20),
+                                //   ),
+                                //   padding: EdgeInsets.all(8.0),
+                                //   height: MediaQuery.of(context).size.height / 6,
+                                //   child: Row(
+                                //     children: [
+                                //       CircleAvatar(
+                                //         radius: 20,
+                                //         child: IconButton(
+                                //           onPressed: () {},
+                                //           icon: Icon(Icons.call, color: AppColors.primaryColor),
+                                //         ),
+                                //       ),
+                                //       const SizedBox(width: 20),
+                                //       Column(
+                                //         mainAxisAlignment: MainAxisAlignment.center,
+                                //         crossAxisAlignment: CrossAxisAlignment.start,
+                                //         children: [
+                                //           Text(
+                                //             'Total Calls',
+                                //             style: text60012,
+                                //           ),
+                                //           Text('1800', style: text40012),
+                                //           Text('14-08-2024', style: text40012),
+                                //         ],
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
                         ),
                         SizedBox(height: 10),
-                        Text('Events', style: text40016black),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Events',style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                            ),),
+                            InkWell(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => SeeAllPage()));
+                                // Navigator.push(context, MaterialPageRoute(builder: (context) => Events(eventType: 'Todays Events'),));
+                              },
+                              child: const Text('See all',style: TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                  decoration: TextDecoration.underline),),
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 10),
             
                         // Events Section
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (todayAnniversaries.isEmpty && upcomingBirthdays.isEmpty)
-                                Center(
-                                  child: Text(
-                                    'There are no events',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.whiteColor,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                )
-                              else ...[
-                                // Display Upcoming Birthdays
-                                if (upcomingBirthdays.isNotEmpty) ...[
-                                  Text(
-                                    'Upcoming Birthdays',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.whiteColor,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  for (var birthday in upcomingBirthdays) ...[
-                                    Row(
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 25,
-                                          backgroundColor: Colors.white,
-                                          child: Icon(
-                                            Icons.cake,
-                                            color: AppColors.primaryColor,
-                                          ),
+                        // Container(
+                        //   decoration: BoxDecoration(
+                        //     color: AppColors.primaryColor,
+                        //     borderRadius: BorderRadius.circular(6),
+                        //   ),
+                        //   padding: const EdgeInsets.all(10.0),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       if (todayAnniversaries.isEmpty && upcomingBirthdays.isEmpty)
+                        //         Center(
+                        //           child: Text(
+                        //             'There are no events',
+                        //             style: TextStyle(
+                        //               fontWeight: FontWeight.w500,
+                        //               color: AppColors.whiteColor,
+                        //               fontSize: 14,
+                        //             ),
+                        //           ),
+                        //         )
+                        //       else ...[
+                        //         // Display Upcoming Birthdays
+                        //         if (upcomingBirthdays.isNotEmpty) ...[
+                        //           Text(
+                        //             'Upcoming Birthdays',
+                        //             style: TextStyle(
+                        //               fontWeight: FontWeight.w500,
+                        //               color: AppColors.whiteColor,
+                        //               fontSize: 12,
+                        //             ),
+                        //           ),
+                        //           SizedBox(height: 10),
+                        //           for (var birthday in upcomingBirthdays) ...[
+                        //             Row(
+                        //               children: [
+                        //                 CircleAvatar(
+                        //                   radius: 25,
+                        //                   backgroundColor: Colors.white,
+                        //                   child: Icon(
+                        //                     Icons.cake,
+                        //                     color: AppColors.primaryColor,
+                        //                   ),
+                        //                 ),
+                        //                 SizedBox(width: 10),
+                        //                 Expanded(
+                        //                   child: Column(
+                        //                     crossAxisAlignment: CrossAxisAlignment.start,
+                        //                     children: [
+                        //                       Text(
+                        //                         '${birthday['firstName']} ${birthday['lastName']}',
+                        //                         style: TextStyle(
+                        //                           fontWeight: FontWeight.w500,
+                        //                           color: AppColors.whiteColor,
+                        //                           fontSize: 12,
+                        //                         ),
+                        //                       ),
+                        //                       Text(
+                        //                         'DOB: ${birthday['date_of_birth']}',
+                        //                         style: TextStyle(
+                        //                           color: AppColors.whiteColor,
+                        //                           fontSize: 12,
+                        //                         ),
+                        //                       ),
+                        //                     ],
+                        //                   ),
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //             SizedBox(height: 10),
+                        //           ],
+                        //         ],
+                        //         SizedBox(height: 20),
+                        //         Container(
+                        //           decoration: BoxDecoration(
+                        //             color: AppColors.primaryColor2,
+                        //             borderRadius: BorderRadius.circular(6),
+                        //           ),
+                        //           child: Padding(
+                        //             padding: const EdgeInsets.all(8.0),
+                        //             child: Row(
+                        //               mainAxisAlignment: MainAxisAlignment.center,
+                        //               children: [
+                        //                 Text(
+                        //                   'Notify me',
+                        //                   style: TextStyle(
+                        //                     fontWeight: FontWeight.w500,
+                        //                     color: AppColors.whiteColor,
+                        //                     fontSize: 12,
+                        //                   ),
+                        //                 ),
+                        //                 SizedBox(width: 10),
+                        //                 Icon(Icons.notifications_active, color: AppColors.whiteColor),
+                        //               ],
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ],
+                        //   ),
+                        // ),
+
+                        FutureBuilder(
+                          future: getEvents(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Some error occurred!'));
+                            } else if (snapshot.hasData) {
+                              print('event data:${snapshot.data}');
+                              return SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        height:100,
+                                        width:250,
+                                        decoration: BoxDecoration(
+                                            color: AppColors.primaryColor2,
+                                            borderRadius: BorderRadius.circular(9)
                                         ),
-                                        SizedBox(width: 10),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '${birthday['firstName']} ${birthday['lastName']}',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  color: AppColors.whiteColor,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                              Text(
-                                                'DOB: ${birthday['date_of_birth']}',
-                                                style: TextStyle(
-                                                  color: AppColors.whiteColor,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            // Text('${snapshot.data['todays']}'),
+                                            Text('Todays Birthdays : ${snapshot.data['todayEvents'][0]['todayBirthday'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
+                                            Text('Todays Anniversarys : ${snapshot.data['todayEvents'][0]['todayAnniversary'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                    SizedBox(height: 10),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        height:100,
+                                        width:250,
+                                        decoration: BoxDecoration(
+                                            color: AppColors.primaryColor2,
+                                            borderRadius: BorderRadius.circular(9)
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            // Text('${snapshot.data['todays']}'),
+                                            Text('Upcoming Birthdays : ${snapshot.data['UpcomingEvents'][0]['BirthdayNotification'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
+                                            Text('Upcoming Anniversarys : ${snapshot.data['UpcomingEvents'][0]['AnniversaryNotification'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+
                                   ],
-                                ],
-                                SizedBox(height: 20),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryColor2,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Notify me',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.whiteColor,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        Icon(Icons.notifications_active, color: AppColors.whiteColor),
-                                      ],
-                                    ),
-                                  ),
                                 ),
-                              ],
-                            ],
-                          ),
+                              );
+
+                            }
+                            return Center(child: Text('Some error occurred, Please restart your application!'));
+                          },
                         ),
             
             
@@ -528,11 +633,11 @@ class _HomepageManagerState extends State<HomepageManager> {
                         SizedBox(height: 10,),
                         Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            ElevatedButton(style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryColor),
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => MyLeaveandexpense(),));
-                              }, child: Text('Leave & Expense',style: text50012,),),
+                            // ElevatedButton(style: ElevatedButton.styleFrom(
+                            //     backgroundColor: AppColors.primaryColor),
+                            //   onPressed: () {
+                            //     Navigator.push(context, MaterialPageRoute(builder: (context) => MyLeaveandexpense(),));
+                            //   }, child: Text('Leave & Expense',style: text50012,),),
             
                           ],
                         ),
@@ -548,4 +653,5 @@ class _HomepageManagerState extends State<HomepageManager> {
       ),
     );
   }
+
 }

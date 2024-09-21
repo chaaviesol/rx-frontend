@@ -81,7 +81,8 @@ class _My_listState extends State<My_list> with SingleTickerProviderStateMixin {
                   ),
                 ],
               ),
-              child: TabBar( tabAlignment: TabAlignment.start,
+              child: TabBar(
+                tabAlignment: TabAlignment.start,
                 isScrollable: true,
                 controller: _tabController,
                 tabs: _tabs,
@@ -97,7 +98,6 @@ class _My_listState extends State<My_list> with SingleTickerProviderStateMixin {
 
       body: SafeArea(
         child: TabBarView(
-
           controller: _tabController,
           children: _pages,
         ),

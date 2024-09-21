@@ -1,6 +1,18 @@
 import 'package:flutter/material.dart';
 class AppColors{
 
+  static final List<Color> pastelColors = [
+    Color(0xFFB39DDB), // Light Purple
+    Color(0xFF81D4FA), // Light Blue
+    Color(0xFFAED581), // Light Green
+    Color(0xFFFFF176), // Light Yellow
+    Color(0xFFFFAB91), // Light Orange
+    Color(0xFFE57373), // Light Red
+    Color(0xFFFFF9C4), // Light Cream
+    Color(0xFFD1C4E9), // Light Lavender
+    Color(0xFFFFCDD2), // Light Pink
+  ];
+
   static const Color buttonColor= Colors.lightGreen;
   
   static const Color primaryColor = Color.fromRGBO(1, 101,252, 1);
@@ -25,9 +37,9 @@ class AppColors{
   // static const Color tilecolor2 = Color.fromRGBO(0, 150, 199, 1);
   // static const Color tilecolor3 = Color.fromRGBO(72, 202, 228, 1);
 
-  static const Color tilecolor3 = Color.fromRGBO(229, 115, 115, 1);
+  static const Color tilecolor1 = Color.fromRGBO(229, 115, 115, 1);
   static const Color tilecolor2 = Color.fromRGBO(255, 205, 210, 1);
-  static const Color tilecolor1 = Color.fromRGBO(174, 213, 100, 1);
+  static const Color tilecolor3 = Color.fromRGBO(174, 213, 100, 1);
 
   static const Color dividerColor = Color.fromRGBO(177, 177, 177, 0.5);
 //core

@@ -1,10 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:rx_route_new/constants/styles.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ChemistList extends StatefulWidget {
   const ChemistList({super.key});
@@ -69,59 +69,30 @@ class _ChemistListState extends State<ChemistList> {
   }
 
   Future<void> _fetchChemists() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? uniqueID = preferences.getString('uniqueID');
-    var requestData = {
-      "userId": uniqueID
-    };
-    final url = 'http://52.66.145.37:3004/user/addedChemist';
 
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        body: jsonEncode(requestData),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
+    final url = 'http://52.66.145.37:3004/rep/get_chemist';
+    final response = await http.post(Uri.parse(url));
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-
-        if (responseData['success'] == true) {
-          List<Map<String, dynamic>> parsedChemists = [];
-
-          // Flatten the data list, extracting each chemist entry
-          for (var chemistList in responseData['data']) {
-            for (var chemist in chemistList) {
-              parsedChemists.add(chemist);
-            }
-          }
-
-          setState(() {
-            _chemists = parsedChemists;
-            _isLoading = false;
-          });
-        } else {
-          setState(() {
-            _errorMessage = responseData['message'];
-            _isLoading = false;
-          });
-        }
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success']) {
+        setState(() {
+          _chemists = List<Map<String, dynamic>>.from(data['data']);
+          _isLoading = false;
+        });
       } else {
         setState(() {
-          _errorMessage = 'Failed to load data';
+          _errorMessage = data['message'];
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } else {
       setState(() {
-        _errorMessage = 'An error occurred: $e';
+        _errorMessage = 'Failed to load data';
         _isLoading = false;
       });
     }
   }
-
 
   void _handleMenuAction(String action, dynamic chemist) {
     switch (action) {
@@ -138,54 +109,50 @@ class _ChemistListState extends State<ChemistList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: RefreshIndicator(
-        onRefresh: _refreshData,
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : _errorMessage.isNotEmpty
-            ? Center(child: Text(_errorMessage))
-            : ListView.builder(
-          itemCount: _chemists.length,
-          itemBuilder: (context, index) {
-            final chemist = _chemists[index];
-            print('chemist list is:$_chemists');
-            return ListTile(
-              // title: Text(chemist['building_name'] ?? 'No Building Name',style: text50014black,),
-              title: Text(chemist['chemist'][0]['address'] ?? 'No Building Name',style: text50014black,),
-              // subtitle: Text(chemist['address'] ?? 'No Address',style: text50012black,),
-              subtitle: Text(chemist['chemist'][0]['pincode'] ?? 'No Address',style: text50012black,),
-              trailing: PopupMenuButton<String>(
-                onSelected: (action) => _handleMenuAction(action, chemist),
-                itemBuilder: (BuildContext context) {
-                  return [
-                    PopupMenuItem<String>(
-                      value: 'edit',
-                      child: Row(
-                        children: const [
-                          Icon(Icons.edit,),
-                          SizedBox(width: 10),
-                          Text('Edit',style: text50012black,),
-                        ],
-                      ),
+      onRefresh: _refreshData,
+      child: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _errorMessage.isNotEmpty
+          ? Center(child: Text(_errorMessage))
+          : ListView.builder(
+        itemCount: _chemists.length,
+        itemBuilder: (context, index) {
+          final chemist = _chemists[index];
+          return ListTile(
+            title: Text(chemist['building_name'] ?? 'No Building Name',style: text50014black,),
+            subtitle: Text(chemist['address'] ?? 'No Address',style: text50012black,),
+            trailing: PopupMenuButton<String>(
+              onSelected: (action) => _handleMenuAction(action, chemist),
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem<String>(
+                    value: 'edit',
+                    child: Row(
+                      children: const [
+                        Icon(Icons.edit,),
+                        SizedBox(width: 10),
+                        Text('Edit',style: text50012black,),
+                      ],
                     ),
-                    PopupMenuItem<String>(
-                      value: 'delete',
-                      child: Row(
-                        children: const [
-                          Icon(Icons.delete),
-                          SizedBox(width: 10),
-                          Text('Delete',style: text50012black,),
-                        ],
-                      ),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Row(
+                      children: const [
+                        Icon(Icons.delete),
+                        SizedBox(width: 10),
+                        Text('Delete',style: text50012black,),
+                      ],
                     ),
-                  ];
-                },
-              ),
-            );
-          },
-        ),
+                  ),
+                ];
+              },
+            ),
+          );
+        },
       ),
+    ),
     );
   }
 }

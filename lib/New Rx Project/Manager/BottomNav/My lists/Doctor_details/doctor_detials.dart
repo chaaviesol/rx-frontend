@@ -27,14 +27,35 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
   List<dynamic> _visitHistory = [];
   bool _isVisitHistoryLoading = true;
   String? _visitHistoryErrorMessage;
+  String _selectedMonth = "01";
+  List<dynamic> _performanceData = [];
+
+  Future<void> _fetchPerformanceData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = await preferences.getString('uniqueID');
+    print('useriddd:${uniqueID}');
+    final response = await http.post(
+      Uri.parse(AppUrl.getuserPerformance),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({"requesterUniqueId": uniqueID, "drId": widget.doctorId, "month": _selectedMonth}),
+    );
+    print('stcode:${response.statusCode}');
+    print('respo:${response.body}');
+    if (response.statusCode == 200 && json.decode(response.body)['success']) {
+      setState(() => _performanceData = json.decode(response.body)['data']);
+    } else {
+      throw Exception('Failed to load performance data');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-    _taggedTabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
+    _taggedTabController = TabController(length: 5, vsync: this);
     _fetchDoctorDetails();
     _fetchVisitHistory();
+    _fetchPerformanceData();
   }
 
   Future<void> _fetchDoctorDetails() async {
@@ -149,42 +170,65 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        color:_doctorDetails?['visit_type'] == 'core'
-                            ? AppColors.tilecolor2
-                            : _doctorDetails?['visit_type'] == 'supercore'
-                            ? AppColors.tilecolor1
-                            : AppColors.tilecolor3,
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height / 5.5,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 40,
-                                backgroundColor: AppColors.whiteColor,
-                                child: Text(_doctorDetails?['firstName'][0] ?? '',),
-                              ),
-                              const SizedBox(width: 20),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                    Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            color:_doctorDetails?['visit_type'] == 'core'
+                                ? AppColors.tilecolor2
+                                : _doctorDetails?['visit_type'] == 'supercore'
+                                ? AppColors.tilecolor1
+                                : AppColors.tilecolor3,
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height / 5.5,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    '${_doctorDetails!['firstName']} ${_doctorDetails!['lastName']}',
-                                    style: text60017black,
+                                  CircleAvatar(
+                                    radius: 40,
+                                    backgroundColor: AppColors.whiteColor,
+                                    child: Text(_doctorDetails?['firstName'][0] ?? '',),
                                   ),
-                                  Text('${_doctorDetails!['doc_qualification']}', style: text40012black),
-                                  Text('${_doctorDetails!['specialization']}', style: text40012black),
+                                  const SizedBox(width: 20),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${_doctorDetails!['firstName']} ${_doctorDetails!['lastName']}',
+                                        style: text60017black,
+                                      ),
+                                      Text('${_doctorDetails!['doc_qualification']}', style: text40012black),
+                                      Text('${_doctorDetails!['specialization']}', style: text40012black),
+                                    ],
+                                  ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                        Positioned(
+                          bottom: 20,
+                          right: 0,
+                          child: ClipPath(
+                            clipper: MyCustomClipper(),
+                            child: Container(
+                              width: 150,
+                              color: Colors.white30,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: Text('${_doctorDetails?['visit_type'].toString().toUpperCase()}',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 12
+                                  ),),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        
+                      ],
                     ),
                     const SizedBox(height: 10),
                     Text('Basic Information', style: text50014black),
@@ -197,6 +241,7 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                       unselectedLabelColor: Colors.black54,
                       indicatorColor: AppColors.primaryColor,
                       tabs: const [
+                        Tab(text: 'Report',),
                         Tab(text: 'Schedule'),
                         Tab(text: 'Overview'),
                         Tab(text: 'Tagged'),
@@ -208,6 +253,7 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                       child: TabBarView(
                         controller: _tabController,
                         children: [
+                          _buildReportTab(),
                           _buildScheduleTab(),
                           _buildOverviewTab(),
                           _buildTaggedTab(),
@@ -236,6 +282,116 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
     );
   }
 
+  //performance widgets......
+  Widget _buildHeaderWithDropdown() {
+    final monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          DropdownButton<String>(
+            value: _selectedMonth,
+            items: List.generate(12, (index) {
+              String month = (index + 1).toString().padLeft(2, '0');
+              return DropdownMenuItem(child: Text(monthNames[index]), value: month);
+            }),
+            onChanged: (value) {
+              setState(() {
+                _selectedMonth = value!;
+                _fetchPerformanceData();
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPerformanceContainer() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        height: 100,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.3), blurRadius: 8)],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildStatCard('Total Visits', _performanceData.isNotEmpty ? _performanceData[0]['total_visits'].toString() : '0', Colors.purple),
+            _buildStatCard('Visited', _performanceData.isNotEmpty ? _performanceData[0]['visited'].toString() : '0', Colors.green),
+            _buildStatCard('Balance Visits', _performanceData.isNotEmpty ? _performanceData[0]['balance_visit'].toString() : '0', Colors.red),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String count, Color color) {
+    return Column(
+      children: [
+        Text(count, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.bold)),
+        Text(title, style: TextStyle(color: Colors.grey[700])),
+      ],
+    );
+  }
+
+  Widget _buildDoctorTable() {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.3), blurRadius: 8)],
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Table(
+                  columnWidths: {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1), 3: FlexColumnWidth(1)},
+                  children: [
+                    TableRow(
+                      decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                      children: ['Doctor Name', 'Assigned Calls', 'Completed Calls', 'Pending Calls'].map((title) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: Text(title, style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                        );
+                      }).toList(),
+                    ),
+                    ..._performanceData.map<TableRow>((data) {
+                      return TableRow(
+                        children: [
+                          Padding(padding: const EdgeInsets.all(8.0), child: Text('Dr. ${data['dr_Id']}', style: TextStyle(color: Colors.blue))),
+                          Padding(padding: const EdgeInsets.all(8.0), child: Text(data['total_visits'].toString(), textAlign: TextAlign.center)),
+                          Padding(padding: const EdgeInsets.all(8.0), child: Text(data['visited'].toString(), textAlign: TextAlign.center)),
+                          Padding(padding: const EdgeInsets.all(8.0), child: Text(data['balance_visit'].toString(), textAlign: TextAlign.center)),
+                        ],
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  // .........
+
   Widget _buildOverviewTab() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -248,6 +404,16 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
           Text('Wedding Date: ${_doctorDetails!['wedding_date']}', style: text50014black),
         ],
       ),
+    );
+  }
+  Widget _buildReportTab(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildHeaderWithDropdown(),
+        _buildPerformanceContainer(),
+        _buildDoctorTable()
+      ],
     );
   }
 
@@ -345,5 +511,49 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
         },
       );
     }
+  }
+}
+
+
+class MyCustomClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    return _getCustomPath(size);
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    return false;
+  }
+
+  // Function to create a custom path matching the shape in the image
+  // Function to create a W-cut path on the left side of the ribbon
+  Path _getCustomPath(Size size) {
+    Path path = Path();
+
+    // Start from top-left corner
+    path.moveTo(0, 0);
+
+    // Move to a point to create the first diagonal cut for the W shape
+    path.lineTo(20, 20);
+
+    // Move back to the left to create the bottom of the first "V" of the "W"
+    path.lineTo(0, 40);
+
+    // Create the second diagonal for the next cut
+    path.lineTo(20, 60);
+
+    // Move back to the left to create the bottom of the second "V" of the "W"
+    path.lineTo(0, 80);
+
+    // Move to the bottom-left corner of the container
+    path.lineTo(0, size.height);
+
+    // Draw the remaining rectangle around the other sides
+    path.lineTo(size.width, size.height); // Right-bottom corner
+    path.lineTo(size.width, 0); // Top-right corner
+    path.close(); // Close the path
+
+    return path;
   }
 }

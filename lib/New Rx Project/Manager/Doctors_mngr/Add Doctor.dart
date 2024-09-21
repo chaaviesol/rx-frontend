@@ -11,6 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:rx_route_new/model/scheduleModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../Util/Routes/routes_name.dart';
+import '../../../Util/Utils.dart';
 import '../../../View/homeView/Doctor/add_doctor.dart';
 import '../../../constants/styles.dart';
 import '../../../defaultButton.dart';
@@ -31,8 +33,9 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   List<ScheduleNew> schedules = [ScheduleNew()];
   String _gender = '';
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _firstnameController = TextEditingController();
+  final TextEditingController _lastnameController = TextEditingController();
 
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _qualificationController =
       TextEditingController();
   final TextEditingController _dobController = TextEditingController();
@@ -139,7 +142,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
 
   List<Map<String, dynamic>> _headquartersData = [];
   Map<String, List<String>> _headquartersMap = {};
-  String? _selectedHeadquarters;
+  int? _selectedHeadquarters;
   bool _isLoading = false;
   List<String> _specializations = [];
 
@@ -173,6 +176,113 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
     }
   }
 
+  Future<dynamic> adddoctors() async {
+    print('add doc called...');
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+
+    String url = AppUrl.add_doctor_rep;
+
+
+
+    // Collect addresses
+    // List<Map<String, String>> addresses = fields.map((field) {
+    //   return {
+    //     "address": field.placeController.text,
+    //     "latitude": field.latController.text,
+    //     "longitude": field.lonController.text,
+    //   };
+    // }).toList();
+    List<Map<dynamic, dynamic?>> addresses = schedules.map((schedule) {
+      int minLength = schedule.days.length < schedule.timeSlots.length
+          ? schedule.days.length
+          : schedule.timeSlots.length;  // Find the minimum length
+
+      // Combine days and time slots into one set, including startTime and endTime
+      List<Map<String, dynamic>> scheduleSets = List.generate(minLength, (index) {
+        return {
+          "day": schedule.days[index],
+          "time": {
+            "startTime": schedule.timeSlots[index].startTime,
+            "endTime": schedule.timeSlots[index].endTime,
+          }
+        };
+      });
+
+      // Return the map for this schedule
+      return {
+        "address": schedule.address.text,
+        "latitude": schedule.latitude.text,
+        "longitude": schedule.longitude.text,
+        "subHeadQuarter": schedule.selectedSubHeadquarter,
+        "schedule": scheduleSets,  // Add the combined day/time sets here
+      };
+    }).toList();
+
+
+    // Format selected products
+    List<Map<String, dynamic>> formattedProducts = _selectedProducts.map((product) {
+      return {
+        "id": product.id,
+        "product": product.productName.first.name,
+      };
+    }).toList();
+
+    // Format selected chemists
+    List<Map<String, dynamic>> formattedChemists = _selectedChemists.map((chemist) {
+      return {
+        "id": chemist.id,
+        "buildingName": chemist.buildingName,
+        // Add other necessary fields here
+      };
+    }).toList();
+
+    Map<String, dynamic> data = {
+      "firstName":_firstnameController.text,
+      "lastName":_lastnameController.text,
+      "qualification": _qualificationController.text,
+      "gender": _gender,
+      "specialization": _specialistaionController.text,
+      "mobile": _mobileController.text,
+      "visits": int.parse(_visitsController.text),
+      "dob": _dobController.text,
+      "wedding_date": _weddingDateController.text,
+      "created_UniqueId":uniqueID,
+      'address':addresses,
+      "chemist": formattedChemists,
+      "product": formattedProducts,
+
+    };
+    print('add doctor data is :$data');
+
+    try {
+      print('in try');
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+      print('st code :${response.statusCode}');
+      print('${jsonEncode(data)}');
+      print('${response.body}');
+      print('body:$data');
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        Navigator.pushNamedAndRemoveUntil(context, RoutesName.successsplash, (route) => false,);
+        Utils.flushBarErrorMessage('${responseData['message']}', context);
+        return responseData;
+      } else {
+        var responseData = jsonDecode(response.body);
+        Utils.flushBarErrorMessage('${responseData['message']}', context);
+      }
+    } catch (e) {
+      Utils.flushBarErrorMessage('${e.toString()}', context);
+      throw Exception('Failed to load data: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -182,42 +292,53 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   }
 
   Future<void> _fetchHeadquarters() async {
-    final response = await http
-        .get(Uri.parse('http://52.66.145.37:3004/rep/get_headquarters'));
+    setState(() {
+      _isLoading = true; // Start loader before the fetch
+    });
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['success']) {
+    try {
+      final response = await http.get(Uri.parse(AppUrl.list_headqrts));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['success']) {
+          setState(() {
+            // Map each headquarter's name and id along with sub-headquarters
+            _headquartersData = List<Map<String, dynamic>>.from(data['data']);
+
+            // Create map to store sub-headquarters
+            _headquartersMap = {
+              for (var item in _headquartersData)
+                item['headquarter_name'].trim(): (item['sub_headquarter'] as String)
+                    .split('\n')
+                    .where((sub) => sub.isNotEmpty)
+                    .toList(),
+            };
+
+            _isLoading = false; // Stop loader after data is loaded
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+          throw Exception('Data fetch unsuccessful');
+        }
+      } else {
         setState(() {
-          _headquartersData = List<Map<String, dynamic>>.from(data['data']);
-          _headquartersMap = {
-            for (var item in _headquartersData)
-              item['headquarter_name']: (item['sub_headquarter'] as String)
-                  .split('\n')
-                  .where((sub) => sub.isNotEmpty)
-                  .toList(),
-          };
           _isLoading = false;
         });
+        throw Exception('Failed to load headquarters');
       }
-    } else {
-      throw Exception('Failed to load headquarters');
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error: $e');
     }
   }
 
-  List<String> _areasList = ['palakkad'];
 
-  void _addArea() {
-    setState(() {
-      _areasList.add('');
-    });
-  }
-
-  void _removeArea(int index) {
-    setState(() {
-      _areasList.removeAt(index);
-    });
-  }
 
   Future<Position> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -337,26 +458,68 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Name',
-                              style: text50012black,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: AppColors.textfiedlColor,
-                                  borderRadius: BorderRadius.circular(6)),
-                              child: TextFormField(
-                                controller: _nameController,
-                                decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(left: 10),
-                                    hintText: 'Name',
-                                    hintStyle: text50010tcolor2,
-                                    counterText: ''),
-                              ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'First Name',
+                                        style: text50012black,
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: AppColors.textfiedlColor,
+                                            borderRadius: BorderRadius.circular(6)),
+                                        child: TextFormField(
+                                          controller: _firstnameController,
+                                          decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              contentPadding: EdgeInsets.only(left: 10),
+                                              hintText: 'First Name',
+                                              hintStyle: text50010tcolor2,
+                                              counterText: ''),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: 10,),
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Last Name',
+                                        style: text50012black,
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: AppColors.textfiedlColor,
+                                            borderRadius: BorderRadius.circular(6)),
+                                        child: TextFormField(
+                                          controller: _lastnameController,
+                                          decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              contentPadding: EdgeInsets.only(left: 10),
+                                              hintText: 'Last Name',
+                                              hintStyle: text50010tcolor2,
+                                              counterText: ''),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                             SizedBox(
                               height: 10,
@@ -540,18 +703,26 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildVisitBox(
-                              label: 'Important',
-                              value: 4,
-                              color: AppColors.tilecolor1),
-                          _buildVisitBox(
-                              label: 'Core',
-                              value: 8,
-                              color: AppColors.tilecolor2),
-                          _buildVisitBox(
-                              label: 'Super Core',
-                              value: 12,
-                              color: AppColors.tilecolor3),
+                          Expanded(
+                            child: _buildVisitBox(
+                                label: 'Important',
+                                value: 4,
+                                color: AppColors.tilecolor3),
+                          ),
+                          SizedBox(width: 10,),
+                          Expanded(
+                            child: _buildVisitBox(
+                                label: 'Core',
+                                value: 8,
+                                color: AppColors.tilecolor2),
+                          ),
+                          SizedBox(width: 10,),
+                          Expanded(
+                            child: _buildVisitBox(
+                                label: 'Super Core',
+                                value: 12,
+                                color: AppColors.tilecolor1),
+                          ),
                         ],
                       ),
                     ],
@@ -793,57 +964,40 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                       SizedBox(
                         height: 10,
                       ),
+
+
                       _isLoading
                           ? Center(child: CircularProgressIndicator())
                           : Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.textfiedlColor,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0, horizontal: 16.0),
-                                    child: DropdownButton<String>(
-                                      hint: Text("Select Headquarters"),
-                                      value: _selectedHeadquarters,
-                                      items: _headquartersData
-                                          .map((item) =>
-                                              DropdownMenuItem<String>(
-                                                value: item['headquarter_name'],
-                                                child: Text(
-                                                    item['headquarter_name']),
-                                              ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _selectedHeadquarters = value;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  if (_selectedHeadquarters != null)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8.0, horizontal: 16.0),
-                                      child: DropdownButton<String>(
-                                        hint: Text("Select Sub-Headquarters"),
-                                        items: _headquartersMap[
-                                                _selectedHeadquarters]
-                                            ?.map((sub) => DropdownMenuItem(
-                                                  value: sub,
-                                                  child: Text(sub),
-                                                ))
-                                            .toList(),
-                                        onChanged: (value) {
-                                          // Handle sub-headquarters selection
-                                        },
-                                      ),
-                                    ),
-                                ],
+                        decoration: BoxDecoration(
+                          color: AppColors.textfiedlColor,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
+                              child: DropdownButton<int>( // Change to int to hold ID
+                                hint: Text("Select Headquarters"),
+                                value: _selectedHeadquarters, // Should hold ID
+                                items: _headquartersData.map((item) =>
+                                    DropdownMenuItem<int>(
+                                      value: item['id'], // Use ID here
+                                      child: Text(item['headquarter_name'].trim()), // Show name
+                                    )
+                                ).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedHeadquarters = value; // Store selected ID
+                                  });
+                                },
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
@@ -1311,12 +1465,14 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                             width: MediaQuery.of(context).size.width / 2.5,
                             child: InkWell(
                               onTap: () {
-                                if (_formKey.currentState!.validate()) {
+                                print('schedule:${schedules}');
+                                // if (_formKey.currentState!.validate()) {
                                   // ScaffoldMessenger.of(context).showSnackBar(
                                   //     const SnackBar(content: Text('Processing Data'))
                                   // );
-                                  // adddoctors();
-                                }
+                                  adddoctors();
+                                // }
+
                               },
                               child: Defaultbutton(
                                 text: 'Submit',

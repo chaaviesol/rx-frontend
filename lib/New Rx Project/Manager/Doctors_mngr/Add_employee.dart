@@ -107,8 +107,7 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
       "headquarters": int.parse(selectedHeadquarter!.id
           .toString()), // Assuming selectedHeadquarters is a list of objects
       "password": _passwordController.text,
-      "role": _designationController
-          .text, // Assuming role is the same as designation
+      "role": _designationController.text, // Assuming role is the same as designation
       "reportingOfficer": int.parse(_selectedReportingOfficer.toString()),
       "reportingType": "Online", // Assuming this is static
       "createdBy": int.parse(myid.toString()),
@@ -572,12 +571,15 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
                                   child: CustomDropdown(
                                     options: ['REP', 'MANAGER'],
                                     onChanged: (value) {
-                                      if (value == 'Reporter') {
-                                        _designationController.text = "Rep";
-                                      } else if (value == 'Manager') {
-                                        _designationController.text =
-                                            value.toString();
-                                      }
+                                      setState(() {
+                                        if (value == 'Reporter') {
+                                          _designationController.text = "Rep";
+                                        } else if (value == 'Manager') {
+                                          _designationController.text =
+                                              value.toString();
+                                        }
+                                      });
+
                                       // _designationController.text = value.toString();
                                     },
                                   ))

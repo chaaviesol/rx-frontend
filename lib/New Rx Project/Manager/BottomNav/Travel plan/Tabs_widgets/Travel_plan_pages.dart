@@ -7,6 +7,7 @@ import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Manual/ManualTP.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/New_tp.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/Travel_plan_pages2.dart';
+import 'package:rx_route_new/res/app_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../Util/Utils.dart';
 import '../../../../../app_colors.dart';
@@ -25,7 +26,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
   Future<void> gettravelplans() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     int userId = int.parse(preferences.getString('userID').toString());
-    final url = Uri.parse("http://52.66.145.37:3004/user/userAddedTP");
+    final url = Uri.parse(AppUrl.getTravelPlans);
     var data = {
       'userId': userId,
     };
@@ -74,7 +75,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
 
 
   Future<dynamic> sendPostRequest(String userId, String month) async {
-    final Uri url = Uri.parse('http://52.66.145.37:3004/generate-visit-plan'); // Replace with your API URL
+    final Uri url = Uri.parse(AppUrl.generateautoTP); // Replace with your API URL
 
     final response = await http.post(
       url,
