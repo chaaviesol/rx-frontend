@@ -1,14 +1,15 @@
 class AppUrl{
   static const port = '3004';
 
-  static const hostedip = '52.66.145.37';
+  // static const hostedip = '52.66.145.37';
+
+  static const hostedip = 'testapi.rxroute.in';
 
   // static const localip = '192.168.1.10';
 
-  static var baseUrl ='testapi.rxroute.in';
-
 
   // static var baseUrl = 'http://${hostedip}:${port}';
+  static var baseUrl = 'http://${hostedip}';
 
   static var login = '$baseUrl/rep/login';
 
