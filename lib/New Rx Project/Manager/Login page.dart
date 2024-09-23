@@ -37,6 +37,7 @@ class _LoginPageNewState extends State<LoginPageNew> {
   Future<void> checkBiometric() async {
     try {
       bool canCheckBiometrics = await _localAuthentication.canCheckBiometrics;
+      debugPrint('debug print');
       print('Can check biometrics: $canCheckBiometrics');
     } catch (e) {
       print('Error checking biometrics: $e');
@@ -172,7 +173,6 @@ class _LoginPageNewState extends State<LoginPageNew> {
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
         if (responseData['success']) {
-          print("Login Successful");
           SharedPreferences preferences = await SharedPreferences.getInstance();
           var userData = responseData['data'][0];
 
@@ -180,19 +180,11 @@ class _LoginPageNewState extends State<LoginPageNew> {
           preferences.setString('uniqueID', userData['uniqueId'].toString());
           preferences.setString('userType', userData['role'].toString());
           preferences.setString('userName', userData['name'].toString());
-
-          print('Stored User ID: ${preferences.getString('userID')}');
-          print('Stored Unique ID: ${preferences.getString('uniqueID')}');
-          print('Stored User Type: ${preferences.getString('userType')}');
-          print('Stored User Name: ${preferences.getString('userName')}');
-
           if (preferences.getString('userType') == 'Rep') {
-            print('oooo');
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavigationRep()));
             Utils.flushBarErrorMessage('${responseData['message']} ${preferences.getString('userName')!.toUpperCase()}', context);
             Utils.getuser();
           } else if (preferences.getString('userType') == 'Manager') {
-            print('dhddh');
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavigationMngr()));
             Utils.flushBarErrorMessage('${responseData['message']} ${preferences.getString('userName')!.toUpperCase()}', context);
             Utils.getuser();
@@ -262,15 +254,16 @@ class _LoginPageNewState extends State<LoginPageNew> {
                     ),
                   ],
                 ),
-                InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => AddDoctor(),));
-                  },
-                    child: Text('data')),InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => DoctorSchedulePage(),));
-                  },
-                    child: Text('data set')),
+                // InkWell(
+                //   onTap: (){
+                //     Navigator.push(context, MaterialPageRoute(builder: (context) => AddDoctor(),));
+                //   },
+                //     child: Text('data')),
+                // InkWell(
+                //   onTap: (){
+                //     Navigator.push(context, MaterialPageRoute(builder: (context) => DoctorSchedulePage(),));
+                //   },
+                //     child: Text('data set')),
                 const SizedBox(height: 10),
                 Form(
                   key: _formKey,
@@ -399,7 +392,6 @@ class _LoginPageNewState extends State<LoginPageNew> {
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 // Handle Terms & Conditions click
-                                print('Terms & Conditions clicked');
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => TermsAndConditions()));
                               },
                           ),
@@ -415,7 +407,6 @@ class _LoginPageNewState extends State<LoginPageNew> {
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 // Handle Privacy Policy click
-                                print('Privacy Policy clicked');
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacyPolicyPage()));
                               },
                           ),
