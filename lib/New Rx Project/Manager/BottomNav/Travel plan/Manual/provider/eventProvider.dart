@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:rx_route_new/res/app_url.dart';
 
 import '../../../../../../model/doctorModel.dart';
 import '../../../../../../services/services.dart';
@@ -50,7 +51,7 @@ class EventProvider with ChangeNotifier {
     print('plandata from function:${jsonEncode(planData)}');
     try {
       final response = await http.post(
-        Uri.parse('http://52.66.145.37:3004/rep/createTravelplan'),
+        Uri.parse(AppUrl.generateManulTP),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(planData),
       );
@@ -85,7 +86,7 @@ class EventProvider with ChangeNotifier {
 
     try {
       final response = await http.post(
-        Uri.parse('http://52.66.145.37:3004/rep/cancelTP'),
+        Uri.parse(AppUrl.cancelTp),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );
@@ -121,7 +122,7 @@ class EventProvider with ChangeNotifier {
 
     try {
       final response = await http.post(
-        Uri.parse('http://52.66.145.37:3004/rep/changeStatus'),
+        Uri.parse(AppUrl.confirmTP),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );

@@ -185,7 +185,7 @@ class _AddDoctorState extends State<AddDoctor> {
       "products": formattedProducts,
       "chemist": formattedChemists,
       "created_UniqueId":uniqueID,
-      'address':addresses
+      'address':addresses,
     };
     print('data is :$data');
 

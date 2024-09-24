@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Login%20page.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Rep/Bottom%20navigation%20rep/Bottomnavigationrep.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Rep/Rep%20Home%20page.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // _initPackageInfo();
     _navigateToHome();
+    verifyPrefrencedata();
   }
 
   // Future<void> _initPackageInfo() async {
@@ -33,28 +35,41 @@ class _SplashScreenState extends State<SplashScreen> {
   //   });
   // }
 
+  Future<void> verifyPrefrencedata()async
+  {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID') ;
+    if(uniqueID == 'null'){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPageNew(),));
+    }
+  }
 
   _navigateToHome() async {
+    debugPrint('navigate to home called...');
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? uniqueID = preferences.getString('uniqueID');
     String? userType = preferences.getString('userType');
-    print('userType:$userType');
+    print('888userType:$userType');
     print('objectddd$preferences');
     if(uniqueID != null){
       if(userType == 'Rep'){
         print('hello yes.....');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const RepHomepage()),
-        );
+        setState(() {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomNavigationRep()),
+          );
+        });
       }else if(userType == 'Manager'){
         print('hello no.....');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const BottomNavigationMngr()),
-        );
+        setState(() {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomNavigationMngr()),
+          );
+        });
       }
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPageNew(),));
+      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPageNew(),));
     }else{
       await Future.delayed(const Duration(seconds: 3), () {});
       Navigator.pushReplacement(

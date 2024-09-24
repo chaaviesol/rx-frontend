@@ -1,14 +1,16 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui'; // Import for blur effect
+
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My_Reports.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20Approvals/My_approvels.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20lists/My_list.dart';
-import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/TpDoctorListPage.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Doctors_mngr/Add%20Doctor.dart';
-import 'package:rx_route_new/New%20Rx%20Project/Rep/Bottom%20navigation%20rep/Leave%20and%20expense/Leave%20and%20expense.dart';
 import 'package:rx_route_new/app_colors.dart';
 
 import '../../../constants/styles.dart';
+import '../../Rep/Bottom navigation rep/Leave and expense/Leave and expense.dart';
 import '../Doctors_mngr/Add_chemist.dart';
 import '../Doctors_mngr/Add_employee.dart';
 import 'HomepageManagerNew.dart';
@@ -39,6 +41,7 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
   void initState() {
     super.initState();
     _pageController = PageController();
+    _showButtons = false;
   }
 
   @override
@@ -50,7 +53,7 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
   void _onPageChanged(int index) {
     setState(() {
       currentIndex = index;
-      _showButtons = index == 0;  // Show the plus button only on the home page
+      _showButtons = false;  // Hide buttons when navigating to other pages
     });
   }
 
@@ -67,62 +70,53 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: 400,
+      body: Stack(
+        children: [
+          PageView(
+            controller: _pageController,
+            onPageChanged: _onPageChanged,
+            children: pages,
           ),
-          child: Stack(
-            children: [
-              PageView(
-                controller: _pageController,
-                onPageChanged: _onPageChanged,
-                children: pages,
+          if (_showButtons)
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Blur effect
+                child: Container(
+                  color: Colors.black.withOpacity(0.3), // Semi-transparent overlay
+                ),
               ),
-              if (_showButtons)
-                Positioned(
-                  bottom: MediaQuery.of(context).padding.bottom + 56 + 16, // Adjust for bottom padding and nav bar height
-                  right: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _buildActionButton('Add Doctor', Add_doctor_mngr()),
-                      SizedBox(height: 10),
-                      _buildActionButton('Add Chemist', Adding_chemistmngr()),
-                      SizedBox(height: 10),
-                      _buildActionButton('Add Employee', Adding_employee_mngr()),
-                      SizedBox(height: 10),
-                      _buildActionButton('Leave & Expense', MyLeaveandexpense()),
-                      SizedBox(height: 80,)
-                    ],
-                  ),
-                ),
-              buildBottomNavigationBar(),
-              if (currentIndex == 0) // Only show the plus button on the home page
-                Positioned(
-                  bottom: MediaQuery.of(context).padding.bottom + 56 + 30, // Adjust for bottom padding and nav bar height
-                  right: 20,
-                  child: FloatingActionButton(
-                    backgroundColor: AppColors.primaryColor,
-                    onPressed: _toggleButtons,
-                    shape: CircleBorder(), // Ensures the button is circular
-                    child: Icon(Icons.add, color: Colors.white),
-                  ),
-                ),
-              if(currentIndex == 0)
-                Positioned(
-                    bottom: MediaQuery.of(context).padding.bottom + 56 + 30,
-                    left: 20,
-                    child: FloatingActionButton(
-                        backgroundColor: AppColors.primaryColor,
-                        shape: CircleBorder(),
-                        onPressed: () {
-                          int currentMonth = DateTime.now().month;
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TpDoctorListPage(month: currentMonth),));
-                        }, child: Icon(Icons.add_chart_rounded,color: AppColors.whiteColor,)))
-            ],
-          ),
-        ),
+            ),
+          if (_showButtons)
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 56 + 16,
+              right: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  _buildActionButton('Add Doctor', Add_doctor_mngr()),
+                  SizedBox(height: 10),
+                  _buildActionButton('Add Chemist', Adding_chemistmngr()),
+                  SizedBox(height: 10),
+                  _buildActionButton('Add Employee', Adding_employee_mngr()),
+                  SizedBox(height: 10),
+                  _buildActionButton('Leave & Expense', MyLeaveandexpense()),
+                  SizedBox(height: 80,),
+                ],
+              ),
+            ),
+          buildBottomNavigationBar(),
+          if (currentIndex == 0)
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 56 + 30,
+              right: 20,
+              child: FloatingActionButton(
+                backgroundColor: AppColors.primaryColor,
+                onPressed: _toggleButtons,
+                shape: CircleBorder(),
+                child: Icon(Icons.add, color: Colors.white),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -131,9 +125,10 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
     return ElevatedButton(
       style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryColor),
       onPressed: () {
-        if (page is Widget) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => page));
-        }
+        setState(() {
+          _showButtons = false; // Hide buttons after navigating
+        });
+        Navigator.push(context, MaterialPageRoute(builder: (context) => page));
       },
       child: Text(label, style: text60012),
     );
@@ -143,7 +138,7 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
     return Positioned(
       left: 16,
       right: 16,
-      bottom: MediaQuery.of(context).padding.bottom + 16, // Adjust for bottom padding
+      bottom: MediaQuery.of(context).padding.bottom + 16,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100.0),
         child: Container(
@@ -163,21 +158,46 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(child: buildNavItem(
-                  iconWidget: Image.asset('assets/icons/myhome.png', height: 24, width: 24),
-                  index: 0, title: "Home")),
-              Expanded(child: buildNavItem(
-                  iconWidget: Image.asset('assets/icons/mylist.png', height: 24, width: 24),
-                  index: 1, title: "My List")),
-              Expanded(child: buildNavItem(
-                  iconWidget: Image.asset('assets/icons/myapprovals.png', height: 24, width: 24),
-                  index: 2, title: "Approvals")),
-              Expanded(child: buildNavItem(
-                  iconWidget: Image.asset('assets/icons/myreports.png', height: 24, width: 24),
-                  index: 3, title: "Reports")),
-              Expanded(child: buildNavItem(
-                  iconWidget: Image.asset('assets/icons/mytp.png', height: 24, width: 24),
-                  index: 4, title: "TP")),
+              Expanded(
+                child: buildNavItem(
+                  iconWidget: Image.asset('assets/icons/myhome.png',
+                      height: 24, width: 24),
+                  index: 0,
+                  title: "Home",
+                ),
+              ),
+              Expanded(
+                child: buildNavItem(
+                  iconWidget: Image.asset('assets/icons/mylist.png',
+                      height: 24, width: 24),
+                  index: 1,
+                  title: "My List",
+                ),
+              ),
+              Expanded(
+                child: buildNavItem(
+                  iconWidget: Image.asset('assets/icons/myapprovals.png',
+                      height: 24, width: 24),
+                  index: 2,
+                  title: "Approvals",
+                ),
+              ),
+              Expanded(
+                child: buildNavItem(
+                  iconWidget: Image.asset('assets/icons/myreports.png',
+                      height: 24, width: 24),
+                  index: 3,
+                  title: "Reports",
+                ),
+              ),
+              Expanded(
+                child: buildNavItem(
+                  iconWidget: Image.asset('assets/icons/mytp.png',
+                      height: 24, width: 24),
+                  index: 4,
+                  title: "TP",
+                ),
+              ),
             ],
           ),
         ),
@@ -185,7 +205,12 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
     );
   }
 
-  Widget buildNavItem({IconData? iconData, Widget? iconWidget, required int index, required String title}) {
+  Widget buildNavItem({
+    IconData? iconData,
+    Widget? iconWidget,
+    required int index,
+    required String title,
+  }) {
     bool isSelected = currentIndex == index;
     return GestureDetector(
       onTap: () => _onNavItemTapped(index),
@@ -196,7 +221,10 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            iconWidget ?? Icon(iconData, size: 24, color: isSelected ? Colors.white : Colors.white70),
+            iconWidget ??
+                Icon(iconData,
+                    size: 24,
+                    color: isSelected ? Colors.white : Colors.white70),
             Text(
               title,
               style: TextStyle(

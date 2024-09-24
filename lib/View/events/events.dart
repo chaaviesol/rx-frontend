@@ -460,7 +460,9 @@
 //
 
 import 'dart:convert';
+import 'dart:isolate';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -468,6 +470,7 @@ import '../../Util/Utils.dart';
 import '../../app_colors.dart';
 import '../../constants/styles.dart';
 import '../../res/app_url.dart';
+import '../../services/localnotifications.dart';
 import '../homeView/home_view_rep.dart';
 
 class Events extends StatefulWidget {
@@ -738,6 +741,20 @@ class _SeeAllPageState extends State<SeeAllPage> with SingleTickerProviderStateM
       throw Exception('Failed to load data: $e');
     }
   }
+
+  void setAlarm() async {
+    // Set the alarm for 5 seconds from now
+    final DateTime now = DateTime.now();
+    final int isolateId = Isolate.current.hashCode;
+    print("[$now] Setting alarm for 5 seconds from now...");
+    // await AndroidAlarmManager.oneShot(
+    //   const Duration(seconds: 5),
+    //   alarmId,
+    //   alarmCallback,
+    //   exact: true,
+    //   wakeup: true,
+    // );
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -831,6 +848,20 @@ class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateM
     }
   }
 
+  void setAlarm() async {
+    // Set the alarm for 5 seconds from now
+    final DateTime now = DateTime.now();
+    final int isolateId = Isolate.current.hashCode;
+    print("[$now] Setting alarm for 5 seconds from now...");
+    // await AndroidAlarmManager.oneShot(
+    //   const Duration(seconds: 5),
+    //   alarmId,
+    //   alarmCallback,
+    //   exact: true,
+    //   wakeup: true,
+    // );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -842,7 +873,7 @@ class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 1, // Number of nested tabs
+      length: 2, // Number of nested tabs
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 0,
@@ -996,10 +1027,48 @@ class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateM
                               fontSize: 9,
                             ),
                           ),
+                          SizedBox(height: 10,),
                         ],
                       ),
                     ],
                   ),
+                  SizedBox(height: 10,),
+                  InkWell(
+                    onTap: ()async{
+                      print('acted....');
+                      setAlarm();
+                    },
+                    child: SizedBox(
+                      width: 130,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor2,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Notify me',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.whiteColor,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Icon(
+                                Icons.notifications_active,
+                                color: AppColors.whiteColor,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),

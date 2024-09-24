@@ -7,15 +7,12 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Manual/provider/eventProvider.dart';
-import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/Travel_plan_pages.dart';
-import 'package:rx_route_new/New%20Rx%20Project/Manager/Login%20page.dart';
 import 'package:rx_route_new/Util/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../../app_colors.dart';
 import '../../../../../res/app_url.dart';
-import '../../../../../widgets/customDropDown.dart';
 class Manualtp extends StatefulWidget {
   const Manualtp({super.key});
 

@@ -183,17 +183,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
 
     String url = AppUrl.add_doctor_rep;
 
-
-
     // Collect addresses
-    // List<Map<String, String>> addresses = fields.map((field) {
-    //   return {
-    //     "address": field.placeController.text,
-    //     "latitude": field.latController.text,
-    //     "longitude": field.lonController.text,
-    //   };
-    // }).toList();
-    List<Map<dynamic, dynamic?>> addresses = schedules.map((schedule) {
+    List<Map<String, dynamic>> addresses = schedules.map((schedule) {
       int minLength = schedule.days.length < schedule.timeSlots.length
           ? schedule.days.length
           : schedule.timeSlots.length;  // Find the minimum length
@@ -219,7 +210,6 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       };
     }).toList();
 
-
     // Format selected products
     List<Map<String, dynamic>> formattedProducts = _selectedProducts.map((product) {
       return {
@@ -237,9 +227,18 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       };
     }).toList();
 
+    // Prepare the schedule sets (extract from addresses)
+    List<List<Map<String, dynamic>>> scheduleSetsList = addresses.map((addr) {
+      return addr['schedule'] as List<Map<String, dynamic>>;
+    }).toList();
+
+    // Flatten the schedule sets (optional: based on whether you want a single list or nested lists)
+    List<Map<String, dynamic>> flattenedScheduleSets = scheduleSetsList.expand((i) => i).toList();
+
+    // Final data to send to the backend
     Map<String, dynamic> data = {
-      "firstName":_firstnameController.text,
-      "lastName":_lastnameController.text,
+      "firstName": _firstnameController.text,
+      "lastName": _lastnameController.text,
       "qualification": _qualificationController.text,
       "gender": _gender,
       "specialization": _specialistaionController.text,
@@ -247,12 +246,13 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       "visits": int.parse(_visitsController.text),
       "dob": _dobController.text,
       "wedding_date": _weddingDateController.text,
-      "created_UniqueId":uniqueID,
-      'address':addresses,
+      "created_UniqueId": uniqueID,
+      'address': addresses,  // Addresses with schedule sets
       "chemist": formattedChemists,
       "product": formattedProducts,
-
+      "schedule": flattenedScheduleSets,  // Include the flattened schedule sets here
     };
+
     print('add doctor data is :$data');
 
     try {
@@ -264,13 +264,15 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
         },
         body: jsonEncode(data),
       );
+
       print('st code :${response.statusCode}');
       print('${jsonEncode(data)}');
       print('${response.body}');
       print('body:$data');
+
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        Navigator.pushNamedAndRemoveUntil(context, RoutesName.successsplash, (route) => false,);
+        Navigator.pushNamedAndRemoveUntil(context, RoutesName.successsplash, (route) => false);
         Utils.flushBarErrorMessage('${responseData['message']}', context);
         return responseData;
       } else {
@@ -282,6 +284,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       throw Exception('Failed to load data: $e');
     }
   }
+
 
   @override
   void initState() {
@@ -706,21 +709,21 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                           Expanded(
                             child: _buildVisitBox(
                                 label: 'Important',
-                                value: 4,
+                                value: 2,
                                 color: AppColors.tilecolor3),
                           ),
                           SizedBox(width: 10,),
                           Expanded(
                             child: _buildVisitBox(
                                 label: 'Core',
-                                value: 8,
+                                value: 4,
                                 color: AppColors.tilecolor2),
                           ),
                           SizedBox(width: 10,),
                           Expanded(
                             child: _buildVisitBox(
                                 label: 'Super Core',
-                                value: 12,
+                                value: 6,
                                 color: AppColors.tilecolor1),
                           ),
                         ],

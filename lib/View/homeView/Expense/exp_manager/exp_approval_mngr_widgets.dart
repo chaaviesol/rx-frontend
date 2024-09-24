@@ -211,7 +211,7 @@ class _ExpenseListState extends State<ExpenseList> {
                                     });
                                   },
                                   child: Container(
-                                      width: MediaQuery.of(context).size.width / 3,
+                                      width: 100,
                                       decoration: BoxDecoration(
                                           color: AppColors.whiteColor,
                                           borderRadius: BorderRadius.circular(6)
@@ -230,7 +230,7 @@ class _ExpenseListState extends State<ExpenseList> {
                                     });
                                   },
                                   child: Container(
-                                      width: MediaQuery.of(context).size.width / 3,
+                                      width:100,
                                       decoration: BoxDecoration(
                                           color: AppColors.whiteColor,
                                           borderRadius: BorderRadius.circular(6)
@@ -260,7 +260,7 @@ class _ExpenseListState extends State<ExpenseList> {
                       right: 20,
                       top: 65,
                       child: Text('${snapdata[index]['status']}', style: TextStyle(
-                          color: AppColors.primaryColor3,
+                          color: snapdata[index]['status'] == "Pending" ? Colors.grey : snapdata[index]['status'] == 'Rejected' ? Colors.red :Colors.green,
                           fontWeight: FontWeight.w400,
                           fontSize: 14
                       ),),

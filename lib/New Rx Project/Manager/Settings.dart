@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Login%20page.dart';
 import 'package:http/http.dart' as http;
+import 'package:rx_route_new/View/profile/edit_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-
 import '../../app_colors.dart';
 import '../../constants/styles.dart';
 import '../../res/app_url.dart';
@@ -118,6 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     icon: Icons.edit,
                     title: 'Edit Profile',
                     onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(),));
                       // Handle Edit Profile action
                     },
                   ),

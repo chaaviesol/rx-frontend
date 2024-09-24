@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/BottomNavManager.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Settings.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Rep/Bottom%20navigation%20rep/Leave%20and%20expense/Leave%20and%20expense.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Widgets/widgets.dart';
 import 'package:rx_route_new/View/homeView/search/home_search_rep.dart';
 import 'package:rx_route_new/View/profile/settings/settings.dart';
 import 'package:rx_route_new/app_colors.dart';
@@ -32,6 +35,13 @@ class _HomepageManagerState extends State<HomepageManager> {
   bool isLoading = false;
   String _locationName = "Fetching location...";
   bool _locationEnabled = false;
+
+  int totalCalls = 0;
+  int visitedCalls = 0;
+  int missedCalls = 0;
+  String visitPercentage = '0.0';
+
+  String currentDate = DateFormat('d-MM-yyyy hh:mm:aa').format(DateTime.now()); // Get current date
 
   TextEditingController _searchText = TextEditingController();
 
@@ -76,11 +86,12 @@ class _HomepageManagerState extends State<HomepageManager> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      print('position:$position');
+      print('position: $position');
 
       // Reverse geocoding using OpenStreetMap Nominatim API
       String url =
           'https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.latitude}&lon=${position.longitude}&zoom=18&addressdetails=1';
+
       var response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -90,6 +101,7 @@ class _HomepageManagerState extends State<HomepageManager> {
             data['address']['village'] ??
             "Unknown location";
 
+        print('current location: $locationName');
         if (mounted) {
           setState(() {
             _locationName = locationName;
@@ -102,7 +114,15 @@ class _HomepageManagerState extends State<HomepageManager> {
           });
         }
       }
+    } on SocketException catch (_) {
+      // Handle network issues such as no internet
+      if (mounted) {
+        setState(() {
+          _locationName = "Unknown location (network issue)";
+        });
+      }
     } catch (e) {
+      // Handle other exceptions
       if (mounted) {
         setState(() {
           _locationName = "Error occurred: $e";
@@ -175,6 +195,30 @@ class _HomepageManagerState extends State<HomepageManager> {
     );
   }
 
+  Future<void> _fetchCallData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+    final response = await http.post(
+      Uri.parse(AppUrl.getallVisitData),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'userId': uniqueID}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        totalCalls = data['data'];
+        visitedCalls = data['visited'];
+        missedCalls = data['missedVisit'];
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
 
   @override
   void initState() {
@@ -182,6 +226,7 @@ class _HomepageManagerState extends State<HomepageManager> {
     super.initState();
     _checkLocationPermission();
     getEvents();
+    _fetchCallData();
   }
 
   Future<dynamic> getEvents() async {
@@ -273,15 +318,22 @@ class _HomepageManagerState extends State<HomepageManager> {
                                     print('pressed');
                                     print('locatoin name:$_locationName');
                                     _checkLocationPermission();
+                                    _getCurrentLocation();
                                   },
                                   child: Icon(
                                     CupertinoIcons.location_solid,
                                     color: AppColors.primaryColor,
                                   ),
                                 ),
-                                Text(
-                                  '${_locationName}',
-                                  style: text50012black,
+                                Wrap(
+
+                                  children: [
+                                    Text(
+                                      overflow: TextOverflow.ellipsis,
+                                      '${_locationName}',
+                                      style: text50012black,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -360,11 +412,15 @@ class _HomepageManagerState extends State<HomepageManager> {
                             scrollDirection: Axis.horizontal,
                             child: Row(
                               children: [
-                                Hometilewidget(),
+                                CallTileWidget(icon: Icons.call, title: 'Assigned Calls', totalCalls: totalCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, updateDate: currentDate,percentage: visitPercentage,),
                                 SizedBox(width: 10,),
-                                Hometilewidget(),
-                                SizedBox(width: 10,),
-                                Hometilewidget()
+                                CallTileWidget(icon: Icons.phone_callback_sharp, title: 'Missed Calls', totalCalls: missedCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, updateDate: currentDate,percentage: visitPercentage,),
+
+                                // Hometilewidget(),
+                                // SizedBox(width: 10,),
+                                // Hometilewidget(),
+                                // SizedBox(width: 10,),
+                                // Hometilewidget()
                                 // Container(
                                 //   width:MediaQuery.of(context).size.width/1.9,
                                 //   decoration: BoxDecoration(
@@ -614,7 +670,6 @@ class _HomepageManagerState extends State<HomepageManager> {
                                         ),
                                       ),
                                     ),
-
 
                                   ],
                                 ),

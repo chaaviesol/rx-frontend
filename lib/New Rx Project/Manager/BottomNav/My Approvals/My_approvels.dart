@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20Approvals/Doctor.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20Approvals/Expense.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20Approvals/Leave.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/TPManagementPage.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/Travel_plan_pages.dart';
 
 import '../../../../app_colors.dart';
@@ -30,14 +31,14 @@ class _MyApprovalState extends State<MyApproval> with SingleTickerProviderStateM
 
     myapprovelexpense(),
 
-    TravelPlanmainpage(),
+    TPManagementPage(),
     MyApprovalDoctor()
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
+    _tabController = TabController( length: _tabs.length, vsync: this);
   }
 
   @override

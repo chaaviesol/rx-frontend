@@ -8,7 +8,7 @@ class AppUrl{
   // static const localip = '192.168.1.10';
 
 
-  // static var baseUrl = 'https://${hostedip}:${port}';
+  // static var baseUrl = 'http://${hostedip}:${port}';
   static var baseUrl = 'https://${hostedip}';
 
   // static var hostedUrl = 'https://testapi.rxroute.in';
@@ -111,9 +111,24 @@ class AppUrl{
 
   static var generateautoTP = '$baseUrl/generate-visit-plan';
 
+  static var generateManulTP = '$baseUrl/rep/createTravelplan';
+
+  static var cancelTp = '$baseUrl/rep/cancelTP';
+
+  static var confirmTP = '$baseUrl/rep/changeStatus';
+
+  //approving manager the tp
+  static var approveUsersTP = '$baseUrl/user/userAddedTP';
+
+  static var approveUserAddedTP = '$baseUrl/user/approveTp';
+
+  static var rejectUserAddedTP = '$baseUrl/user/rejectTp';
+
   //userperformance
   // get doctor visit data
   static var getuserPerformance = '$baseUrl/user/Performance';
 
+  //reports
+ static var getallVisitData = '$baseUrl/user/visitedCount';
 
 }

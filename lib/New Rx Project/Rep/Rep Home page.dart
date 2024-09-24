@@ -5,7 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Settings.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Widgets/widgets.dart';
 import 'package:rx_route_new/Util/Utils.dart';
 import 'package:rx_route_new/View/homeView/search/home_search_rep.dart';
 import 'package:rx_route_new/View/homeView/search/homesearch.dart';
@@ -41,6 +43,13 @@ class _RepHomepageState extends State<RepHomepage> {
   String _locationName = "Fetching location...";
   var locationdata;
   bool _locationEnabled = false;
+
+  int totalCalls = 0;
+  int visitedCalls = 0;
+  int missedCalls = 0;
+  String visitPercentage = '0.0';
+  String currentDate = DateFormat('d-MM-yyyy hh:mm:aa').format(DateTime.now()); // Get current date
+
 
   TextEditingController _searchText = TextEditingController();
 
@@ -300,11 +309,14 @@ class _RepHomepageState extends State<RepHomepage> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        Hometilewidget(),
+                        CallTileWidget(icon: Icons.phone_callback_sharp, title: "Missed Calls", totalCalls: totalCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, percentage: visitPercentage, updateDate: currentDate),
                         SizedBox(width: 10,),
-                        Hometilewidget(),
-                        SizedBox(width: 10,),
-                        Hometilewidget()
+                        CallTileWidget(icon: Icons.call, title: "Assigned Calls", totalCalls: missedCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, percentage: visitPercentage, updateDate: currentDate)
+                        // Hometilewidget(),
+                        // SizedBox(width: 10,),
+                        // Hometilewidget(),
+                        // SizedBox(width: 10,),
+                        // Hometilewidget()
                         // Container(
                         //   width:MediaQuery.of(context).size.width/1.9,
                         //   decoration: BoxDecoration(

@@ -83,6 +83,7 @@ class EventCardWidget extends StatelessWidget {
                 const SizedBox(height: 10),
                 InkWell(
                   onTap: ()async{
+                    // LocalNtification().showNotification(title: 'Sample title',body: 'It works');
                   },
                   child: SizedBox(
                     width: 130,
