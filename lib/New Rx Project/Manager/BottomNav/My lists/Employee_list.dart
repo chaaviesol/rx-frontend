@@ -84,12 +84,11 @@ class _EmployeeListState extends State<EmployeeList> {
   }
 
 
-
   Future<void> _fetchEmployees() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? userID = preferences.getString('uniqueID');
     try {
-      final url = 'http://52.66.145.37:3004/manager/get_Replist';
+      final url = AppUrl.get_employee;
       final response = await http.post(
 
         Uri.parse(url),

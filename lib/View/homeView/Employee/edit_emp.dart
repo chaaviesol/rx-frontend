@@ -61,14 +61,15 @@ class _EditRepState extends State<EditRep> {
         },
         body: jsonEncode(data),
       );
-
       if (response.statusCode == 200) {
+        print('responsedaata:${response.body}');
         var responseData = jsonDecode(response.body);
 
         // Check if 'data' is a list or a map
         if (responseData['data'] is List && responseData['data'].isNotEmpty) {
           var data = responseData['data'][0];  // Access the first item if it's a list
-
+          print('that data is:$data');
+          debugPrint('ddd');
           _nameController.text = data['name'];
           _qualificationController.text = data['qualification'];
           _dobController.text = data['date_of_birth'];
@@ -79,6 +80,7 @@ class _EditRepState extends State<EditRep> {
           _passwordController.text = data['password'];
           _addressController.text = data['address'] ?? 'N/A'; // Handle null address
           _gender = data['gender'];
+          _selectedReportingOfficer =data['reportingOfficer_id'];
 
           // Return the entire 'data' object for further use if necessary
           return responseData['data'];
@@ -191,7 +193,6 @@ class _EditRepState extends State<EditRep> {
     };
 
     try {
-      print('sending...:${jsonEncode(data)}');
       final response = await http.post(
         Uri.parse(url),
         headers: {
@@ -209,10 +210,10 @@ class _EditRepState extends State<EditRep> {
         Utils.flushBarErrorMessage('${responseData['message']}', context);
       } else {
         var responseData = jsonDecode(response.body);
-        Utils.flushBarErrorMessage('${responseData['message']}', context);
+        Utils.flushBarErrorMessage2('${responseData['message']}', context);
       }
     } catch (e) {
-      Utils.flushBarErrorMessage('Failed to load data: $e', context);
+      Utils.flushBarErrorMessage2('Failed to load data: $e', context);
     }
   }
 

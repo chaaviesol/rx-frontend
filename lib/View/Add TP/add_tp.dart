@@ -52,8 +52,7 @@ class _AddTravelPlanState extends State<AddTravelPlan> {
 
     if (dateHeadquarters.isEmpty) {
       // Handle error - show a message or alert indicating that all fields must be filled.
-      Utils.flushBarErrorMessage('Please fill all the fields !', context);
-      print('Please fill all fields to submit the travel plan.');
+      Utils.flushBarErrorMessage2('Please fill all fields to submit the travel plan.!', context);
       return;
     }
 
@@ -68,19 +67,14 @@ class _AddTravelPlanState extends State<AddTravelPlan> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
-      print('data:${jsonEncode(requestData)}');
-      print('status code :${response.statusCode}');
-      print('repons${response.body}');
-      print('url :${AppUrl.generate_tp}');
       if (response.statusCode == 200) {
         // Handle success
         var responseData = jsonDecode(response.body);
         Utils.flushBarErrorMessage('${responseData['message']}', context);
         Navigator.pushNamedAndRemoveUntil(context, RoutesName.successsplash, (route) => false,);
-        print('Travel plan submitted successfully.');
       } else {
         var responseData = jsonDecode(response.body);
-        Utils.flushBarErrorMessage('${responseData['message']}', context);
+        Utils.flushBarErrorMessage2('${responseData['message']}', context);
         // Handle error
         print('Failed to submit travel plan.');
       }

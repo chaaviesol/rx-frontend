@@ -126,16 +126,16 @@ class _TPManagementPageState extends State<TPManagementPage>
               children: [
                 Text(
                   'TP IDs: ${item['id']}',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   'User: ${item['userdetails'][0]['name']}',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Month: ${item['month']}',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 12),
                 ),
                 SizedBox(height: 8),
                 Text(

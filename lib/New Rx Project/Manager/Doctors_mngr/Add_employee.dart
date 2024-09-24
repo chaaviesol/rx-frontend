@@ -35,6 +35,7 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   String? selectedReportingType;
+  
 
   String _gender = '';
 
@@ -99,21 +100,22 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
       "gender": _gender,
       "dob": _dobController.text,
       "address": _addressController.text,
+      "nationality": _nationalityController.text,
       "mobile": _mobileController.text,
       "email": _emailController.text,
       "designation": _designationController.text,
-      "nationality": _nationalityController.text,
       "qualification": _qualificationController.text,
-      "headquarters": int.parse(selectedHeadquarter!.id
-          .toString()), // Assuming selectedHeadquarters is a list of objects
+      "headquarters": int.parse(selectedHeadquarter!.id.toString()), // Assuming selectedHeadquarters is a list of objects
       "password": _passwordController.text,
       "role": _designationController.text, // Assuming role is the same as designation
       "reportingOfficer": int.parse(_selectedReportingOfficer.toString()),
       "reportingType": "Online", // Assuming this is static
       "createdBy": int.parse(myid.toString()),
       "reportingType": selectedReportingType,
-      "adminid": 1, // Assuming this is static, or replace with a dynamic value
+      "adminid": 0001, // Assuming this is static, or replace with a dynamic value
     };
+
+    print("${data}");
 
     try {
       final response = await http.post(
@@ -130,10 +132,10 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
         Utils.flushBarErrorMessage('Employee added successfully!', context);
       } else {
         var responseData = jsonDecode(response.body);
-        Utils.flushBarErrorMessage('${responseData['message']}', context);
+        Utils.flushBarErrorMessage2('${responseData['message']}', context);
       }
     } catch (e) {
-      Utils.flushBarErrorMessage('Failed to load data: $e', context);
+      Utils.flushBarErrorMessage2('Failed to load data: $e', context);
     }
   }
 
@@ -176,6 +178,7 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.whiteColor,
         leading: IconButton(
           icon: CircleAvatar(
               backgroundColor: Colors.white,
@@ -194,46 +197,6 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
           style: text40016black,
         ),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width / 3,
-            child: InkWell(
-              onTap: () {
-                if (_formKey.currentState!.validate()) {
-                  addEmployee();
-                }
-              },
-              child: Defaultbutton(
-                text: 'Submit',
-                bgColor: AppColors.primaryColor,
-                textstyle: const TextStyle(
-                  color: AppColors.whiteColor,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: MediaQuery.of(context).size.width / 3,
-            child: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Defaultbutton(
-                text: 'Cancel',
-                bgColor: AppColors.primaryColor,
-                textstyle: const TextStyle(
-                  color: AppColors.whiteColor,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -280,6 +243,12 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
                               borderRadius: BorderRadius.circular(6)),
                           child: TextFormField(
                             controller: _nameController,
+                            validator: (value) {
+                              if (value! == null && value.isEmpty) {
+                                return 'Please fill this field';
+                              }
+                              return null;
+                            },
                             decoration: InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.only(left: 10),
@@ -498,16 +467,16 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
                                         currentDate.year,
                                         currentDate.month - 1,
                                         currentDate.day - 1);
-                                    DateTime lastDate = DateTime(
-                                        currentDate.year,
-                                        currentDate.month + 2,
-                                        0); // Last day of the next month
+                                    // DateTime lastDate = DateTime(
+                                    //     currentDate.year,
+                                    //     currentDate.month + 2,
+                                    //     0); // Last day of the next month
 
                                     DateTime? pickedDate = await showDatePicker(
                                       context: context,
                                       firstDate: firstDate,
                                       initialDate: currentDate,
-                                      lastDate: lastDate,
+                                      lastDate: DateTime.now(),
                                       builder:
                                           (BuildContext context, Widget? child) {
                                         return Theme(
@@ -565,24 +534,24 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
                                 height: 10,
                               ),
                               Container(
-                                  decoration: BoxDecoration(
-                                      color: AppColors.textfiedlColor,
-                                      borderRadius: BorderRadius.circular(6)),
-                                  child: CustomDropdown(
-                                    options: ['REP', 'MANAGER'],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        if (value == 'Reporter') {
-                                          _designationController.text = "Rep";
-                                        } else if (value == 'Manager') {
-                                          _designationController.text =
-                                              value.toString();
-                                        }
-                                      });
+                                decoration: BoxDecoration(
+                                  color: AppColors.textfiedlColor,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: CustomDropdown(
+                                  options: ['REP', 'MANAGER'],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if (value == 'REP') {
+                                        _designationController.text = "Rep";
+                                      } else if (value == 'MANAGER') {
+                                        _designationController.text = "Manager";
+                                      }
+                                    });
+                                  },
+                                ),
+                              )
 
-                                      // _designationController.text = value.toString();
-                                    },
-                                  ))
                             ],
                           ),
                         )
@@ -751,7 +720,7 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
                   children: [
                     Text(
                       'Personal Address',
-                      style: text50014black,
+                      style: text50012black,
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -762,8 +731,14 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
                         controller: _addressController,
                         maxLines: 3,
                         maxLength: 118,
+                        validator: (value) {
+                          if (value! == null && value.isEmpty) {
+                            return 'Please fill this field';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration(
-                            contentPadding: EdgeInsets.only(left: 10),
+                            contentPadding: EdgeInsets.only(left: 10,top: 10),
                             border: InputBorder.none,
                             hintText: 'Personel Address',
                             counterText: '',
@@ -813,11 +788,49 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
                               ),
                             ),
                           )),
+                      SizedBox(height:30),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SizedBox(
+                            width: 150,
+                            child: InkWell(
+                              onTap: () {
+                                if (_formKey.currentState!.validate()) {
+                                  addEmployee();
+                                }
+                              },
+                              child: Defaultbutton(
+                                text: 'Submit',
+                                bgColor: AppColors.primaryColor,
+                                textstyle: const TextStyle(
+                                  color: AppColors.whiteColor,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 150,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Defaultbutton(
+                                text: 'Cancel',
+                                bgColor: AppColors.primaryColor,
+                                textstyle: const TextStyle(
+                                  color: AppColors.whiteColor,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
                     ],
                   ),
-                ),
-                SizedBox(
-                  height: 100,
                 ),
               ],
             ),

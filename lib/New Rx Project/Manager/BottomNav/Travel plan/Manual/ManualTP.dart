@@ -28,6 +28,7 @@ class _ManualtpState extends State<Manualtp> {
   final Map<DateTime, List> _holidays = {
     DateTime(2024, 1, 1): ['New Year\'s Day'],
     DateTime(2024, 12, 25): ['Christmas Day'],
+    DateTime(2024, 09, 9): ['Christmas Day'],
     // Add more holidays here
   };
 
@@ -145,32 +146,6 @@ class _ManualtpState extends State<Manualtp> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.textfiedlColor,
-                        borderRadius: BorderRadius.circular(9),
-                      ),
-                      child: TextFormField(
-                        onTap: () => _showSelectionPopup(context), // Open the selection popup
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          hintText: selectedItems.isNotEmpty
-                              ? selectedItems.join(', ') // Display selected items as a comma-separated string
-                              : 'Select Sub Quarter',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.only(left: 10),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Wrap(
@@ -216,7 +191,7 @@ class _ManualtpState extends State<Manualtp> {
           iscalenderVisible ? TableCalendar
             (
             focusedDay: _focusedDay,
-            firstDay: DateTime.utc(2020, 10, 16),
+            firstDay: DateTime(DateTime.now().year, DateTime.now().month, 1), // Start from the first day of the current month
             lastDay: DateTime.utc(2050, 3, 14),
             eventLoader: (day){
               return _holidays['day'] ?? [];
@@ -251,12 +226,16 @@ class _ManualtpState extends State<Manualtp> {
                   );
                 }
             ),
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+            ),
             calendarStyle: CalendarStyle(
               holidayTextStyle: TextStyle(color: Colors.red),
-              holidayDecoration: BoxDecoration(
-                color: Colors.redAccent,
-                shape:BoxShape.circle,
-              ),
+              // holidayDecoration: BoxDecoration(
+              //   color: Colors.redAccent,
+              //   shape:BoxShape.circle,
+              // ),
               selectedDecoration: BoxDecoration(
                 color: Colors.blue, // Set the selected day's background color
                 shape: BoxShape.circle, // Set the selected day's shape
@@ -299,6 +278,31 @@ class _ManualtpState extends State<Manualtp> {
             ),
           ),
           SizedBox(height: 10.0,),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.textfiedlColor,
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  child: TextFormField(
+                    onTap: () => _showSelectionPopup(context), // Open the selection popup
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      hintText: selectedItems.isNotEmpty
+                          ? selectedItems.join(', ') // Display selected items as a comma-separated string
+                          : 'Select Sub Quarter',
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.only(left: 10),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           Expanded(
             child: Column(
               children: [
