@@ -330,7 +330,7 @@ class _LeaveListState extends State<LeaveList> {
                                             });
                                           },
                                           child: Container(
-                                            width: MediaQuery.of(context).size.width / 3,
+                                            width: 150,
                                             decoration: BoxDecoration(
                                               color: AppColors.whiteColor,
                                               borderRadius: BorderRadius.circular(6),
@@ -355,7 +355,7 @@ class _LeaveListState extends State<LeaveList> {
                                             });
                                           },
                                           child: Container(
-                                            width: MediaQuery.of(context).size.width / 3,
+                                            width: 150,
                                             decoration: BoxDecoration(
                                               color: AppColors.whiteColor,
                                               borderRadius: BorderRadius.circular(6),
@@ -401,9 +401,9 @@ class _LeaveListState extends State<LeaveList> {
                                       style: text50014black,
                                     ),
                                     SizedBox(height: 10),
-                                    Text(
+                                   Text(
                                       '${snapdata[index]['status'].toString().toUpperCase()}',
-                                      style: text40016,
+                                      style: TextStyle(fontWeight: FontWeight.w400,fontSize: 14,color:snapdata[index]['status'] == 'Rejected' ? Colors.red:Colors.black),
                                     ),
                                   ],
                                 ),

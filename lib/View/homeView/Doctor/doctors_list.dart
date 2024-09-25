@@ -212,47 +212,47 @@ class _DoctorsListState extends State<DoctorsList> {
         child: Icon(Icons.add,color: AppColors.whiteColor,),),
       body: RefreshIndicator(
         onRefresh: getdoctors,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20.0,right: 20.0,left: 20.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 0.5, color: AppColors.borderColor),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: TextFormField(
-                          controller: _searchController,
-                          decoration: const InputDecoration(
-                            hintText: 'Search',
-                            prefixIcon: Icon(Icons.search),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Container(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0,right: 20.0,left: 20.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
                       decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
+                        border: Border.all(width: 0.5, color: AppColors.borderColor),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: Image.asset('assets/icons/settings.png'),
+                      child: TextFormField(
+                        controller: _searchController,
+                        decoration: const InputDecoration(
+                          hintText: 'Search',
+                          prefixIcon: Icon(Icons.search),
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
-                  ],
-                ),
-                Expanded(
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: SizedBox(
+                        height: 25,
+                        width: 25,
+                        child: Image.asset('assets/icons/settings.png'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SafeArea(
+                child: Expanded(
                   child: _isLoading ? Center(child: CircularProgressIndicator()) : ListView.builder(
                     itemCount: list_of_doctors.length,
                     itemBuilder: (context, index) {
@@ -300,8 +300,8 @@ class _DoctorsListState extends State<DoctorsList> {
                     },
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

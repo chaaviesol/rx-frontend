@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
-import 'package:rx_route_new/app_colors.dart'; // Add this import for date formatting
+import 'package:rx_route_new/app_colors.dart';
+import 'package:rx_route_new/constants/styles.dart'; // Add this import for date formatting
 
 class Hometilewidget extends StatefulWidget {
   const Hometilewidget({super.key});
@@ -111,18 +112,20 @@ class CallTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width / 1.4,
+      width: 250,
+      height: 150,
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.primaryColor2,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              CircleAvatar(backgroundColor: AppColors.whiteColor,child:Icon(Icons.phone_callback_sharp,color: AppColors.primaryColor,)),
+              CircleAvatar(radius: 10,backgroundColor: AppColors.whiteColor,
+                  child:Icon(size: 15,Icons.phone_callback_sharp,color: AppColors.primaryColor,)),
               SizedBox(width: 8),
               Text(
                 title,
@@ -138,7 +141,7 @@ class CallTileWidget extends StatelessWidget {
                 '${totalCalls}',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 30,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -169,7 +172,7 @@ class CallTileWidget extends StatelessWidget {
           Divider(),
           Text(
             'Updated: ${updateDate}', // Display the current date
-            style: TextStyle(color: Colors.white, fontSize: 14),
+            style: text40012bordercolor,
           ),
         ],
       ),

@@ -6,6 +6,8 @@ import 'dart:convert';
 
 import 'package:rx_route_new/constants/styles.dart';
 
+import '../../../../res/app_url.dart';
+
 class ChemistList extends StatefulWidget {
   const ChemistList({super.key});
 
@@ -31,7 +33,7 @@ class _ChemistListState extends State<ChemistList> {
   Future<void> _deleteChemist(int chemistId) async {
     try {
       final response = await http.post(
-        Uri.parse('http://52.66.145.37:3004/rep/delete_chemist'),
+        Uri.parse(AppUrl.delete_chemists),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'chemist_id': chemistId}),
       );
@@ -70,7 +72,7 @@ class _ChemistListState extends State<ChemistList> {
 
   Future<void> _fetchChemists() async {
 
-    final url = 'http://52.66.145.37:3004/rep/get_chemist';
+    final url = AppUrl.get_chemists;
     final response = await http.post(Uri.parse(url));
 
     if (response.statusCode == 200) {

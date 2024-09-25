@@ -93,7 +93,7 @@ class _MyApprovalDoctorState extends State<MyApprovalDoctor>
   Future<void> approveDoctor(int doctorId, String status) async {
     try {
       final response = await http.post(
-        Uri.parse('http://52.66.145.37:3004/user/approveDoctors'),
+        Uri.parse(AppUrl.approving_doctors),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({"dr_id": doctorId, "status": status}),
       );
@@ -247,7 +247,7 @@ class DoctorList extends StatelessWidget {
                                 }
                               },
                               child: Container(
-                                width: MediaQuery.of(context).size.width / 3,
+                                width: 150,
                                 decoration: BoxDecoration(
                                   color: AppColors.whiteColor,
                                   borderRadius: BorderRadius.circular(6),
@@ -267,7 +267,7 @@ class DoctorList extends StatelessWidget {
                                 }
                               },
                               child: Container(
-                                width: MediaQuery.of(context).size.width / 3,
+                                width: 150,
                                 decoration: BoxDecoration(
                                   color: AppColors.whiteColor,
                                   borderRadius: BorderRadius.circular(6),

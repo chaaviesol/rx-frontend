@@ -7,6 +7,7 @@ import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My_Reports.dar
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20Approvals/My_approvels.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20lists/My_list.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Doctors_mngr/Add%20Doctor.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Reports/reportsMainPage.dart';
 import 'package:rx_route_new/app_colors.dart';
 
 import '../../../constants/styles.dart';
@@ -33,7 +34,8 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
     HomepageManager(),
     My_list(),
     MyApproval(),
-    Myreports(),
+    // Myreports(),
+    Reportsmainpage(),
     Mngr_T_P(),
   ];
 

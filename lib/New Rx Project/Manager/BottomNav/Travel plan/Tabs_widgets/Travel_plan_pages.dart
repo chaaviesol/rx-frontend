@@ -149,42 +149,50 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                 itemCount: monthNames.length,
                 itemBuilder: (context, index) {
                   final monthName = monthNames.keys.elementAt(index);
-                  final monthNumber = monthNames[monthName];
+                  final monthNumber = monthNames[monthName]!;
+                  final currentMonth = DateTime.now().month;
+                  final isPastMonth = monthNumber < currentMonth; // Condition for past months
+
                   return GestureDetector(
-                    onTap: () {
+                    onTap: isPastMonth
+                        ? null // Disable onTap for past months
+                        : () {
                       final formattedMonth = '$monthNumber-${DateTime.now().year}';
                       Navigator.of(context).pop(formattedMonth); // Pass the selected month
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 10,
-                            offset: Offset(4, 4), // Shadow
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.calendar_month_sharp,
-                            size: 15,
-                            color: Colors.white, // Calendar icon
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            monthName,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white, // Month text color
+                    child: Opacity(
+                      opacity: isPastMonth ? 0.5 : 1, // Reduce opacity for past months
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isPastMonth ? Colors.grey : AppColors.primaryColor,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 10,
+                              offset: Offset(4, 4), // Shadow
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.calendar_month_sharp,
+                              size: 15,
+                              color: Colors.white, // Calendar icon
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              monthName,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white, // Month text color
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -195,6 +203,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
         );
       },
     );
+
 
     if (selectedMonth != null) {
       _showLoaderDialog(context); // Show loader dialog

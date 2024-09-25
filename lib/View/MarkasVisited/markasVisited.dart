@@ -236,24 +236,31 @@ class _MarkAsVisitedState extends State<MarkAsVisited> {
                       shrinkWrap: true,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
+                        crossAxisSpacing: 8.0, // Add spacing between items horizontally
+                        mainAxisSpacing: 8.0,  // Add spacing between items vertically
+                        childAspectRatio: 3, // Adjust aspect ratio to make it look like a ListTile
                       ),
                       itemCount: doctorDetails[0]['addressDetail'][0][0]['product'].length,
                       itemBuilder: (context, index) {
                         print('555${doctorDetails[0]['addressDetail'][0][0]['product']}');
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            height: 100,
-                            width: 50,
-                            decoration: BoxDecoration(color: AppColors.primaryColor, borderRadius: BorderRadius.circular(5), ),
-                            child: Row(mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Icon(Icons.circle, size: 8.0), // Dot icon
-                                 // Spacing between icon and text
-                                Center(child: Text('${doctorDetails[0]["addressDetail"][0][0]['product'][index]['product']}',style:text50014,)),
-                              ],
-                            ),
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(8), // Adjust for ListTile style
                           ),
+                          child: Center(child: Text('${doctorDetails[0]["addressDetail"][0][0]['product'][index]['product']}',style: TextStyle(fontWeight: FontWeight.bold,color: AppColors.whiteColor),))
+                          // ListTile(
+                          //   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Adjust padding
+                          //   leading: Icon(
+                          //     Icons.circle,
+                          //     size: 24.0, // Dot icon
+                          //     color: Colors.white, // Icon color
+                          //   ),
+                          //   title: Text(
+                          //     '${doctorDetails[0]["addressDetail"][0][0]['product'][index]['product']}',
+                          //     style: text50014.copyWith(color: Colors.white),
+                          //   ),
+                          // ),
                         );
                       },
                     ),

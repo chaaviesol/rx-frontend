@@ -71,16 +71,16 @@ class _myapprovelleaveState extends State<myapprovelleave> with SingleTickerProv
                 ),
               ],
             ),
-            Positioned(
-              left: MediaQuery.of(context).size.width/3,
-              bottom: MediaQuery.of(context).size.height/7.9,
-              child: ElevatedButton(style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor),
-                onPressed: () {
-               Navigator.push(context, MaterialPageRoute(builder: (context) => LeaveApplyPage(),));
-
-              }, child: Text('Leave Request',style: text50012,),),
-            ),
+            // Positioned(
+            //   left: MediaQuery.of(context).size.width/3,
+            //   bottom: MediaQuery.of(context).size.height/7.9,
+            //   child: ElevatedButton(style: ElevatedButton.styleFrom(
+            //       backgroundColor: AppColors.primaryColor),
+            //     onPressed: () {
+            //    Navigator.push(context, MaterialPageRoute(builder: (context) => LeaveApplyPage(),));
+            //
+            //   }, child: Text('Leave Request',style: text50012,),),
+            // ),
           ],
         ),
       ),

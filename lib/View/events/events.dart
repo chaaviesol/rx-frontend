@@ -898,8 +898,8 @@ class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateM
                 dividerHeight: 0,
                 controller: _tabControllersub,
                 tabs: [
-                  Tab(text: 'Birthdays'),
-                  Tab(text: 'Anniversarys'),
+                  Tab(text: 'Birthday'),
+                  Tab(text: 'Anniversary'),
                 ],
                 indicatorColor: Colors.blue,
                 labelColor: Colors.black,
@@ -925,7 +925,11 @@ class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateM
                   return ListView.builder(
                     itemCount: birthdays.length,
                     itemBuilder: (context, index) {
-                      return buildEventCard(birthdays[index], 'Birthday');
+                      return Column(
+                        children: [
+                          buildEventCard(birthdays[index], 'Birthday'),
+                        ],
+                      );
                     },
                   );
                 } else {
@@ -948,6 +952,7 @@ class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateM
 
                   return ListView.builder(
                     itemCount: anniversaries.length,
+                    shrinkWrap: true,
                     itemBuilder: (context, index) {
                       return buildEventCard(anniversaries[index], 'Anniversary');
                     },
@@ -966,13 +971,13 @@ class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateM
   // Method to build an event card for Birthday or Anniversary
   Widget buildEventCard(Map<String, dynamic> eventData, String eventType) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(top:10,left: 10.0,right: 10.0),
       child: Stack(
         children: [
           Container(
             decoration: BoxDecoration(
               color: AppColors.primaryColor,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(9),
             ),
             child: Padding(
               padding: const EdgeInsets.only(
@@ -1000,75 +1005,79 @@ class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateM
                       fontSize: 12,
                     ),
                   ),
-                  const SizedBox(height: 30),
-                  Row(
+                  const SizedBox(height: 10),
+                  Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 25,
-                        child: Text(eventData['firstName'][0].toString().toUpperCase()),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
                         children: [
-                          Text(
-                            eventData['firstName'],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.whiteColor,
-                              fontSize: 12,
-                            ),
+                          CircleAvatar(
+                            radius: 20,
+                            child: Text(eventData['firstName'][0].toString().toUpperCase()),
                           ),
-                          Text(
-                            eventData['doc_qualification'] ?? '',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.whiteColor,
-                              fontSize: 9,
-                            ),
-                          ),
-                          SizedBox(height: 10,),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10,),
-                  InkWell(
-                    onTap: ()async{
-                      print('acted....');
-                      setAlarm();
-                    },
-                    child: SizedBox(
-                      width: 130,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor2,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Notify me',
-                                style: TextStyle(
+                                eventData['firstName'],
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w500,
                                   color: AppColors.whiteColor,
                                   fontSize: 12,
                                 ),
                               ),
-                              SizedBox(width: 10),
-                              Icon(
-                                Icons.notifications_active,
-                                color: AppColors.whiteColor,
+                              Text(
+                                eventData['doc_qualification'] ?? '',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.whiteColor,
+                                  fontSize: 9,
+                                ),
                               ),
+                              SizedBox(height: 10,),
                             ],
                           ),
-                        ),
+                        ],
                       ),
-                    ),
-                  )
+                      // Positioned(
+                      //   right: 0,
+                      //     child: InkWell(
+                      //   onTap: ()async{
+                      //     setAlarm();
+                      //   },
+                      //   child: SizedBox(
+                      //     width: 130,
+                      //     child: Container(
+                      //       decoration: BoxDecoration(
+                      //         color: AppColors.primaryColor2,
+                      //         borderRadius: BorderRadius.circular(6),
+                      //       ),
+                      //       child: const Padding(
+                      //         padding: EdgeInsets.all(6.0),
+                      //         child: Row(
+                      //           mainAxisAlignment: MainAxisAlignment.center,
+                      //           children: [
+                      //             Text(
+                      //               'Notify me',
+                      //               style: TextStyle(
+                      //                 fontWeight: FontWeight.w400,
+                      //                 color: AppColors.whiteColor,
+                      //                 fontSize: 10,
+                      //               ),
+                      //             ),
+                      //             SizedBox(width: 10),
+                      //             Icon(
+                      //               Icons.notifications_active,
+                      //               color: AppColors.whiteColor,
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ))
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -1114,8 +1123,8 @@ class NestedTabView2 extends StatelessWidget {
           backgroundColor: Colors.grey[300],
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Birthdays'),
-              Tab(text: 'Anniversarys'),
+              Tab(text: 'Birthday'),
+              Tab(text: 'Anniversary '),
             ],
             indicatorColor: Colors.blue,
             labelColor: Colors.black,

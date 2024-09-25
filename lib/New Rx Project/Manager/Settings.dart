@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Login%20page.dart';
 import 'package:http/http.dart' as http;
+import 'package:rx_route_new/Util/Utils.dart';
 import 'package:rx_route_new/View/profile/edit_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -147,6 +148,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     icon: Icons.logout,
                     title: 'Logout',
                     onTap: () {
+                      Utils.deleteuser(context);
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(

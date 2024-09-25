@@ -30,6 +30,7 @@ class _EmpListState extends State<EmpList> {
   Future<void> getemployees() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? userID = preferences.getString('userID');
+    print('user ID is :$userID');
     String url = AppUrl.get_employee;
     Map<String, dynamic> data = {
       "manager_id": int.parse(userID.toString())
@@ -64,7 +65,7 @@ class _EmpListState extends State<EmpList> {
   }
 
   Future<void> deleteemployee(String empID) async {
-    String url = 'http://52.66.145.37:3004/rep/delete_rep';
+    String url = AppUrl.delete_employee;
     Map<String, dynamic> data = {
       "userId": int.parse(empID.toString())
     };
@@ -165,39 +166,7 @@ class _EmpListState extends State<EmpList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
-      // appBar: AppBar(
-      //   backgroundColor: AppColors.whiteColor,
-      //   title: const Text('Employee list', style: TextStyle(),),
-      //   centerTitle: true,
-      //   leading: Padding(
-      //     padding: const EdgeInsets.all(8.0),
-      //     child: Container(
-      //       decoration: BoxDecoration(
-      //         color: AppColors.primaryColor, // Replace with your desired color
-      //         borderRadius: BorderRadius.circular(6),
-      //       ),
-      //       child: InkWell(
-      //         onTap: () {
-      //           Navigator.pop(context);
-      //         },
-      //         child: const Icon(Icons.arrow_back, color: Colors.white),
-      //       ), // Adjust icon color
-      //     ),
-      //   ),
-      //   actions: [
-      //     Padding(
-      //       padding: const EdgeInsets.only(right: 20.0),
-      //       child: ProfileIconWidget(userName: Utils.userName![0].toString().toUpperCase() ?? 'N?A',),
-      //     ),
-      //   ],
-      // ),
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: AppColors.primaryColor,
-      //   onPressed: () {
-      //     Navigator.push(context, MaterialPageRoute(builder: (context) => AddRep(),));
-      //   },
-      //   child: Icon(Icons.add, color: AppColors.whiteColor,),
-      // ),
+
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -250,7 +219,7 @@ class _EmpListState extends State<EmpList> {
                         padding: const EdgeInsets.all(8.0),
                         child: InkWell(
                           onTap: () {
-                            print("empid:${employee['id']}");
+                            print('emp data:$employee');
                             Navigator.push(
                               context,
                               MaterialPageRoute(

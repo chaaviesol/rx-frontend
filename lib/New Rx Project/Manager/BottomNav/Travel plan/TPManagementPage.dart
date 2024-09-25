@@ -83,7 +83,9 @@ class _TPManagementPageState extends State<TPManagementPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TP Approvals'),
+        toolbarHeight: 0,
+        backgroundColor: AppColors.whiteColor,
+        elevation: 0,
         bottom: TabBar(
           controller: _tabController,
           tabs: [

@@ -131,4 +131,6 @@ class AppUrl{
   //reports
  static var getallVisitData = '$baseUrl/user/visitedCount';
 
+ static var userPerformance = '$baseUrl/user/userPerformance';
+
 }

@@ -221,21 +221,26 @@ class _SettingsState extends State<Settings> {
                       ),
                     ),
                   ),
-                  ListTile(
-                    leading: const Text('Logout',style: TextStyle(
-                      fontSize:   14,
-                      fontWeight: FontWeight.w600,
-                    ),),
-                    trailing:Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Container(
-                        height: 35,
-                        width: 35,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                          borderRadius: BorderRadius.circular(6),
+                  InkWell(
+                    onTap: (){
+                      // Utils.deleteuser(context);
+                    },
+                    child: ListTile(
+                      leading: const Text('Logout',style: TextStyle(
+                        fontSize:   14,
+                        fontWeight: FontWeight.w600,
+                      ),),
+                      trailing:Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Icon(Icons.arrow_forward, color: AppColors.whiteColor),
                         ),
-                        child: const Icon(Icons.arrow_forward, color: AppColors.whiteColor),
                       ),
                     ),
                   ),

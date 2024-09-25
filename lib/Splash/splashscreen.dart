@@ -49,11 +49,10 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? uniqueID = preferences.getString('uniqueID');
     String? userType = preferences.getString('userType');
-    print('888userType:$userType');
-    print('objectddd$preferences');
     if(uniqueID != null){
+      print('in pref uniqueid:${preferences.getString('uniqueID')}');
+      print('in pref userid:${preferences.getString('userID')}');
       if(userType == 'Rep'){
-        print('hello yes.....');
         setState(() {
           Navigator.pushReplacement(
             context,
@@ -61,7 +60,6 @@ class _SplashScreenState extends State<SplashScreen> {
           );
         });
       }else if(userType == 'Manager'){
-        print('hello no.....');
         setState(() {
           Navigator.pushReplacement(
             context,

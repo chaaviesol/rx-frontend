@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:rx_route_new/View/homeView/Doctor/edit_doctor.dart';
 import 'package:rx_route_new/res/app_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,6 +9,7 @@ import '../../../../../View/MarkasVisited/markasVisited.dart';
 import '../../../../../View/homeView/Leave/LeaveRequest.dart';
 import '../../../../../app_colors.dart';
 import '../../../../../constants/styles.dart';
+import '../../../Doctors_mngr/Edit_Doctor.dart';
 
 class DoctorDetailsPage extends StatefulWidget {
   final int doctorId;
@@ -33,14 +35,11 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
   Future<void> _fetchPerformanceData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? uniqueID = await preferences.getString('uniqueID');
-    print('useriddd:${uniqueID}');
     final response = await http.post(
       Uri.parse(AppUrl.getuserPerformance),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({"requesterUniqueId": uniqueID, "drId": widget.doctorId, "month": _selectedMonth}),
     );
-    print('stcode:${response.statusCode}');
-    print('respo:${response.body}');
     if (response.statusCode == 200 && json.decode(response.body)['success']) {
       setState(() => _performanceData = json.decode(response.body)['data']);
     } else {
@@ -210,6 +209,14 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                           ),
                         ),
                         Positioned(
+                            right: 10,
+                            top: 10,
+                            child: InkWell(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => Edit_Doctor(doctorID: _doctorDetails!['id'],),));
+                              },
+                                child: Icon(Icons.edit))),
+                        Positioned(
                           bottom: 20,
                           right: 0,
                           child: ClipPath(
@@ -241,6 +248,7 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                       unselectedLabelColor: Colors.black54,
                       indicatorColor: AppColors.primaryColor,
                       tabs: const [
+                        // Tab(text: 'Address',),
                         Tab(text: 'Report',),
                         Tab(text: 'Schedule'),
                         Tab(text: 'Overview'),
@@ -254,6 +262,7 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                         controller: _tabController,
                         children: [
                           _buildReportTab(),
+                          // _buildAddressTab(),
                           _buildScheduleTab(),
                           _buildOverviewTab(),
                           _buildTaggedTab(),
@@ -391,7 +400,28 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
 
 
   // .........
-
+  Widget _buildAddressTab(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+    Padding(
+    padding: EdgeInsets.all(25.0),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+    ListView.builder(
+      shrinkWrap: true,
+      itemBuilder: (context,index) {
+        return Text('${_doctorDetails!['addressDetail'][0]}');
+      }
+    ),
+    SizedBox(height: 10,),
+    ],
+    ),
+    )
+      ],
+    );
+  }
   Widget _buildOverviewTab() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -422,17 +452,25 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
       itemCount: _doctorDetails!['schedule'].length,
       itemBuilder: (context, index) {
         final schedule = _doctorDetails!['schedule'][index][0];
-        return Column(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10,),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  height: 30,width:100,
-                    color: AppColors.primaryColor,
-                    child: Center(child: Text(schedule['schedule']['day'], style: text50014))),
+              Text('${_doctorDetails!['addressDetail'][0][0]['address']['address']}'),
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                        height: 30,width:100,
+                        color: AppColors.primaryColor,
+                        child: Center(child: Text(schedule['schedule']['day'], style: text50014))),
+                  ),
+                  SizedBox(width: 10,),
+                  Text('${schedule['schedule']['start_time']} - ${schedule['schedule']['end_time']}', style: text50014black),
+                ],
               ),
-              Text('${schedule['schedule']['start_time']} - ${schedule['schedule']['end_time']}', style: text50014black),
+
             ],
 
         );
@@ -474,6 +512,7 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
       itemCount: _doctorDetails!['addressDetail'][0][0]['product'].length,
       itemBuilder: (context, index) {
         final product = _doctorDetails!['addressDetail'][0][0]['product'][index];
+        int itemNum = index=1;
         return ListTile(
           title: Text(product['product'], style: text50014black),
         );
@@ -487,11 +526,16 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
       itemBuilder: (context, index) {
         final chemist = _doctorDetails!['addressDetail'][0][0]['chemist'][index];
         return ListTile(
-          title: Text(chemist['address'], style: text50014black),
-          subtitle: Text('Pincode: ${chemist['pincode']}', style: text50014black),
+          leading: CircleAvatar(
+            backgroundColor: AppColors.pastelColors[index],
+            child: Text('${chemist['buildingName'][0]}'),
+          ),
+          title: Text(chemist['buildingName'], style: text50014black),
+          // subtitle: Text('Pincode: ${chemist['pincode']}', style: text50014black),
         );
       },
     );
+    // return Text('${_doctorDetails!['addressDetail'][0][0]['chemist'][0]['buildingName']}');
   }
 
   Widget _buildVisitHistoryTab() {

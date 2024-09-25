@@ -164,12 +164,6 @@ class _LoginPageNewState extends State<LoginPageNew> {
         },
         body: jsonEncode(data),
       );
-
-      print('User ID: ${userid.text}');
-      print('Password: ${password.text}');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
         if (responseData['success']) {

@@ -30,7 +30,6 @@ class _Mngr_T_PState extends State<Mngr_T_P> with SingleTickerProviderStateMixin
     Events_page()
 
 
-
   ];
 
   @override
@@ -64,7 +63,7 @@ class _Mngr_T_PState extends State<Mngr_T_P> with SingleTickerProviderStateMixin
         // ),
         automaticallyImplyLeading: false,
         title: Text(
-          'Travel Plansss',
+          'Travel Plans',
           style: text40016black,
         ),
         centerTitle: true,
@@ -86,10 +85,8 @@ class _Mngr_T_PState extends State<Mngr_T_P> with SingleTickerProviderStateMixin
                 ],
               ),
               child: TabBar(
-
                 unselectedLabelColor: Colors.white,
                 labelStyle: text40014,
-
                 controller: _tabController,
                 tabs: _tabs,
                 labelColor: Colors.white,

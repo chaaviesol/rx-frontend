@@ -1,35 +1,31 @@
+//using this edit doctor page...
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-
-import 'package:intl/intl.dart';
-import 'package:rx_route_new/New%20Rx%20Project/Manager/Doctors_mngr/Add_chemist.dart';
-import 'package:rx_route_new/app_colors.dart';
 import 'package:http/http.dart' as http;
-import 'package:rx_route_new/model/scheduleModel.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../Util/Routes/routes_name.dart';
 import '../../../Util/Utils.dart';
 import '../../../View/homeView/Doctor/add_doctor.dart';
+import '../../../app_colors.dart';
 import '../../../constants/styles.dart';
 import '../../../defaultButton.dart';
-import '../../../model/doctorModel.dart';
+import '../../../model/scheduleModel.dart';
 import '../../../res/app_url.dart';
 import '../../../widgets/customDropDown.dart';
+import 'Add_chemist.dart';
 
-class Add_doctor_mngr extends StatefulWidget {
-  const Add_doctor_mngr({Key? key}) : super(key: key);
+class Edit_Doctor extends StatefulWidget {
+  int doctorID;
+  Edit_Doctor({required this.doctorID,super.key});
 
   @override
-  State<Add_doctor_mngr> createState() => _Add_doctor_mngrState();
+  State<Edit_Doctor> createState() => _Edit_DoctorState();
 }
 
-class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
-  @override
-  //schedule section
+class _Edit_DoctorState extends State<Edit_Doctor> {
   List<ScheduleNew> schedules = [ScheduleNew()];
   String _gender = '';
   final _formKey = GlobalKey<FormState>();
@@ -37,7 +33,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   final TextEditingController _lastnameController = TextEditingController();
 
   final TextEditingController _qualificationController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _nationalityController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
@@ -46,9 +42,11 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _specialistaionController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController _headQuaters = TextEditingController();
   final TextEditingController _exstation = TextEditingController();
+
+  List<dynamic> doctorDetails = [];
 
   bool basicInfo = true;
   bool workInfo = true;
@@ -193,8 +191,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       List<Map<String, dynamic>> scheduleSets = List.generate(minLength, (index) {
         return {
           "day": schedule.days[index],
-            "start_time": schedule.timeSlots[index].startTime,
-            "end_time": schedule.timeSlots[index].endTime,
+          "start_time": schedule.timeSlots[index].startTime,
+          "end_time": schedule.timeSlots[index].endTime,
           // "time": {
           //   "startTime": schedule.timeSlots[index].startTime,
           //   "endTime": schedule.timeSlots[index].endTime,
@@ -287,10 +285,169 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
     }
   }
 
+  Future<dynamic> single_doctordetails() async {
+    print('called meee...');
+    String url = AppUrl.single_doctor_details;
+    print('url :${AppUrl.single_doctor_details}');
+    Map<String,dynamic> docdata = {
+      "dr_id":widget.doctorID
+    };
+    try {
+      print('entered..here...');
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(docdata),
+      );
+      print('st code is :${response.statusCode}');
+      if (response.statusCode == 200) {
+        print('passed....');
+        var responseData = jsonDecode(response.body);
+        doctorDetails.clear();
+        doctorDetails.addAll(responseData['data']);
+        _firstnameController.text =responseData['data'][0]['firstName'];
+        _lastnameController.text =responseData['data'][0]['lastName'];
+        _qualificationController.text = responseData['data'][0]['doc_qualification'];
+        _gender = responseData['data'][0]['gender'].toString();
+        _specialistaionController.text = responseData['data'][0]['specialization'];
+        _mobileController.text = responseData['data'][0]['mobile'];
+        _visitsController.text = responseData['data'][0]['no_of_visits'].toString();
+        _dobController.text = responseData['data'][0]['date_of_birth'];
+        _weddingDateController.text = responseData['data'][0]['wedding_date'];
+
+        // Populate the selected products
+        _selectedProducts = (responseData['data'][0]['products'] as List).map((product) {
+          return ProductData(
+            id: product['id'],
+            productName: [ProductName(name: product['product'])], createdBy: '', quantity: 0, status: '',
+          );
+        }).toList();
+
+        // Populate the selected chemists
+        _selectedChemists = (responseData['data'][0]['chemist'] as List).map((chemist) {
+          return Chemist(
+            // id: chemist['id'],
+            id: 1,
+
+            buildingName: chemist['address'], mobile: '0', email: 'a', licenseNumber: '123456', address: 'adsf', dateOfBirth: '12-05-2024', status: 'active',
+            // Add other necessary fields here
+          );
+        }).toList();
+
+        // Populate addresses
+        // fields = (responseData['data'][0]['addressDetail'] as List).expand((addressGroup) {
+        //   return addressGroup.map((address) {
+        //     return FieldEntry(
+        //       placeController: TextEditingController(text: address['address']['address']),
+        //       latController: TextEditingController(), // Populate with latitude if available
+        //       lonController: TextEditingController(), // Populate with longitude if available
+        //     );
+        //   }).toList();
+        // }).toList() as List<FieldEntry>;
+
+        print('ppp:${responseData['data'][0]['products']}');
+        // _selectedChemists = responseData['data'][0]['chemist'];
+        print('sp products:$_selectedProducts');
+        print('sp chemists:$_selectedChemists');
+        return responseData['data'];
+      } else {
+        print('its here.....');
+        var responseData = jsonDecode(response.body);
+        Utils.flushBarErrorMessage('${responseData['message']}', context);
+      }
+    } catch (e) {
+      Utils.flushBarErrorMessage('${e.toString()}', context);
+      throw Exception('Failed to load data: $e');
+    }
+  }
+
+  Future<dynamic> editdoctors() async {
+    print('add doc called...');
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+    String? userID = preferences.getString('userID');
+
+    String url = AppUrl.edit_doctor;
+
+
+
+    // Collect addresses
+    // List<Map<String, String>> addresses = fields.map((field) {
+    //   return {
+    //     "address": field.placeController.text,
+    //     "latitude": field.latController.text,
+    //     "longitude": field.lonController.text,
+    //   };
+    // }).toList();
+
+    // Format selected products
+    List<Map<String, dynamic>> formattedProducts = _selectedProducts.map((product) {
+      return {
+        "id": product.id,
+        "product": product.productName.first.name,
+      };
+    }).toList();
+
+    // Format selected chemists
+    List<Map<String, dynamic>> formattedChemists = _selectedChemists.map((chemist) {
+      return {
+        "id": chemist.id,
+        "buildingName": chemist.buildingName,
+        // Add other necessary fields here
+      };
+    }).toList();
+
+    Map<String, dynamic> data = {
+      "created_UserId":uniqueID,
+      "dr_id":widget.doctorID,
+      "firstName": _firstnameController.text,
+      "lastName": _lastnameController.text,
+      "qualification": _qualificationController.text,
+      "gender": _gender,
+      "specialization": _specialistaionController.text,
+      "mobile": _mobileController.text,
+      "visits": int.parse(_visitsController.text),
+      "dob": _dobController.text,
+      "wedding_date": _weddingDateController.text,
+      "products": formattedProducts,
+      "chemist": formattedChemists,
+      // 'address':addresses,
+      "modified_by":uniqueID
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+      print('st code :${response.statusCode}');
+      print('${jsonEncode(data)}');
+      print('${response.body}');
+      print('body:$data');
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        Navigator.pushNamedAndRemoveUntil(context, RoutesName.successsplash, (route) => false,);
+        Utils.flushBarErrorMessage('${responseData['message']}', context);
+        return responseData;
+      } else {
+        var responseData = jsonDecode(response.body);
+        Utils.flushBarErrorMessage2('${responseData['message']}', context);
+      }
+    } catch (e) {
+      Utils.flushBarErrorMessage2('${e.toString()}', context);
+      throw Exception('Failed to load data: $e');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    single_doctordetails();
     _fetchHeadquarters();
     fetchChemists();
     _futureProducts = _fetchProducts();
@@ -421,7 +578,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
         ),
         centerTitle: true,
         title: Text(
-          'Add Doctor',
+          'Edit Doctor',
           style: text40016black,
         ),
       ),
@@ -461,234 +618,234 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                 children: [
                   basicInfo
                       ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'First Name',
-                                        style: text50012black,
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: AppColors.textfiedlColor,
-                                            borderRadius: BorderRadius.circular(6)),
-                                        child: TextFormField(
-                                          controller: _firstnameController,
-                                          decoration: InputDecoration(
-                                              border: InputBorder.none,
-                                              contentPadding: EdgeInsets.only(left: 10),
-                                              hintText: 'First Name',
-                                              hintStyle: text50010tcolor2,
-                                              counterText: ''),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: 10,),
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Last Name',
-                                        style: text50012black,
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: AppColors.textfiedlColor,
-                                            borderRadius: BorderRadius.circular(6)),
-                                        child: TextFormField(
-                                          controller: _lastnameController,
-                                          decoration: InputDecoration(
-                                              border: InputBorder.none,
-                                              contentPadding: EdgeInsets.only(left: 10),
-                                              hintText: 'Last Name',
-                                              hintStyle: text50010tcolor2,
-                                              counterText: ''),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Mobile',
-                                        style: text50012black,
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: AppColors.textfiedlColor,
-                                            borderRadius:
-                                                BorderRadius.circular(6)),
-                                        child: TextFormField(
-                                          controller: _mobileController,
-                                          keyboardType: TextInputType.phone,
-                                          maxLength: 10,
-                                          decoration: InputDecoration(
-                                              contentPadding:
-                                                  EdgeInsets.only(left: 10),
-                                              border: InputBorder.none,
-                                              hintText: 'Mobile Number',
-                                              hintStyle: text50010tcolor2,
-                                              counterText: ''),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Gender',
-                                        style: text50012black,
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Container(
-                                          decoration: BoxDecoration(
-                                              color: AppColors.textfiedlColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: CustomDropdown(
-                                            options: [
-                                              'Male',
-                                              'Female',
-                                              'Other'
-                                            ],
-                                            onChanged: (value) {
-                                              _gender = value.toString();
-                                            },
-                                          )),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Specialisation', style: text50012black),
-                                SizedBox(height: 10),
-                                Autocomplete<String>(
-                                  optionsBuilder:
-                                      (TextEditingValue textEditingValue) {
-                                    if (textEditingValue.text.isEmpty) {
-                                      return const Iterable<String>.empty();
-                                    } else {
-                                      fetchSpecializations(
-                                          textEditingValue.text);
-                                      return _specializations.where((option) {
-                                        return option.toLowerCase().contains(
-                                            textEditingValue.text
-                                                .toLowerCase());
-                                      });
-                                    }
-                                  },
-                                  onSelected: (String selection) {
-                                    _specialistaionController.text = selection;
-                                  },
-                                  fieldViewBuilder: (context, controller,
-                                      focusNode, onEditingComplete) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: AppColors.textfiedlColor,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: TextFormField(
-                                        controller: controller,
-                                        focusNode: focusNode,
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          contentPadding:
-                                              EdgeInsets.only(left: 10),
-                                          hintText: 'Specialisation',
-                                          hintStyle: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.grey[600]),
-                                        ),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please enter a specialization';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    );
-                                  },
+                                Text(
+                                  'First Name',
+                                  style: text50012black,
                                 ),
-                                if (_isLoading)
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 8.0),
-                                    child: CircularProgressIndicator(),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: AppColors.textfiedlColor,
+                                      borderRadius: BorderRadius.circular(6)),
+                                  child: TextFormField(
+                                    controller: _firstnameController,
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        contentPadding: EdgeInsets.only(left: 10),
+                                        hintText: 'First Name',
+                                        hintStyle: text50010tcolor2,
+                                        counterText: ''),
                                   ),
+                                ),
                               ],
                             ),
-                            SizedBox(
-                              height: 10,
+                          ),
+                          SizedBox(width: 10,),
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Last Name',
+                                  style: text50012black,
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: AppColors.textfiedlColor,
+                                      borderRadius: BorderRadius.circular(6)),
+                                  child: TextFormField(
+                                    controller: _lastnameController,
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        contentPadding: EdgeInsets.only(left: 10),
+                                        hintText: 'Last Name',
+                                        hintStyle: text50010tcolor2,
+                                        counterText: ''),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'Qualification',
-                              style: text50012black,
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Mobile',
+                                  style: text50012black,
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: AppColors.textfiedlColor,
+                                      borderRadius:
+                                      BorderRadius.circular(6)),
+                                  child: TextFormField(
+                                    controller: _mobileController,
+                                    keyboardType: TextInputType.phone,
+                                    maxLength: 10,
+                                    decoration: InputDecoration(
+                                        contentPadding:
+                                        EdgeInsets.only(left: 10),
+                                        border: InputBorder.none,
+                                        hintText: 'Mobile Number',
+                                        hintStyle: text50010tcolor2,
+                                        counterText: ''),
+                                  ),
+                                )
+                              ],
                             ),
-                            SizedBox(
-                              height: 10,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Gender',
+                                  style: text50012black,
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                    decoration: BoxDecoration(
+                                        color: AppColors.textfiedlColor,
+                                        borderRadius:
+                                        BorderRadius.circular(6)),
+                                    child: CustomDropdown(
+                                      options: [
+                                        'Male',
+                                        'Female',
+                                        'Other'
+                                      ],
+                                      onChanged: (value) {
+                                        _gender = value.toString();
+                                      },
+                                    )),
+                              ],
                             ),
-                            Container(
-                              decoration: BoxDecoration(
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Specialisation', style: text50012black),
+                          SizedBox(height: 10),
+                          Autocomplete<String>(
+                            optionsBuilder:
+                                (TextEditingValue textEditingValue) {
+                              if (textEditingValue.text.isEmpty) {
+                                return const Iterable<String>.empty();
+                              } else {
+                                fetchSpecializations(
+                                    textEditingValue.text);
+                                return _specializations.where((option) {
+                                  return option.toLowerCase().contains(
+                                      textEditingValue.text
+                                          .toLowerCase());
+                                });
+                              }
+                            },
+                            onSelected: (String selection) {
+                              _specialistaionController.text = selection;
+                            },
+                            fieldViewBuilder: (context, controller,
+                                focusNode, onEditingComplete) {
+                              return Container(
+                                decoration: BoxDecoration(
                                   color: AppColors.textfiedlColor,
-                                  borderRadius: BorderRadius.circular(6)),
-                              child: TextFormField(
-                                controller: _qualificationController,
-                                decoration: InputDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: TextFormField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(left: 10),
-                                    hintText: 'Qualification',
-                                    hintStyle: text50010tcolor2,
-                                    counterText: ''),
-                              ),
+                                    contentPadding:
+                                    EdgeInsets.only(left: 10),
+                                    hintText: 'Specialisation',
+                                    hintStyle: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[600]),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter a specialization';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                          if (_isLoading)
+                            Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: CircularProgressIndicator(),
                             ),
-                          ],
-                        )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Qualification',
+                        style: text50012black,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: AppColors.textfiedlColor,
+                            borderRadius: BorderRadius.circular(6)),
+                        child: TextFormField(
+                          controller: _qualificationController,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.only(left: 10),
+                              hintText: 'Qualification',
+                              hintStyle: text50010tcolor2,
+                              counterText: ''),
+                        ),
+                      ),
+                    ],
+                  )
                       : Text(''),
                   SizedBox(
                     height: 10,
@@ -764,7 +921,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                   hintStyle: text50010tcolor2,
                                   isDense: true,
                                   contentPadding:
-                                      const EdgeInsets.fromLTRB(10, 10, 20, 0),
+                                  const EdgeInsets.fromLTRB(10, 10, 20, 0),
                                   filled: true,
                                   fillColor: Colors.grey.shade100,
                                   border: OutlineInputBorder(
@@ -803,7 +960,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                               primary: AppColors.primaryColor),
                                           buttonTheme: const ButtonThemeData(
                                               textTheme:
-                                                  ButtonTextTheme.primary),
+                                              ButtonTextTheme.primary),
                                         ),
                                         child: child!,
                                       );
@@ -813,8 +970,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                   if (pickedDate != null) {
                                     // Change the format of the date here
                                     String formattedDate =
-                                        DateFormat('dd-MM-yyyy')
-                                            .format(pickedDate);
+                                    DateFormat('dd-MM-yyyy')
+                                        .format(pickedDate);
                                     setState(() {
                                       _dobController.text = formattedDate;
                                     });
@@ -862,7 +1019,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                   hintStyle: text50010tcolor2,
                                   isDense: true,
                                   contentPadding:
-                                      const EdgeInsets.fromLTRB(10, 10, 20, 0),
+                                  const EdgeInsets.fromLTRB(10, 10, 20, 0),
                                   filled: true,
                                   fillColor: Colors.grey.shade100,
                                   border: OutlineInputBorder(
@@ -901,7 +1058,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                               primary: AppColors.primaryColor),
                                           buttonTheme: const ButtonThemeData(
                                               textTheme:
-                                                  ButtonTextTheme.primary),
+                                              ButtonTextTheme.primary),
                                         ),
                                         child: child!,
                                       );
@@ -911,8 +1068,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                   if (pickedDate != null) {
                                     // Change the format of the date here
                                     String formattedDate =
-                                        DateFormat('dd-MM-yyyy')
-                                            .format(pickedDate);
+                                    DateFormat('dd-MM-yyyy')
+                                        .format(pickedDate);
                                     setState(() {
                                       _weddingDateController.text =
                                           formattedDate;
@@ -1013,8 +1170,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                               return Container(
                                 margin: EdgeInsets.only(bottom: 20),
                                 decoration: BoxDecoration(
-                                    // border: Border.all()
-                                    ),
+                                  // border: Border.all()
+                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -1022,7 +1179,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                     SizedBox(height: 20,),
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text('Create Schedule',
                                             style: text50012black),
@@ -1057,50 +1214,50 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                     SizedBox(height: 10),
                                     _isLoading
                                         ? Center(
-                                            child: CircularProgressIndicator())
+                                        child: CircularProgressIndicator())
                                         : Container(
-                                            decoration: BoxDecoration(
-                                              color: AppColors.textfiedlColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                DropdownButton<String>(
-                                                  value: schedulenew
-                                                      .selectedSubHeadquarter,
-                                                  hint: Text(
-                                                      'Select a sub-headquarter'),
-                                                  items: _headquartersData
-                                                      .expand((item) {
-                                                    return (item[
-                                                                'sub_headquarter']
-                                                            as String)
-                                                        .split('\n')
-                                                        .where((sub) =>
-                                                            sub.isNotEmpty)
-                                                        .map((sub) {
-                                                      return DropdownMenuItem<
-                                                          String>(
-                                                        value: sub,
-                                                        child: Text(sub),
-                                                      );
-                                                    }).toList();
-                                                  }).toList(),
-                                                  onChanged:
-                                                      (selectedSubHeadquarter) {
-                                                    setState(() {
-                                                      schedulenew
-                                                              .selectedSubHeadquarter =
-                                                          selectedSubHeadquarter;
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.textfiedlColor,
+                                        borderRadius:
+                                        BorderRadius.circular(6),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          DropdownButton<String>(
+                                            value: schedulenew
+                                                .selectedSubHeadquarter,
+                                            hint: Text(
+                                                'Select a sub-headquarter'),
+                                            items: _headquartersData
+                                                .expand((item) {
+                                              return (item[
+                                              'sub_headquarter']
+                                              as String)
+                                                  .split('\n')
+                                                  .where((sub) =>
+                                              sub.isNotEmpty)
+                                                  .map((sub) {
+                                                return DropdownMenuItem<
+                                                    String>(
+                                                  value: sub,
+                                                  child: Text(sub),
+                                                );
+                                              }).toList();
+                                            }).toList(),
+                                            onChanged:
+                                                (selectedSubHeadquarter) {
+                                              setState(() {
+                                                schedulenew
+                                                    .selectedSubHeadquarter =
+                                                    selectedSubHeadquarter;
+                                              });
+                                            },
                                           ),
+                                        ],
+                                      ),
+                                    ),
                                     SizedBox(height: 20),
                                     dayTimeSelector(schedulenew),
                                     Text(
@@ -1114,14 +1271,14 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                       decoration: BoxDecoration(
                                           color: AppColors.textfiedlColor,
                                           borderRadius:
-                                              BorderRadius.circular(6)),
+                                          BorderRadius.circular(6)),
                                       child: TextFormField(
                                         controller: schedulenew.address,
                                         // _addressController,
                                         decoration: InputDecoration(
                                             border: InputBorder.none,
                                             contentPadding:
-                                                EdgeInsets.only(left: 10),
+                                            EdgeInsets.only(left: 10),
                                             hintText: 'Address',
                                             hintStyle: text50010tcolor2,
                                             counterText: ''),
@@ -1143,9 +1300,9 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                             SizedBox(height: 25,),
                                             SizedBox(
                                               height:
-                                                  50, // Set the height of the button
+                                              50, // Set the height of the button
                                               width:
-                                                  50, // Set the width of the button
+                                              50, // Set the width of the button
                                               child: ElevatedButton(
                                                 onPressed:()async{
                                                   try {
@@ -1165,8 +1322,8 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                                       .textfiedlColor, // Button color
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            6), // Adjust button corner radius
+                                                    BorderRadius.circular(
+                                                        6), // Adjust button corner radius
                                                   ),
                                                   padding: EdgeInsets
                                                       .zero, // Remove default padding
@@ -1182,12 +1339,12 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                         ),
                                         SizedBox(
                                             width:
-                                                20), // Space between the button and the fields
+                                            20), // Space between the button and the fields
                                         Expanded(
                                           flex: 2,
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Text('Latitude',
                                                   style: text50012black),
@@ -1195,18 +1352,18 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                               Container(
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      AppColors.textfiedlColor,
+                                                  AppColors.textfiedlColor,
                                                   borderRadius:
-                                                      BorderRadius.circular(6),
+                                                  BorderRadius.circular(6),
                                                 ),
                                                 child: TextFormField(
                                                   controller:
-                                                      schedulenew.latitude,
+                                                  schedulenew.latitude,
                                                   decoration: InputDecoration(
                                                     border: InputBorder.none,
                                                     contentPadding:
-                                                        EdgeInsets.only(
-                                                            left: 10),
+                                                    EdgeInsets.only(
+                                                        left: 10),
                                                     hintText: 'Latitude',
                                                     hintStyle: text50010tcolor2,
                                                     counterText: '',
@@ -1219,12 +1376,12 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                         ),
                                         SizedBox(
                                             width:
-                                                20), // Space between the latitude and longitude fields
+                                            20), // Space between the latitude and longitude fields
                                         Expanded(
                                           flex: 2,
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Text('Longitude',
                                                   style: text50012black),
@@ -1232,18 +1389,18 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                               Container(
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      AppColors.textfiedlColor,
+                                                  AppColors.textfiedlColor,
                                                   borderRadius:
-                                                      BorderRadius.circular(6),
+                                                  BorderRadius.circular(6),
                                                 ),
                                                 child: TextFormField(
                                                   controller:
-                                                      schedulenew.longitude,
+                                                  schedulenew.longitude,
                                                   decoration: InputDecoration(
                                                     border: InputBorder.none,
                                                     contentPadding:
-                                                        EdgeInsets.only(
-                                                            left: 10),
+                                                    EdgeInsets.only(
+                                                        left: 10),
                                                     hintText: 'Longitude',
                                                     hintStyle: text50010tcolor2,
                                                     counterText: '',
@@ -1472,10 +1629,10 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                               onTap: () {
                                 print('schedule:${schedules}');
                                 // if (_formKey.currentState!.validate()) {
-                                  // ScaffoldMessenger.of(context).showSnackBar(
-                                  //     const SnackBar(content: Text('Processing Data'))
-                                  // );
-                                  adddoctors();
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //     const SnackBar(content: Text('Processing Data'))
+                                // );
+                                editdoctors();
                                 // }
 
                               },
@@ -1831,7 +1988,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                     child: timeField(
                       context,
                       slot.startTime ?? '00:00',
-                      (selectedTime) {
+                          (selectedTime) {
                         setState(() {
                           slot.startTime = selectedTime;
                         });
@@ -1844,7 +2001,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                   child: timeField(
                     context,
                     slot.endTime ?? '00:00',
-                    (selectedTime) {
+                        (selectedTime) {
                       setState(() {
                         slot.endTime = selectedTime;
                       });
