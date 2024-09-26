@@ -28,7 +28,6 @@ class _ManualtpState extends State<Manualtp> {
   final Map<DateTime, List> _holidays = {
     DateTime(2024, 1, 1): ['New Year\'s Day'],
     DateTime(2024, 12, 25): ['Christmas Day'],
-    DateTime(2024, 09, 9): ['Christmas Day'],
     // Add more holidays here
   };
 

@@ -106,8 +106,10 @@ class AppUrl{
   //travelplan
 
   static var submitAutoTP = '$baseUrl/user/SubmitAutomaticTp';
-
+// get all created tp
   static var getTravelPlans = '$baseUrl/user/userAddedTP';
+  //get created tp
+  static var getCreatedTP  = '$baseUrl/rep/getTravelPlan';
 
   static var generateautoTP = '$baseUrl/generate-visit-plan';
 

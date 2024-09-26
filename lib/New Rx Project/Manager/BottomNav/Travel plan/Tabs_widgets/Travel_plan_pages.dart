@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../Util/Utils.dart';
 import '../../../../../app_colors.dart';
 import '../../../../../constants/styles.dart';
+import '../../My lists/Doctor_details/doctor_detials.dart';
 
 class TravelPlanmainpage extends StatefulWidget {
   const TravelPlanmainpage({Key? key}) : super(key: key);
@@ -73,7 +74,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
     'December': 12,
   };
 
-
+//generate TP
   Future<dynamic> sendPostRequest(String userId, String month) async {
     final Uri url = Uri.parse(AppUrl.generateautoTP); // Replace with your API URL
 
@@ -206,7 +207,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
 
 
     if (selectedMonth != null) {
-      _showLoaderDialog(context); // Show loader dialog
+      // _showLoaderDialog(context); // Show loader dialog
 
       try {
         // Call your API request here
@@ -240,7 +241,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
         }
       } catch (e) {
         // Dismiss the loader in case of an error
-        Navigator.of(context).pop(); // Close the loader dialog
+        // Navigator.of(context).pop(); // Close the loader dialog
 
         // Show error message
         Flushbar(
@@ -337,8 +338,8 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                           monthandyear: '${DateFormat('MMMM yyyy').format(DateTime.parse(travelPlans[index]['created_date']))}',),));
                       },
                       child: Container(
-                        width: MediaQuery.of(context).size.width / 2 - 18, // Half of screen width with padding
-                        height: MediaQuery.of(context).size.width / 2 - 18, // Square containers
+                        width: 180,
+                        height: 150,
                         decoration: BoxDecoration(
                           color: AppColors.textfiedlColor,
                           borderRadius: BorderRadius.circular(10),
@@ -351,22 +352,40 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                               child: Icon(Icons.more_vert, color: AppColors.primaryColor),
                             ),
                             Positioned(
-                              top: 100,
-                              right: 10,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                                  child: Text(
-                                    '${travelPlans[index]['status']}',
-                                    style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),
+                              bottom: 20,
+                              right: 0,
+                              child: ClipPath(
+                                clipper: MyCustomClipper(),
+                                child: Container(
+                                  width: 100,
+                                  color:travelPlans[index]['status'] == 'Rejected'?Colors.grey: AppColors.primaryColor,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: Text('   ${travelPlans[index]['status']}',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 12
+                                      ),),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
+                            // Positioned(
+                            //   top: 100,
+                            //   right: 10,
+                            //   child: Container(
+                            //     decoration: BoxDecoration(
+                            //       color: AppColors.primaryColor,
+                            //       borderRadius: BorderRadius.circular(50),
+                            //     ),
+                            //     child: Padding(
+                            //       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                            //       child: Text(
+                            //         '${travelPlans[index]['status']}',
+                            //         style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
                             ListTile(
                               title: Text(
                                 DateFormat('MMMM yyyy').format(DateTime.parse(travelPlans[index]['created_date'])),

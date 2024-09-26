@@ -23,6 +23,8 @@ class _AutotpState extends State<Autotp> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
 
+  bool iscalenderVisible = false;
+
 
   // Convert the data from the backend to events for the calendar
   // void _populateEvents() {
@@ -97,12 +99,13 @@ class _AutotpState extends State<Autotp> {
         var responseData = jsonDecode(response.body);
         Utils.flushBarErrorMessage('${responseData['message']}', context);
       }else{
-        Utils.flushBarErrorMessage('error aan mone', context);
+        var responsedata = jsonDecode(response.body);
+        Utils.flushBarErrorMessage('${responsedata['message']}', context);
       }
 
     } catch (e) {
       print('Error: $e');
-      Utils.flushBarErrorMessage('Failed to submit AutoTP', context);
+      Utils.flushBarErrorMessage2('Failed to submit AutoTP', context);
     } finally {
       // setState(() {
       //   _loading = false; // Stop loading after submission
@@ -137,7 +140,9 @@ class _AutotpState extends State<Autotp> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryColor),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
             child: Text('Cancel', style: TextStyle(color: AppColors.whiteColor)),
           )
         ],
@@ -148,7 +153,7 @@ class _AutotpState extends State<Autotp> {
         children: [
           // Dropdown for selecting date
           // Calendar view
-          TableCalendar(
+          iscalenderVisible?TableCalendar(
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: _focusedDay,
@@ -175,6 +180,37 @@ class _AutotpState extends State<Autotp> {
             headerStyle: HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,
+            ),
+          ):Text(''),
+          InkWell(
+            onTap: (){
+              setState(() {
+                iscalenderVisible = !iscalenderVisible;
+              });
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  color: AppColors.primaryColor
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          _selectedDay != null
+                              ? DateFormat('dd/MM/yyyy').format(_selectedDay)
+                              : '',
+                          style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),
+                        ),
+                        iscalenderVisible ? Icon(Icons.keyboard_arrow_up,color: AppColors.whiteColor,):Icon(Icons.keyboard_arrow_down,color: AppColors.whiteColor,)
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
           // Display doctors' details

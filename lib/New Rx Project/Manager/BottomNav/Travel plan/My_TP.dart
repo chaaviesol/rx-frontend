@@ -63,7 +63,7 @@ class _Mngr_T_PState extends State<Mngr_T_P> with SingleTickerProviderStateMixin
         // ),
         automaticallyImplyLeading: false,
         title: Text(
-          'Travel Plans',
+          'Travel Plansss',
           style: text40016black,
         ),
         centerTitle: true,

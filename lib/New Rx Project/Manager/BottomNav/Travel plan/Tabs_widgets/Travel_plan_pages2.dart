@@ -234,6 +234,7 @@ import 'dart:convert'; // For decoding JSON response
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http; // For API requests
 import 'package:intl/intl.dart';
+import 'package:rx_route_new/res/app_url.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../../app_colors.dart';
@@ -262,7 +263,7 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
   }
 
   Future<void> _fetchTravelPlanData() async {
-    final String apiUrl = 'http://52.66.145.37:3004/rep/getTravelPlan';
+    final String apiUrl = AppUrl.getCreatedTP;
     final Map<String, dynamic> body = {
       // "travelPlanId": int.parse(widget.tpid.toString()),
       "travelPlanId":widget.tpid,
