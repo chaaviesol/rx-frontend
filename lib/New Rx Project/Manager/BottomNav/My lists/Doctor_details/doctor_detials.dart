@@ -238,7 +238,50 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Text('Basic Information', style: text50014black),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Basic Information', style: text50014black),
+                        _doctorDetails!['approvalStatus'] == "Accepted"? InkWell(
+                          onTap: (){
+                            // Navigator.pushNamed(context, RoutesName.markasvisited,arguments: doctorDetails);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(
+                              doctorID: widget.doctorId,products:_doctorDetails!["addressDetail"][0][0]['product'],),));
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: AppColors.primaryColor2,
+                                borderRadius: BorderRadius.circular(50)),
+                            child: const Padding(
+                              padding: EdgeInsets.only(top: 8.0,bottom: 8.0,left: 10,right: 10),
+                              child: Text(
+                                'Mark as Visited',
+                                style: text40012
+                              ),
+                            ),
+                          ),
+                        ):InkWell(
+                          onTap: (){
+
+                            // Navigator.pushNamed(context, RoutesName.markasvisited,arguments: doctorDetails);
+                            // Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(
+                            //   doctorID: widget.doctorId,products:_doctorDetails!["addressDetail"][0][0]['product'],),));
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(50)),
+                            child: const Padding(
+                              padding: EdgeInsets.only(top: 8.0,bottom: 8.0,left: 10,right: 10),
+                              child: Text(
+                                  'Mark as Visited',
+                                  style: text40012
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                     const SizedBox(height: 10),
                     TabBar(
                       tabAlignment: TabAlignment.start,
@@ -273,17 +316,15 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                   ],
                 ),
               ),
-              Positioned(
-                left: MediaQuery.of(context).size.width/4,
-                bottom: MediaQuery.of(context).size.height/14.9,
-                child: ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor),
-                  onPressed: () {
-                  print('00000${_doctorDetails!["addressDetail"][0][0]['product']}');
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(doctorID: widget.doctorId, products: _doctorDetails!["addressDetail"][0][0]['product'],),));
-
-                  }, child: Text('Mark As Visited',style: text50012,),),
-              ),
+              // Positioned(
+              //   left: MediaQuery.of(context).size.width/4,
+              //   bottom: MediaQuery.of(context).size.height/14.9,
+              //   child: ElevatedButton(style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppColors.primaryColor),
+              //     onPressed: () {
+              //       Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(doctorID: widget.doctorId, products: _doctorDetails!["addressDetail"][0][0]['product'],),));
+              //     }, child: Text('Mark As Visited',style: text50012,),),
+              // ),
             ],
           ),
         ),
@@ -470,6 +511,13 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                   Text('${schedule['schedule']['start_time']} - ${schedule['schedule']['end_time']}', style: text50014black),
                 ],
               ),
+              ListView.builder(
+                itemCount: _doctorDetails!['addressDetail'],
+                shrinkWrap: true,
+                itemBuilder: (context,index) {
+                  return Text('${_doctorDetails!["addressDetail"]}');
+                }
+              )
 
             ],
 

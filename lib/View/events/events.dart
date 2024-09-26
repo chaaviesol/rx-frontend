@@ -712,539 +712,221 @@ class _EventsState extends State<Events> {
 }
 
 
+
 class SeeAllPage extends StatefulWidget {
   @override
   _SeeAllPageState createState() => _SeeAllPageState();
 }
 
-class _SeeAllPageState extends State<SeeAllPage> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  Future<Map<String, dynamic>> getEvents() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? uniqueID = preferences.getString('uniqueID');
-    final url = Uri.parse(AppUrl.getEvents);
-    var data = {"requesterUniqueId": uniqueID};
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      throw Exception('Failed to load data: $e');
-    }
-  }
-
-  void setAlarm() async {
-    // Set the alarm for 5 seconds from now
-    final DateTime now = DateTime.now();
-    final int isolateId = Isolate.current.hashCode;
-    print("[$now] Setting alarm for 5 seconds from now...");
-    // await AndroidAlarmManager.oneShot(
-    //   const Duration(seconds: 5),
-    //   alarmId,
-    //   alarmCallback,
-    //   exact: true,
-    //   wakeup: true,
-    // );
-  }
-  @override
-  void initState() {
-    // TODO: implement initState
-    _tabController = TabController(length: 2, vsync: this);
-    super.initState();
-  }
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2, // Number of top-level tabs
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          title: const Text('Events'),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(48.0),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor,
-                  borderRadius: BorderRadius.circular(100),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: TabBar(
-                  dividerHeight: 0,
-                  controller:_tabController,
-                  isScrollable: true,
-                  labelColor: Colors.white,
-                  indicatorColor: AppColors.whiteColor,
-                  unselectedLabelColor: Colors.white,
-                  tabs:  [
-                    Tab(text: 'Todays Events'),
-                    Tab(text: 'Upcoming Events'),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            // First main tab content with nested tabs
-            NestedTabView(),
-            // Second main tab content
-            NestedTabView2()
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Widget for nested tabs in Main Tab 1
-class NestedTabView extends StatefulWidget {
-  @override
-  State<NestedTabView> createState() => _NestedTabViewState();
-}
-
-class _NestedTabViewState extends State<NestedTabView> with TickerProviderStateMixin{
-
-  late TabController _tabControllersub;
-
-  Future<Map<String, dynamic>> getEvents() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? uniqueID = preferences.getString('uniqueID');
-    final url = Uri.parse(AppUrl.getEvents);
-    var data = {"requesterUniqueId": uniqueID};
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      throw Exception('Failed to load data: $e');
-    }
-  }
-
-  void setAlarm() async {
-    // Set the alarm for 5 seconds from now
-    final DateTime now = DateTime.now();
-    final int isolateId = Isolate.current.hashCode;
-    print("[$now] Setting alarm for 5 seconds from now...");
-    // await AndroidAlarmManager.oneShot(
-    //   const Duration(seconds: 5),
-    //   alarmId,
-    //   alarmCallback,
-    //   exact: true,
-    //   wakeup: true,
-    // );
-  }
+class _SeeAllPageState extends State<SeeAllPage> with TickerProviderStateMixin {
+  late TabController _mainTabController;
+  late TabController _subTabController;
+  List<dynamic> todayBirthday = [];
+  List<dynamic> todayAnniversary = [];
+  List<dynamic> upcomingBirthday = [];
+  List<dynamic> upcomingAnniversary = [];
+  bool isLoading = true;
 
   @override
   void initState() {
-    // TODO: implement initState
-    getEvents();
-    _tabControllersub = TabController(length: 2, vsync: this);
     super.initState();
+    _mainTabController = TabController(length: 2, vsync: this); // Main tabs
+    _subTabController = TabController(length: 2, vsync: this); // Sub-tabs
+    fetchNotifications();
+  }
+
+  Future<void> fetchNotifications() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+    final url = AppUrl.getEvents;
+    final body = jsonEncode({
+      "requesterUniqueId": uniqueID,
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          setState(() {
+            todayBirthday = data['todayEvents'][0]['todayBirthday'] ?? [];
+            todayAnniversary = data['todayEvents'][0]['todayAnniversary'] ?? [];
+            upcomingBirthday = data['UpcomingEvents'][0]['BirthdayNotification'] ?? [];
+            upcomingAnniversary = data['UpcomingEvents'][0]['AnniversaryNotification'] ?? [];
+            isLoading = false; // Set loading to false after data is fetched
+          });
+        } else {
+          print("Error: ${data['message']}");
+        }
+      } else {
+        print("Server error: ${response.statusCode}");
+      }
+    } catch (error) {
+      print("Error fetching notifications: $error");
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2, // Number of nested tabs
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 0,
-          elevation: 0,
-          automaticallyImplyLeading: false, // Removes back button from nested tab bar
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(48.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.whiteColor,
-                borderRadius: BorderRadius.circular(100),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: TabBar(
-                dividerHeight: 0,
-                controller: _tabControllersub,
-                tabs: [
-                  Tab(text: 'Birthday'),
-                  Tab(text: 'Anniversary'),
-                ],
-                indicatorColor: Colors.blue,
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.grey,
-              ),
-            ),
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            // First nested tab content
-            // Tab for Birthdays
-            FutureBuilder(
-              future: getEvents(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('Some error occurred!'));
-                } else if (snapshot.hasData) {
-                  var events = snapshot.data as Map<String, dynamic>;
-                  var birthdays = events['todayEvents'][0]['todayBirthday'] ?? [];
-                  return ListView.builder(
-                    itemCount: birthdays.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          buildEventCard(birthdays[index], 'Birthday'),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  return const Center(child: Text('No Data'));
-                }
-              },
-            ),
-            // Second nested tab content
-            // Tab for Anniversaries
-            FutureBuilder(
-              future: getEvents(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('Some error occurred!'));
-                } else if (snapshot.hasData) {
-                  var events = snapshot.data as Map<String, dynamic>;
-                  var anniversaries = events['todayEvents'][0]['todayAnniversary'] ?? [];
-
-                  return ListView.builder(
-                    itemCount: anniversaries.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return buildEventCard(anniversaries[index], 'Anniversary');
-                    },
-                  );
-                } else {
-                  return const Center(child: Text('No Data'));
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+  void dispose() {
+    _mainTabController.dispose();
+    _subTabController.dispose();
+    super.dispose();
   }
-
-  // Method to build an event card for Birthday or Anniversary
-  Widget buildEventCard(Map<String, dynamic> eventData, String eventType) {
-    return Padding(
-      padding: const EdgeInsets.only(top:10,left: 10.0,right: 10.0),
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              borderRadius: BorderRadius.circular(9),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: 25.0,
-                top: 10,
-                bottom: 10,
-                right: 10,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'It\'s ${eventData['firstName']}\'s $eventType!',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.whiteColor,
-                      fontSize: 12,
-                    ),
+  Widget _buildEventList(List<dynamic> events, String eventType) {
+    if (events.isEmpty) {
+      return Center(child: Text("No $eventType"));
+    }
+    return ListView.builder(
+      itemCount: events.length,
+      itemBuilder: (context, index) {
+        final eventData = events[index];
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'It\'s ${eventData['firstName']}\'s ${eventType == "Birthday" ? "Birthday" : "Anniversary"}!',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.whiteColor,
+                    fontSize: 12,
                   ),
-                  const Text(
-                    'Wish them all the best!',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.whiteColor,
-                      fontSize: 12,
-                    ),
+                ),
+                const Text(
+                  'Wish them all the best!',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.whiteColor,
+                    fontSize: 12,
                   ),
-                  const SizedBox(height: 10),
-                  Stack(
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            child: Text(eventData['firstName'][0].toString().toUpperCase()),
-                          ),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                eventData['firstName'],
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.whiteColor,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                eventData['doc_qualification'] ?? '',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.whiteColor,
-                                  fontSize: 9,
-                                ),
-                              ),
-                              SizedBox(height: 10,),
-                            ],
-                          ),
-                        ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 25,
+                      child: Text(
+                        eventData['firstName'][0].toString().toUpperCase(),
                       ),
-                      // Positioned(
-                      //   right: 0,
-                      //     child: InkWell(
-                      //   onTap: ()async{
-                      //     setAlarm();
-                      //   },
-                      //   child: SizedBox(
-                      //     width: 130,
-                      //     child: Container(
-                      //       decoration: BoxDecoration(
-                      //         color: AppColors.primaryColor2,
-                      //         borderRadius: BorderRadius.circular(6),
-                      //       ),
-                      //       child: const Padding(
-                      //         padding: EdgeInsets.all(6.0),
-                      //         child: Row(
-                      //           mainAxisAlignment: MainAxisAlignment.center,
-                      //           children: [
-                      //             Text(
-                      //               'Notify me',
-                      //               style: TextStyle(
-                      //                 fontWeight: FontWeight.w400,
-                      //                 color: AppColors.whiteColor,
-                      //                 fontSize: 10,
-                      //               ),
-                      //             ),
-                      //             SizedBox(width: 10),
-                      //             Icon(
-                      //               Icons.notifications_active,
-                      //               color: AppColors.whiteColor,
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ))
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          eventData['firstName'],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.whiteColor,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Text(
+                          eventData['doc_qualification'] ?? '',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.whiteColor,
+                            fontSize: 9,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
-  }
-}
-//Widget for nested tabs in Main Tab 2
-class NestedTabView2 extends StatelessWidget {
-
-  Future<Map<String, dynamic>> getEvents() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? uniqueID = preferences.getString('uniqueID');
-    final url = Uri.parse(AppUrl.getEvents);
-    var data = {"requesterUniqueId": uniqueID};
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      throw Exception('Failed to load data: $e');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2, // Number of nested tabs
+      length: 2, // Main tabs
       child: Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false, // Removes back button from nested tab bar
-          backgroundColor: Colors.grey[300],
-          bottom: const TabBar(
+          title: Text("Events"),
+          bottom: TabBar(
+            controller: _mainTabController,
             tabs: [
-              Tab(text: 'Birthday'),
-              Tab(text: 'Anniversary '),
+              Tab(text: "Today's Events"),
+              Tab(text: "Upcoming Events"),
             ],
-            indicatorColor: Colors.blue,
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.grey,
           ),
         ),
         body: TabBarView(
+          controller: _mainTabController,
           children: [
-            // First nested tab content
-            FutureBuilder(
-              future: getEvents(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('Some error occurred!'));
-                } else if (snapshot.hasData) {
-                  var events = snapshot.data as Map<String, dynamic>;
-                  var upcomingEvents = events['UpcomingEvents'] ?? [];
-                  return ListView.builder(
-                    itemCount: upcomingEvents.length,
-                    itemBuilder: (context, index) {
-                      var birthdayNotifications = upcomingEvents[index]['BirthdayNotification'] ?? [];
-                      var anniversaryNotifications = upcomingEvents[index]['AnniversaryNotification'] ?? [];
-                      return Column(
-                        children: [
-                          ...birthdayNotifications.map((event) => buildEventCard(event, 'Upcoming Birthday')),
-                          ...anniversaryNotifications.map((event) => buildEventCard(event, 'Upcoming Anniversary')),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  return const Center(child: Text('No Data'));
-                }
-              },
+            // Today's Events
+            Column(
+              children: [
+                TabBar(
+                  controller: _subTabController,
+                  tabs: [
+                    Tab(text: "Today's Birthday"),
+                    Tab(text: "Today's Anniversary"),
+                  ],
+                ),
+                Expanded(
+                  child: isLoading
+                      ? Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), // Set your desired color here
+                    ),
+                  ) // Loading indicator
+                      : TabBarView(
+                    controller: _subTabController,
+                    children: [
+                      _buildEventList(todayBirthday, "Birthday"),
+                      _buildEventList(todayAnniversary, "Anniversary"),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            // Second nested tab content
-            Center(
-              child: Text('Content for Sub Tab 2'),
+            // Upcoming Events
+            Column(
+              children: [
+                TabBar(
+                  controller: _subTabController,
+                  tabs: [
+                    Tab(text: "Upcoming Birthday"),
+                    Tab(text: "Upcoming Anniversary"),
+                  ],
+                ),
+                Expanded(
+                  child: isLoading
+                      ? Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), // Set your desired color here
+                    ),
+                  ) // Loading indicator
+                      : TabBarView(
+                    controller: _subTabController,
+                    children: [
+                      _buildEventList(upcomingBirthday, "Birthday"),
+                      _buildEventList(upcomingAnniversary, "Anniversary"),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // Method to build an event card for Birthday or Anniversary
-  Widget buildEventCard(Map<String, dynamic> eventData, String eventType) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: 25.0,
-                top: 10,
-                bottom: 10,
-                right: 10,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'It\'s ${eventData['firstName']}\'s $eventType!',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.whiteColor,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const Text(
-                    'Wish them all the best!',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.whiteColor,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 25,
-                        child: Text(eventData['firstName'][0].toString().toUpperCase()),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            eventData['firstName'],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.whiteColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            eventData['doc_qualification'] ?? '',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.whiteColor,
-                              fontSize: 9,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

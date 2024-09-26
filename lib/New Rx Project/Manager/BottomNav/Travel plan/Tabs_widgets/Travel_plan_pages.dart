@@ -46,6 +46,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
 
         setState(() {
           travelPlans = decodedResponse['data']; // Assuming 'data' is where your travel plans are
+          print('${travelPlans}');
         });
 
         print('get response : ${response.body}');
@@ -218,12 +219,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
         if (data != null) {
           // Navigate to the Autotp page
           print('sending data to next page :${data['data']}');
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Autotp(data: data['data'],),
-            ),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: data['data'],),),);
 
           // Optionally show success message after navigation
           Flushbar(
@@ -326,31 +322,35 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
             child: Column(
               children: [
                 SizedBox(height: 50,),
-                Wrap(
-                  spacing: 8.0, // Horizontal space between containers
-                  runSpacing: 8.0, // Vertical space between containers
-                  children: List.generate(travelPlans.length, (index) {
+                GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, // Number of columns
+                    crossAxisSpacing: 8.0, // Horizontal space between containers
+                    mainAxisSpacing: 8.0, // Vertical space between containers
+                    childAspectRatio: 160 / 150, // Adjust the ratio based on width and height of your container
+                  ),
+                  shrinkWrap: true, // To prevent GridView from expanding infinitely
+                  physics: NeverScrollableScrollPhysics(), // Disable scroll if it's within a scrollable parent
+                  itemCount: travelPlans.length,
+                  itemBuilder: (context, index) {
+                    String monthName = Utils.getMonthName(travelPlans[index]['month']);
+                    String year = DateFormat('yyyy').format(DateTime.parse(travelPlans[index]['created_date']));
                     return InkWell(
                       onTap: () {
                         // Handle the tap event
                         Navigator.push(context, MaterialPageRoute(builder: (context) => TravelPlanPages2(
                           tpid: travelPlans[index]['id'],
-                          monthandyear: '${DateFormat('MMMM yyyy').format(DateTime.parse(travelPlans[index]['created_date']))}',),));
+                          tp_status: travelPlans[index]['status'],
+                          monthandyear: '${monthName} ${year}',
+                        )));
                       },
                       child: Container(
-                        width: 180,
-                        height: 150,
                         decoration: BoxDecoration(
                           color: AppColors.textfiedlColor,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(18),
                         ),
                         child: Stack(
                           children: [
-                            Positioned(
-                              top: 10,
-                              right: 10,
-                              child: Icon(Icons.more_vert, color: AppColors.primaryColor),
-                            ),
                             Positioned(
                               bottom: 20,
                               right: 0,
@@ -358,44 +358,40 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                                 clipper: MyCustomClipper(),
                                 child: Container(
                                   width: 100,
-                                  color:travelPlans[index]['status'] == 'Rejected'?Colors.grey: AppColors.primaryColor,
+                                  color: travelPlans[index]['status'] == 'Approved'
+                                      ? Colors.green
+                                      : travelPlans[index]['status'] == 'Submitted'
+                                      ? AppColors.primaryColor2
+                                      : AppColors.primaryColor,
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Center(
-                                      child: Text('   ${travelPlans[index]['status']}',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 12
-                                      ),),
+                                      child: Text(
+                                        '   ${travelPlans[index]['status']}',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            // Positioned(
-                            //   top: 100,
-                            //   right: 10,
-                            //   child: Container(
-                            //     decoration: BoxDecoration(
-                            //       color: AppColors.primaryColor,
-                            //       borderRadius: BorderRadius.circular(50),
-                            //     ),
-                            //     child: Padding(
-                            //       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                            //       child: Text(
-                            //         '${travelPlans[index]['status']}',
-                            //         style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
                             ListTile(
-                              title: Text(
-                                DateFormat('MMMM yyyy').format(DateTime.parse(travelPlans[index]['created_date'])),
-                                style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.w500,fontSize: 12),
+                              title: Text("${monthName+year}",
+                                style: TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Travel Plan ${travelPlans[index]['id']}',
+                                    'Travel Plan ${travelPlans.length-index}',
                                     style: TextStyle(color: AppColors.primaryColor),
                                   ),
                                 ],
@@ -405,7 +401,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                         ),
                       ),
                     );
-                  }),
+                  },
                 ),
                 SizedBox(height: 100), // Add space at the end of the tile list
               ],

@@ -165,5 +165,30 @@ class Utils{
 //     window.localStorage.remove('token');
 //   }
 
+  static String getMonthName(int month) {
+    const List<String> monthNames = [
+      '', // Placeholder for 0 index (not used)
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+
+    // Ensure the month is between 1 and 12
+    if (month < 1 || month > 12) {
+      return 'Invalid month';
+    }
+
+    return monthNames[month];
+  }
+
 
 }

@@ -87,29 +87,6 @@ class _DoctorDetailsState extends State<DoctorDetails> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
-      floatingActionButton: InkWell(
-        onTap: (){
-          print('ddtls:${doctorDetails[0]['products']}');
-          // Navigator.pushNamed(context, RoutesName.markasvisited,arguments: doctorDetails);
-          Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(doctorID: widget.doctorID,products: doctorDetails[0]['products'],),));
-        },
-        child: Container(
-          decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              borderRadius: BorderRadius.circular(6)),
-          child: const Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              'Mark as Visited',
-              style: TextStyle(
-                  color: AppColors.whiteColor,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14),
-            ),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text('Details', style: TextStyle(),),

@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:rx_route_new/New%20Rx%20Project/Manager/Doctors_mngr/Edit_Doctor.dart';
+
 import 'package:rx_route_new/res/app_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../app_colors.dart';
 import '../../../../constants/styles.dart';
+import '../../Doctors_mngr/Edit_Doctor.dart';
 import 'Doctor_details/doctor_detials.dart';
 
 class DoctorList extends StatefulWidget {
@@ -124,9 +125,11 @@ class _DoctorListState extends State<DoctorList> {
     String searchQuery = _searchController.text.toLowerCase();
     setState(() {
       _filteredDoctors = _doctors.where((doctor) {
-        String fullName = '${doctor['firstName']} ${doctor['lastName']}'.toLowerCase();
+        String fullName =
+            '${doctor['firstName']} ${doctor['lastName']}'.toLowerCase();
         String specialization = doctor['specialization']?.toLowerCase() ?? '';
-        return fullName.contains(searchQuery) || specialization.contains(searchQuery);
+        return fullName.contains(searchQuery) ||
+            specialization.contains(searchQuery);
       }).toList();
     });
   }
@@ -135,7 +138,13 @@ class _DoctorListState extends State<DoctorList> {
     switch (action) {
       case 'edit':
         print('Edit ${doctor['firstName']} ${doctor['lastName']}');
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Edit_Doctor(doctorID: doctor['id'],),));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Edit_Doctor(
+                doctorID: doctor['id'],
+              ),
+            ));
         break;
       case 'delete':
         _deleteDoctor(doctor['id']);
@@ -146,19 +155,20 @@ class _DoctorListState extends State<DoctorList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea( // Add SafeArea to avoid overlapping with system UI
+      body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _refreshData,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 10.0, top: 10.0, bottom: 10.0),
-                child: Row(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                Row(
                   children: [
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          border: Border.all(width: 0.5, color: AppColors.borderColor),
+                          border: Border.all(
+                              width: 0.5, color: AppColors.borderColor),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: TextFormField(
@@ -188,93 +198,103 @@ class _DoctorListState extends State<DoctorList> {
                     ),
                   ],
                 ),
-              ),
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _errorMessage != null
-                  ? Center(child: Text(_errorMessage!))
-                  : Expanded(
-                child: ListView.builder(
-                  itemCount: _filteredDoctors.length + 1,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    if (index < _filteredDoctors.length) {
-                      final doctor = _filteredDoctors[index];
-                      final visitType = doctor['visit_type'] ?? 'unknown';
-
-                      return ListTile(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  DoctorDetailsPage(doctorId: doctor['id']),
+                const SizedBox(height: 10), // Space between search and list
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _errorMessage != null
+                        ? Center(child: Text(_errorMessage!))
+                        : Expanded(
+                            child: ListView.builder(
+                              itemCount: _filteredDoctors.length + 1,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                if (index < _filteredDoctors.length) {
+                                  final doctor = _filteredDoctors[index];
+                                  final visitType =
+                                      doctor['visit_type'] ?? 'unknown';
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DoctorDetailsPage(
+                                                    doctorId: doctor['id']),
+                                          ),
+                                        );
+                                      },
+                                      child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor:
+                                              doctor['visit_type'] == 'core'
+                                                  ? AppColors.tilecolor2
+                                                  : doctor['visit_type'] ==
+                                                          'supercore'
+                                                      ? AppColors.tilecolor1
+                                                      : AppColors.tilecolor3,
+                                          child: Text(
+                                            doctor['firstName'][0],
+                                            style: TextStyle(
+                                                color: AppColors.whiteColor),
+                                          ),
+                                        ),
+                                        title: Text(
+                                          '${doctor['firstName']} ${doctor['lastName']}',
+                                          style: text50014black,
+                                        ),
+                                        subtitle: Text(
+                                          '${doctor['specialization']}',
+                                          style: text50012black,
+                                        ),
+                                        trailing: PopupMenuButton<String>(
+                                          onSelected: (action) =>
+                                              _handleMenuAction(action, doctor),
+                                          itemBuilder: (BuildContext context) {
+                                            return [
+                                              PopupMenuItem<String>(
+                                                value: 'edit',
+                                                child: Row(
+                                                  children: const [
+                                                    Icon(Icons.edit),
+                                                    SizedBox(width: 10),
+                                                    Text('Edit',
+                                                        style: text50012black),
+                                                  ],
+                                                ),
+                                              ),
+                                              PopupMenuItem<String>(
+                                                value: 'delete',
+                                                child: Row(
+                                                  children: const [
+                                                    Icon(Icons.delete),
+                                                    SizedBox(width: 10),
+                                                    Text('Delete',
+                                                        style: text50012black),
+                                                  ],
+                                                ),
+                                              ),
+                                            ];
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return Container(
+                                    height: 100,
+                                    color: Colors.white,
+                                  );
+                                }
+                              },
                             ),
-                          );
-                        },
-                        leading: CircleAvatar(
-                          backgroundColor: doctor['visit_type'] == 'core'
-                              ? AppColors.tilecolor2
-                              : doctor['visit_type'] == 'supercore'
-                              ? AppColors.tilecolor1
-                              : AppColors.tilecolor3,
-                          child: Text(
-                            doctor['firstName'][0], // Display first letter
-                            style: TextStyle(color: AppColors.whiteColor),
                           ),
-                        ),
-                        title: Text(
-                          '${doctor['firstName']} ${doctor['lastName']}',
-                          style: text50014black,
-                        ),
-                        subtitle: Text(
-                          '${doctor['specialization']}',
-                          style: text50012black,
-                        ),
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (action) =>
-                              _handleMenuAction(action, doctor),
-                          itemBuilder: (BuildContext context) {
-                            return [
-                              PopupMenuItem<String>(
-                                value: 'edit',
-                                child: Row(
-                                  children: const [
-                                    Icon(Icons.edit),
-                                    SizedBox(width: 10),
-                                    Text('Edit', style: text50012black),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem<String>(
-                                value: 'delete',
-                                child: Row(
-                                  children: const [
-                                    Icon(Icons.delete),
-                                    SizedBox(width: 10),
-                                    Text('Delete', style: text50012black),
-                                  ],
-                                ),
-                              ),
-                            ];
-                          },
-                        ),
-                      );
-                    } else {
-                      return Container(
-                        decoration: BoxDecoration(color: AppColors.whiteColor),
-                        height: 100,
-                      );
-                    }
-                  },
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
 }
-

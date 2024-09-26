@@ -136,8 +136,7 @@ class _AddRepState extends State<AddRep> {
 
       if (response.statusCode == 200) {
         Navigator.pushNamedAndRemoveUntil(context, RoutesName.successsplash, (route) => false,);
-        Utils.flushBarErrorMessage('Employee adde'
-            'd successfully!', context);
+        Utils.flushBarErrorMessage('Employee adde dsuccessfully!', context);
       } else {
         var responseData = jsonDecode(response.body);
         Utils.flushBarErrorMessage('${responseData['message']}', context);

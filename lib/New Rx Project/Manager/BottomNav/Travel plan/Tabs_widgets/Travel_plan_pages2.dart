@@ -243,7 +243,8 @@ import '../../My lists/Doctor_details/doctor_detials.dart';
 class TravelPlanPages2 extends StatefulWidget {
   int tpid;
   String monthandyear;
-  TravelPlanPages2({required this.tpid,required this.monthandyear,Key? key}) : super(key: key);
+  String tp_status;
+  TravelPlanPages2({required this.tpid,required this.monthandyear,required this.tp_status,Key? key}) : super(key: key);
 
   @override
   State<TravelPlanPages2> createState() => _TravelPlanPages2State();
@@ -261,6 +262,7 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
     super.initState();
     _fetchTravelPlanData();
   }
+
 
   Future<void> _fetchTravelPlanData() async {
     final String apiUrl = AppUrl.getCreatedTP;
@@ -333,8 +335,6 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
     }
   }
 
-
-
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -356,53 +356,80 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Travel Plan')),
+      appBar: AppBar(title: Text('View Travel Plan'),
+        actions: [
+         widget.tp_status=="Submitted" || widget.tp_status == 'Approved'?Text(''): ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryColor),
+              onPressed: (){}, child: Text('Save',style: TextStyle(color: Colors.white),)),
+          SizedBox(width: 10,),
+        ],
+      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator()) // Show loading spinner while fetching data
           : Column(
         children: [
-         isVisibleCalendar?
-         TableCalendar(
-           firstDay: DateTime.utc(2020, 1, 1),
-           lastDay: DateTime.utc(2030, 12, 31),
-           focusedDay: selectedDate ?? DateTime.now(),
-           selectedDayPredicate: (day) {
-             return isSameDay(selectedDate, day);
-           },
-           eventLoader: (day) {
-             return events[day] ?? [];
-           },
-           onDaySelected: (selectedDay, focusedDay) {
-             setState(() {
-               selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
-               selectedDoctors = events[selectedDate] ?? [];
-             });
-           },
-           // Use calendarBuilders to customize day appearance
-           calendarBuilders: CalendarBuilders(
-             // Customize default day cells
-             defaultBuilder: (context, day, focusedDay) {
-               bool hasDoctor = events.containsKey(day) && events[day]!.isNotEmpty;
-               return Container(
-                 margin: const EdgeInsets.all(4.0),
-                 decoration: BoxDecoration(
-                   color: hasDoctor ? Colors.green : Colors.transparent, // Highlight in green if doctor present
-                   borderRadius: BorderRadius.circular(8.0),
-                 ),
-                 child: Center(
-                   child: Text(
-                     '${day.day}',
-                     style: TextStyle(
-                       color: hasDoctor ? Colors.white : Colors.black, // Change text color if highlighted
-                       fontWeight: hasDoctor ? FontWeight.bold : FontWeight.normal,
-                     ),
-                   ),
-                 ),
-               );
-             },
-           ),
-         )
-             :Text(''),
+        isVisibleCalendar
+            ? TableCalendar(
+          firstDay: DateTime.utc(2020, 1, 1),
+          lastDay: DateTime.utc(2030, 12, 31),
+
+          // Parse the `monthandyear` into a DateTime
+          focusedDay: selectedDate ?? DateFormat('MMMM yyyy').parse(widget.monthandyear), // Open the month and year from `widget.monthandyear`
+
+          selectedDayPredicate: (day) {
+            return isSameDay(selectedDate, day);
+          },
+
+          eventLoader: (day) {
+            return events[day] ?? [];
+          },
+
+          onDaySelected: (selectedDay, focusedDay) {
+            setState(() {
+              selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
+              selectedDoctors = events[selectedDate] ?? [];
+            });
+          },
+
+          calendarBuilders: CalendarBuilders(
+            defaultBuilder: (context, day, focusedDay) {
+              bool hasDoctor = events.containsKey(day) && events[day]!.isNotEmpty;
+              bool isSunday = day.weekday == DateTime.sunday;
+
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(
+                    '${day.day}',
+                    style: TextStyle(
+                      color: isSunday ? Colors.red : (hasDoctor ? Colors.green : Colors.black), // Text color: red for Sundays, green for events, black otherwise
+                      fontWeight: hasDoctor ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  if (hasDoctor) // Show dot if there is a doctor
+                    Positioned(
+                      bottom: 4,
+                      child: Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: Colors.green, // Dot color for events
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+
+          headerStyle: HeaderStyle(
+            formatButtonVisible: false, // Hides the "2 weeks" format button
+            titleCentered: true, // Centers the month title
+            formatButtonShowsNext: false,
+          ),
+        )
+            : Container(),
           const SizedBox(height: 16),
           InkWell(
             onTap: (){
@@ -449,8 +476,6 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  height: 80,
-                                  width: 35,
                                   decoration: BoxDecoration(
                                     color:doctor['visit_type'] == 'core'
                                         ? AppColors.tilecolor2
@@ -464,8 +489,29 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
                                   child: Center(
                                     child: Stack(
                                       children: [
-                                        ListTile(
-                                          title: Text('${doctor['firstName']} ${doctor['lastName']}'),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(9),
+                                            border: Border.all(
+                                              width: 1,
+                                              color: doctor['visit_type'] == 'core'
+                                                  ? AppColors.tilecolor2
+                                                  : doctor['visit_type'] == 'supercore'
+                                                  ? AppColors.tilecolor1
+                                                  : AppColors.tilecolor3,
+                                            ),
+                                          ),
+                                          child: ListTile(
+                                            leading: CircleAvatar(
+                                              backgroundColor: doctor['visit_type'] == 'core'
+                                                  ? AppColors.tilecolor2
+                                                  : doctor['visit_type'] == 'supercore'
+                                                  ? AppColors.tilecolor1
+                                                  : AppColors.tilecolor3,
+                                              child: Text(doctor['firstName'][3]),
+                                            ),
+                                            title: Text('${doctor['firstName']} ${doctor['lastName']}'),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -476,22 +522,7 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
                           ),
                         ),
                       ),
-                      // ListTile(
-                      //   title: Column(
-                      //     crossAxisAlignment: CrossAxisAlignment.start,
-                      //     children: [
-                      //       // Display the entire doctor map
-                      //       Text(
-                      //         'Doctor Map: ${doctor.toString()}',
-                      //         style: const TextStyle(fontWeight: FontWeight.bold),
-                      //       ),
-                      //       // Display specific fields from the doctor map
-                      //       Text(
-                      //           'Doctor Name: ${doctor['firstName']} ${doctor['lastName']}'),
-                      //     ],
-                      //   ),
-                      //   subtitle: Text('ID: ${doctor['id']}'),
-                      // ),
+
                     ],
                   );
                 },

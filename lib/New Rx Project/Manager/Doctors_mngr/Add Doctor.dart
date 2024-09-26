@@ -1467,7 +1467,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: MediaQuery.of(context).size.width / 2.5,
+                            width: 110,
                             child: InkWell(
                               onTap: () {
                                 print('schedule:${schedules}');
@@ -1494,7 +1494,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                               Navigator.pop(context);
                             },
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width / 2.5,
+                              width: 110,
                               child: Defaultbutton(
                                 text: 'Cancel',
                                 bgColor: AppColors.whiteColor,

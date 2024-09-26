@@ -49,7 +49,8 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? uniqueID = preferences.getString('uniqueID');
     String? userType = preferences.getString('userType');
-    if(uniqueID != null){
+    String? userID = preferences.getString('userID');
+    if(uniqueID != null && userID != null){
       print('in pref uniqueid:${preferences.getString('uniqueID')}');
       print('in pref userid:${preferences.getString('userID')}');
       if(userType == 'Rep'){
@@ -69,6 +70,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
       // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPageNew(),));
     }else{
+      Utils.deleteuser(context);
       await Future.delayed(const Duration(seconds: 3), () {});
       Navigator.pushReplacement(
         context,

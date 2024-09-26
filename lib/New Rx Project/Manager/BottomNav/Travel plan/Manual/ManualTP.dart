@@ -87,7 +87,7 @@ class _ManualtpState extends State<Manualtp> {
                SharedPreferences prefrences = await SharedPreferences.getInstance();
                int userId = int.parse(prefrences.getString('userID').toString());
               // Show the loading dialog
-              _showLoadingDialog(context);
+              // _showLoadingDialog(context);
 
               // Filter out any dates with empty doctor lists
               var filteredPlan = _selectedDoctorsPerDay.entries
@@ -459,13 +459,6 @@ class _ManualtpState extends State<Manualtp> {
           )
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     String dayString = DateFormat('EEEE').format(_selectedDay); // Get the day as string
-      //     context.read<EventProvider>().fetchDoctorsForDay(dayString);
-      //   },
-      //   child: Icon(Icons.add),
-      // ),
     );
   }
 
