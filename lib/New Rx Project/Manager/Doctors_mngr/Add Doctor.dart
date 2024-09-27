@@ -239,7 +239,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
 
     // Final data to send to the backend
     Map<String, dynamic> data = {
-      "firstName": _firstnameController.text,
+      "firstName": 'Dr.${_firstnameController.text}',
       "lastName": _lastnameController.text,
       "qualification": _qualificationController.text,
       "gender": _gender,

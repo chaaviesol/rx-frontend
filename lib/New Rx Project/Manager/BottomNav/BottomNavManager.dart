@@ -15,6 +15,7 @@ import '../../Rep/Bottom navigation rep/Leave and expense/Leave and expense.dart
 import '../Doctors_mngr/Add_chemist.dart';
 import '../Doctors_mngr/Add_employee.dart';
 import 'HomepageManagerNew.dart';
+import 'TpDoctorListPage.dart';
 import 'Travel plan/My_TP.dart';
 
 class BottomNavigationMngr extends StatefulWidget {
@@ -118,7 +119,57 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
                 child: Icon(Icons.add, color: Colors.white),
               ),
             ),
+          if(currentIndex == 0)
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 56 + 30,
+              left: 20,
+              child: FloatingActionButton(
+                backgroundColor: AppColors.primaryColor,
+                shape: CircleBorder(),
+                onPressed: () {
+                  _showConfirmationDialog(context);  // Call the method to show the alert box
+                },
+                child: Icon(Icons.add_chart_rounded, color: AppColors.whiteColor),
+              ),
+            )
         ],
+      ),
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Are you sure you want to continue?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog without navigating
+              },
+            ),
+            TextButton(
+              child: Text('Continue'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                _navigateToTpDoctorList(context); // Navigate to the new page
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToTpDoctorList(BuildContext context) {
+    int currentMonth = DateTime.now().month;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TpDoctorListPage(month: currentMonth),
       ),
     );
   }

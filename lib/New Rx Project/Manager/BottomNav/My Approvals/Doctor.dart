@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:rx_route_new/Util/Utils.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -59,7 +60,11 @@ class _MyApprovalDoctorState extends State<MyApprovalDoctor>
         final List<dynamic> doctorList = [];
         for (var rep in data['data']) {
           if (rep['doctorList'] != null) {
-            doctorList.addAll(rep['doctorList']);
+            // Attach "name" to each doctor in the doctorList
+            for (var doctor in rep['doctorList']) {
+              doctor['repName'] = rep['name']; // Store the rep's name inside the doctor data
+              doctorList.add(doctor);
+            }
           }
         }
 
@@ -90,6 +95,7 @@ class _MyApprovalDoctorState extends State<MyApprovalDoctor>
     }
   }
 
+
   Future<void> approveDoctor(int doctorId, String status) async {
     try {
       final response = await http.post(
@@ -102,10 +108,12 @@ class _MyApprovalDoctorState extends State<MyApprovalDoctor>
       print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
+        Utils.flushBarErrorMessage('$status successfully !', context);
         setState(() {
           fetchDoctorData(); // Refresh the doctor data after approval/rejection
         });
       } else {
+        Utils.flushBarErrorMessage('$status failed !', context);
         print('Failed to update doctor status');
       }
     } catch (e) {
@@ -116,40 +124,45 @@ class _MyApprovalDoctorState extends State<MyApprovalDoctor>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'Pending'),
-              Tab(text: 'Rejected'),
-              Tab(text: 'Accepted'),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: 'Pending'),
+                  Tab(text: 'Rejected'),
+                  Tab(text: 'Accepted'),
+                ],
+              ),
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : errorMessage.isNotEmpty
+                    ? Center(child: Text(errorMessage))
+                    : TabBarView(
+                  controller: _tabController,
+                  children: [
+                    DoctorList(
+                        doctors: pendingDoctors,
+                        showActions: true,
+                        onApproveDoctor: approveDoctor),
+                    DoctorList(
+                        doctors: rejectedDoctors,
+                        showActions: false,
+                        onApproveDoctor: approveDoctor),
+                    DoctorList(
+                        doctors: acceptedDoctors,
+                        showActions: false,
+                        onApproveDoctor: approveDoctor),
+                  ],
+                ),
+              ),
             ],
           ),
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : errorMessage.isNotEmpty
-                ? Center(child: Text(errorMessage))
-                : TabBarView(
-              controller: _tabController,
-              children: [
-                DoctorList(
-                    doctors: pendingDoctors,
-                    showActions: true,
-                    onApproveDoctor: approveDoctor),
-                DoctorList(
-                    doctors: rejectedDoctors,
-                    showActions: false,
-                    onApproveDoctor: approveDoctor),
-                DoctorList(
-                    doctors: acceptedDoctors,
-                    showActions: false,
-                    onApproveDoctor: approveDoctor),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -186,10 +199,19 @@ class DoctorList extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Display "name": "Manu"
+                      Text(
+                        'From: ${doctor['repName']}', // Display the rep's name
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 10),
                       Row(
                         children: [
                           CircleAvatar(
@@ -221,7 +243,7 @@ class DoctorList extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: EdgeInsets.only(top: 12.0),
+                                    padding: const EdgeInsets.only(top: 12.0),
                                     child: Text(doctor['approvalStatus'],
                                         style: TextStyle(
                                             fontWeight: FontWeight.w400,
@@ -278,7 +300,6 @@ class DoctorList extends StatelessWidget {
                                 ),
                               ),
                             ),
-
                           ],
                         ),
                     ],
@@ -292,3 +313,4 @@ class DoctorList extends StatelessWidget {
     );
   }
 }
+

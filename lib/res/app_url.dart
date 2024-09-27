@@ -122,9 +122,14 @@ class AppUrl{
   //approving manager the tp
   static var approveUsersTP = '$baseUrl/user/userAddedTP';
 
+  //list managers rep tp
+  static var getUserAddedTP = '$baseUrl/user/getUserAddedTp';
+
   static var approveUserAddedTP = '$baseUrl/user/approveTp';
 
   static var rejectUserAddedTP = '$baseUrl/user/rejectTp';
+
+  static var checkTPinMonth = '$baseUrl/user/findTpAddedMonth';
 
   //userperformance
   // get doctor visit data

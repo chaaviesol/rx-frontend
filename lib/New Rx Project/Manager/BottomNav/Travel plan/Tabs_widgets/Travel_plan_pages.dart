@@ -98,8 +98,9 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
     if (response.statusCode == 200) {
       // Successful response
       var responseData = jsonDecode(response.body);
+      Utils.flushBarErrorMessage('${responseData['message']}', context);
       // Utils.flushBarErrorMessage('${responseData['data']['message']}', context);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: responseData['data']['data'],),));
+      // Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: responseData['data']['data'],),));
       // Utils.flushBarErrorMessage('${responseData['data']['message']}', context);
       print('Response data: ${response.body}');
       print('Response datas: ${responseData['data']['data']}');
@@ -158,9 +159,58 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                   return GestureDetector(
                     onTap: isPastMonth
                         ? null // Disable onTap for past months
-                        : () {
+                        : ()async {
                       final formattedMonth = '$monthNumber-${DateTime.now().year}';
-                      Navigator.of(context).pop(formattedMonth); // Pass the selected month
+                      if (formattedMonth != null) {
+                        // _showLoaderDialog(context); // Show loader dialog
+
+                        try {
+                          // Call your API request here
+                          var data = await sendPostRequest('${uniqueId}', formattedMonth);
+                          print('auto data: $data');
+
+                          // Ensure the response data is valid before navigating
+                          if (data != null) {
+                            // Navigate to the Autotp page
+                            print('sending data to next page :${data['data']}');
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(
+                              selectedMonth:formattedMonth,
+                              data: data['data'],),),
+                            );
+
+                            // Optionally show success message after navigation
+                            Flushbar(
+                              message: "Travel plan generated successfully for $formattedMonth!",
+                              icon: Icon(
+                                Icons.check_circle,
+                                size: 28.0,
+                                color: Colors.green,
+                              ),
+                              duration: Duration(seconds: 3),
+                              leftBarIndicatorColor: Colors.green,
+                            ).show(context);
+                          } else {
+                            throw Exception("No data returned from the API");
+                          }
+                        } catch (e) {
+                          // Dismiss the loader in case of an error
+                          // Navigator.of(context).pop(); // Close the loader dialog
+
+                          // Show error message
+                          Flushbar(
+                            message: "Error generating travel plan. Please try again.",
+                            icon: Icon(
+                              Icons.error,
+                              size: 28.0,
+                              color: Colors.red,
+                            ),
+                            duration: Duration(seconds: 3),
+                            leftBarIndicatorColor: Colors.red,
+                          ).show(context);
+                        }
+                      }else{
+                        Utils.flushBarErrorMessage2('Some error occured !', context);
+                      }
                     },
                     child: Opacity(
                       opacity: isPastMonth ? 0.5 : 1, // Reduce opacity for past months
@@ -207,51 +257,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
     );
 
 
-    if (selectedMonth != null) {
-      // _showLoaderDialog(context); // Show loader dialog
 
-      try {
-        // Call your API request here
-        var data = await sendPostRequest('${uniqueId}', selectedMonth);
-        print('auto data: $data');
-
-        // Ensure the response data is valid before navigating
-        if (data != null) {
-          // Navigate to the Autotp page
-          print('sending data to next page :${data['data']}');
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(data: data['data'],),),);
-
-          // Optionally show success message after navigation
-          Flushbar(
-            message: "Travel plan generated successfully for $selectedMonth!",
-            icon: Icon(
-              Icons.check_circle,
-              size: 28.0,
-              color: Colors.green,
-            ),
-            duration: Duration(seconds: 3),
-            leftBarIndicatorColor: Colors.green,
-          ).show(context);
-        } else {
-          throw Exception("No data returned from the API");
-        }
-      } catch (e) {
-        // Dismiss the loader in case of an error
-        // Navigator.of(context).pop(); // Close the loader dialog
-
-        // Show error message
-        Flushbar(
-          message: "Error generating travel plan. Please try again.",
-          icon: Icon(
-            Icons.error,
-            size: 28.0,
-            color: Colors.red,
-          ),
-          duration: Duration(seconds: 3),
-          leftBarIndicatorColor: Colors.red,
-        ).show(context);
-      }
-    }
   }
 
 

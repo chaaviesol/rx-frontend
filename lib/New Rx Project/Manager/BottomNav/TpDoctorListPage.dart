@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/BottomNavManager.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20lists/Doctor%20list.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20lists/Doctor_details/doctor_detials.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/Travel_plan_pages.dart';
@@ -78,7 +79,10 @@ class _TpDoctorListPageState extends State<TpDoctorListPage> {
                 Navigator.of(context).pop(); // Close the dialog
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => TravelPlanmainpage()), // Replace with actual page
+                  MaterialPageRoute(builder: (context) =>
+                      // TravelPlanmainpage()
+                    BottomNavigationMngr()
+                  ), // Replace with actual page
                 );
               },
             ),
@@ -92,10 +96,25 @@ class _TpDoctorListPageState extends State<TpDoctorListPage> {
                 );
               },
             ),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop(); // Close the dialog
+
+              },
+            ),
           ],
         );
       },
     );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    print('paassed month:${widget.month}');
+    super.initState();
   }
 
   @override
@@ -137,39 +156,36 @@ class _TpDoctorListPageState extends State<TpDoctorListPage> {
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration( color: Colors.white,border: Border.all(color: Colors.white)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 100,
-                              width: 35,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Container(
                               decoration: BoxDecoration(
-                                color:doctor['visit_type'] == 'core'
+                                borderRadius: BorderRadius.circular(9),
+                                border: Border.all(width: 1,color: doctor['visit_type'] == 'core'
                                     ? AppColors.tilecolor2
                                     : doctor['visit_type'] == 'supercore'
                                     ? AppColors.tilecolor1
-                                    : AppColors.tilecolor3,
-                                  border: Border.all(color: Colors.white),),
-
-                            ),
-                            Expanded(
-                              child: Center(
-                                child: Stack(
-                                  children: [
-                                    ListTile(
-                                      title: Text('${doctor['firstName']} ${doctor['lastName']}'),
-                                      subtitle: Text('Specialization: ${doctor['specialization']}'),
-                                      trailing: Text('Phone: ${doctor['mobile']}'),
-                                    ),
-                                  ],
+                                    : AppColors.tilecolor3,)
+                              ),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: doctor['visit_type'] == 'core'
+                              ? AppColors.tilecolor2
+                              : doctor['visit_type'] == 'supercore'
+                              ? AppColors.tilecolor1
+                              : AppColors.tilecolor3,
+                                  child: Text('${doctor['firstName'][3]}'),
                                 ),
+                                title: Text('${doctor['firstName']} ${doctor['lastName']}'),
+                                // subtitle: Text('Specialization: ${doctor['specialization']}'),
+                                // trailing: Text('Phone: ${doctor['mobile']}'),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   );

@@ -364,177 +364,179 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
           SizedBox(width: 10,),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator()) // Show loading spinner while fetching data
-          : Column(
-        children: [
-        isVisibleCalendar
-            ? TableCalendar(
-          firstDay: DateTime.utc(2020, 1, 1),
-          lastDay: DateTime.utc(2030, 12, 31),
+      body: Container(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator()) // Show loading spinner while fetching data
+            : Column(
+          children: [
+          isVisibleCalendar
+              ? TableCalendar(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
 
-          // Parse the `monthandyear` into a DateTime
-          focusedDay: selectedDate ?? DateFormat('MMMM yyyy').parse(widget.monthandyear), // Open the month and year from `widget.monthandyear`
+            // Parse the `monthandyear` into a DateTime
+            focusedDay: selectedDate ?? DateFormat('MMMM yyyy').parse(widget.monthandyear), // Open the month and year from `widget.monthandyear`
 
-          selectedDayPredicate: (day) {
-            return isSameDay(selectedDate, day);
-          },
-
-          eventLoader: (day) {
-            return events[day] ?? [];
-          },
-
-          onDaySelected: (selectedDay, focusedDay) {
-            setState(() {
-              selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
-              selectedDoctors = events[selectedDate] ?? [];
-            });
-          },
-
-          calendarBuilders: CalendarBuilders(
-            defaultBuilder: (context, day, focusedDay) {
-              bool hasDoctor = events.containsKey(day) && events[day]!.isNotEmpty;
-              bool isSunday = day.weekday == DateTime.sunday;
-
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  Text(
-                    '${day.day}',
-                    style: TextStyle(
-                      color: isSunday ? Colors.red : (hasDoctor ? Colors.green : Colors.black), // Text color: red for Sundays, green for events, black otherwise
-                      fontWeight: hasDoctor ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                  if (hasDoctor) // Show dot if there is a doctor
-                    Positioned(
-                      bottom: 4,
-                      child: Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: Colors.green, // Dot color for events
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                ],
-              );
+            selectedDayPredicate: (day) {
+              return isSameDay(selectedDate, day);
             },
-          ),
 
-          headerStyle: HeaderStyle(
-            formatButtonVisible: false, // Hides the "2 weeks" format button
-            titleCentered: true, // Centers the month title
-            formatButtonShowsNext: false,
-          ),
-        )
-            : Container(),
-          const SizedBox(height: 16),
-          InkWell(
-            onTap: (){
+            eventLoader: (day) {
+              return events[day] ?? [];
+            },
+
+            onDaySelected: (selectedDay, focusedDay) {
               setState(() {
-                isVisibleCalendar = !isVisibleCalendar;
+                selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
+                selectedDoctors = events[selectedDate] ?? [];
               });
             },
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('${DateFormat('dd-MM-yyyy').format(selectedDate ?? DateTime.now())}', style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold)),
-                    isVisibleCalendar?Icon(Icons.arrow_drop_up,color: AppColors.whiteColor,):Icon(Icons.arrow_drop_down,color: AppColors.whiteColor,)
-                  ],
-                ),
-              ),
-            ),
-          ),
-          if (selectedDoctors.isNotEmpty)
-            Expanded(
-              child: ListView.builder(
-                itemCount: selectedDoctors.length,
-                itemBuilder: (context, index) {
-                  final doctor = selectedDoctors[index];
-                  return Column(
-                    children: [
-                      InkWell(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => DoctorDetailsPage(tpid: widget.tpid,doctorId: doctor['id']),));
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                // color: Colors.white,border: Border.all(color: Colors.orange),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color:doctor['visit_type'] == 'core'
-                                        ? AppColors.tilecolor2
-                                        : doctor['visit_type'] == 'supercore'
-                                        ? AppColors.tilecolor1
-                                        : AppColors.tilecolor3,
-                                    border: Border.all(color: Colors.white),),
 
-                                ),
-                                Expanded(
-                                  child: Center(
-                                    child: Stack(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(9),
-                                            border: Border.all(
-                                              width: 1,
-                                              color: doctor['visit_type'] == 'core'
-                                                  ? AppColors.tilecolor2
-                                                  : doctor['visit_type'] == 'supercore'
-                                                  ? AppColors.tilecolor1
-                                                  : AppColors.tilecolor3,
-                                            ),
-                                          ),
-                                          child: ListTile(
-                                            leading: CircleAvatar(
-                                              backgroundColor: doctor['visit_type'] == 'core'
-                                                  ? AppColors.tilecolor2
-                                                  : doctor['visit_type'] == 'supercore'
-                                                  ? AppColors.tilecolor1
-                                                  : AppColors.tilecolor3,
-                                              child: Text(doctor['firstName'][3]),
-                                            ),
-                                            title: Text('${doctor['firstName']} ${doctor['lastName']}'),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+            calendarBuilders: CalendarBuilders(
+              defaultBuilder: (context, day, focusedDay) {
+                bool hasDoctor = events.containsKey(day) && events[day]!.isNotEmpty;
+                bool isSunday = day.weekday == DateTime.sunday;
+
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Text(
+                      '${day.day}',
+                      style: TextStyle(
+                        color: isSunday ? Colors.red : (hasDoctor ? Colors.green : Colors.black), // Text color: red for Sundays, green for events, black otherwise
+                        fontWeight: hasDoctor ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                    if (hasDoctor) // Show dot if there is a doctor
+                      Positioned(
+                        bottom: 4,
+                        child: Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: Colors.green, // Dot color for events
+                            shape: BoxShape.circle,
                           ),
                         ),
                       ),
+                  ],
+                );
+              },
+            ),
 
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false, // Hides the "2 weeks" format button
+              titleCentered: true, // Centers the month title
+              formatButtonShowsNext: false,
+            ),
+          )
+              : Container(),
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: (){
+                setState(() {
+                  isVisibleCalendar = !isVisibleCalendar;
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('${DateFormat('dd-MM-yyyy').format(selectedDate ?? DateTime.now())}', style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold)),
+                      isVisibleCalendar?Icon(Icons.arrow_drop_up,color: AppColors.whiteColor,):Icon(Icons.arrow_drop_down,color: AppColors.whiteColor,)
                     ],
-                  );
-                },
-              ),
-            )
-          else
-            const Expanded(
-              child: Center(
-                child: Text('No doctors available for the selected date'),
+                  ),
+                ),
               ),
             ),
-        ],
+            if (selectedDoctors.isNotEmpty)
+              Expanded(
+                child: ListView.builder(
+                  itemCount: selectedDoctors.length,
+                  itemBuilder: (context, index) {
+                    final doctor = selectedDoctors[index];
+                    return Column(
+                      children: [
+                        InkWell(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => DoctorDetailsPage(tpid: widget.tpid,doctorId: doctor['id']),));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  // color: Colors.white,border: Border.all(color: Colors.orange),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color:doctor['visit_type'] == 'core'
+                                          ? AppColors.tilecolor2
+                                          : doctor['visit_type'] == 'supercore'
+                                          ? AppColors.tilecolor1
+                                          : AppColors.tilecolor3,
+                                      border: Border.all(color: Colors.white),),
+
+                                  ),
+                                  Expanded(
+                                    child: Center(
+                                      child: Stack(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(9),
+                                              border: Border.all(
+                                                width: 1,
+                                                color: doctor['visit_type'] == 'core'
+                                                    ? AppColors.tilecolor2
+                                                    : doctor['visit_type'] == 'supercore'
+                                                    ? AppColors.tilecolor1
+                                                    : AppColors.tilecolor3,
+                                              ),
+                                            ),
+                                            child: ListTile(
+                                              leading: CircleAvatar(
+                                                backgroundColor: doctor['visit_type'] == 'core'
+                                                    ? AppColors.tilecolor2
+                                                    : doctor['visit_type'] == 'supercore'
+                                                    ? AppColors.tilecolor1
+                                                    : AppColors.tilecolor3,
+                                                child: Text(doctor['firstName'][3]),
+                                              ),
+                                              title: Text('${doctor['firstName']} ${doctor['lastName']}'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      ],
+                    );
+                  },
+                ),
+              )
+            else
+              const Expanded(
+                child: Center(
+                  child: Text('No doctors available for the selected date'),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

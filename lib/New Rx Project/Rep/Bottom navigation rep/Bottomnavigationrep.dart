@@ -10,6 +10,7 @@ import 'package:rx_route_new/New%20Rx%20Project/Manager/Doctors_mngr/Add%20Docto
 import 'package:rx_route_new/app_colors.dart';
 
 import '../../../constants/styles.dart';
+import '../../Manager/BottomNav/TpDoctorListPage.dart';
 import '../../Manager/BottomNav/Travel plan/My_TP.dart';
 import '../../Manager/Doctors_mngr/Add_chemist.dart';
 import '../../Rep/Bottom navigation rep/Leave and expense/Leave and expense.dart';
@@ -112,7 +113,57 @@ class _BottomNavigationRepState extends State<BottomNavigationRep>
                 child: Icon(Icons.add, color: Colors.white),
               ),
             ),
+          if (currentIndex == 0) // Only show the plus button on the home page
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 56 + 30,
+              left: 20,
+              child: FloatingActionButton(
+                backgroundColor: AppColors.primaryColor,
+                shape: CircleBorder(),
+                onPressed: () {
+                  _showConfirmationDialog(context);  // Call the method to show the alert box
+                },
+                child: Icon(Icons.add_chart_rounded, color: AppColors.whiteColor),
+              ),
+            )
         ],
+      ),
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Are you sure you want to continue?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog without navigating
+              },
+            ),
+            TextButton(
+              child: Text('Continue'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                _navigateToTpDoctorList(context); // Navigate to the new page
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToTpDoctorList(BuildContext context) {
+    int currentMonth = DateTime.now().month;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TpDoctorListPage(month: currentMonth),
       ),
     );
   }

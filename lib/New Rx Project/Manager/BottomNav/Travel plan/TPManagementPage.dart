@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:rx_route_new/Util/Utils.dart';
 import 'package:rx_route_new/app_colors.dart';
 import 'package:rx_route_new/res/app_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,33 +30,44 @@ class _TPManagementPageState extends State<TPManagementPage>
     int? uniqueID = int.parse(preferences.getString('userID').toString());
 
     final response = await http.post(
-      Uri.parse(AppUrl.approveUsersTP),
+      Uri.parse(AppUrl.getUserAddedTP),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'userId': uniqueID}),
     );
 
     if (response.statusCode == 200) {
-      setState(() {
-        _data = jsonDecode(response.body)['data'];
-      });
+      final responseData = jsonDecode(response.body);
+
+      if (responseData['success']) {
+        setState(() {
+          _data = responseData['data']
+              .map((item) => item['tp'])
+              .toList(); // Extract only 'tp' part from each item
+        });
+      } else {
+        // Handle error from API
+        Utils.flushBarErrorMessage2(responseData['message'], context);
+      }
     } else {
       // Handle error
+      Utils.flushBarErrorMessage2('Failed to fetch data', context);
     }
   }
 
   Future<void> _acceptTP(int id) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    int? userID = int.parse(preferences.getString('userID').toString());
     final response = await http.post(
       Uri.parse(AppUrl.approveUserAddedTP),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'travelPlanId': id, 'userId': 2}),
+      body: jsonEncode({'travelPlanId': id, 'userId': userID}),
     );
-
+    print('approval data :${response.body}');
     if (response.statusCode == 200) {
       Fluttertoast.showToast(msg: 'Travel plan successfully approved');
-
       _fetchData(); // Refresh data
     } else {
-      // Handle error
+      Utils.flushBarErrorMessage2('Travel plan approval failed!', context);
     }
   }
 
@@ -70,13 +82,19 @@ class _TPManagementPageState extends State<TPManagementPage>
       _fetchData(); // Refresh data
       Fluttertoast.showToast(msg: 'Travel plan successfully rejected.');
     } else {
-      // Handle error
+      Utils.flushBarErrorMessage2('Rejecting travel plan failed!', context);
     }
   }
 
   String formatDateTime(String dateTime) {
     DateTime parsedDate = DateTime.parse(dateTime);
     return DateFormat('yyyy-MM-dd hh:mm a').format(parsedDate);
+  }
+
+  // Function to convert the month number to its name
+  String getMonthName(int month) {
+    DateTime date = DateTime(0, month); // Creating a dummy date to get the month name
+    return DateFormat.MMMM().format(date); // Full month name (e.g., September)
   }
 
   @override
@@ -95,25 +113,34 @@ class _TPManagementPageState extends State<TPManagementPage>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildTabContent('Draft', showButtons: true),
-          _buildTabContent('Cancel', showButtons: false),
-          _buildTabContent('Approved', showButtons: false),
-        ],
+      body: SafeArea(
+        child: Container(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 70.0),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildTabContent('Submitted', showButtons: true),
+                _buildTabContent('Cancel', showButtons: false),
+                _buildTabContent('Approved', showButtons: false),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildTabContent(String status, {required bool showButtons}) {
     final filteredData =
-        _data.where((item) => item['status'] == status).toList();
+    _data.where((item) => item['status'] == status).toList();
 
     return ListView.builder(
       itemCount: filteredData.length,
       itemBuilder: (context, index) {
         final item = filteredData[index];
+        final user = item['user']; // User data from the 'user' key
+
         return Card(
           color: AppColors.textfiedlColor,
           margin: const EdgeInsets.all(10),
@@ -127,16 +154,16 @@ class _TPManagementPageState extends State<TPManagementPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'TP IDs: ${item['id']}',
+                  'TP ID: ${item['id']}',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  'User: ${item['userdetails'][0]['name']}',
+                  'User: ${user['name']}',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Month: ${item['month']}',
+                  'Month: ${getMonthName(item['month'])}',  // Use month name instead of number
                   style: TextStyle(fontSize: 12),
                 ),
                 SizedBox(height: 8),
@@ -152,11 +179,10 @@ class _TPManagementPageState extends State<TPManagementPage>
                       ElevatedButton(
                         onPressed: () {
                           _acceptTP(item['id']);
-                          print('called ');
                         },
-                        child: Text('Accept',style: TextStyle(color: AppColors.whiteColor)),
+                        child: Text('Accept', style: TextStyle(color: AppColors.whiteColor)),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor, // Button color
+                          backgroundColor: AppColors.primaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -167,9 +193,9 @@ class _TPManagementPageState extends State<TPManagementPage>
                         onPressed: () {
                           _rejectTP(item['id']);
                         },
-                        child: Text('Reject',style: TextStyle(color: AppColors.whiteColor),),
+                        child: Text('Reject', style: TextStyle(color: AppColors.whiteColor)),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:AppColors.primaryColor, // Button color
+                          backgroundColor: AppColors.primaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

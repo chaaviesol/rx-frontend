@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rx_route_new/Util/Routes/routes_name.dart';
 import 'package:rx_route_new/Util/Utils.dart';
 import 'package:rx_route_new/app_colors.dart';
 import 'package:rx_route_new/res/app_url.dart';
@@ -264,9 +265,10 @@ import 'package:table_calendar/table_calendar.dart';
 // }
 //this page for automatic generated tp viewing page
 class Autotp extends StatefulWidget {
+  String selectedMonth;
   final Map<String, dynamic> data;
 
-  Autotp({required this.data, super.key});
+  Autotp({required this.selectedMonth,required this.data, super.key});
 
   @override
   State<Autotp> createState() => _AutotpState();
@@ -281,7 +283,23 @@ class _AutotpState extends State<Autotp> {
   @override
   void initState() {
     super.initState();
+    // Parse the month and year from widget.selectedMonth (format: "MM-yyyy")
+    List<String> dateParts = widget.selectedMonth.split('-');
+    int selectedMonth = int.parse(dateParts[0]);
+    int selectedYear = int.parse(dateParts[1]);
+
+    // Set the focused day and selected day to the first day of the selected month and year
+    _focusedDay = DateTime(selectedYear, selectedMonth, 1);
+    _selectedDay = DateTime(selectedYear, selectedMonth, 1);
     print('widget data :${widget.data}');
+    print('widget data :${widget.selectedMonth}');
+  }
+
+
+  // Rename the function for better readability
+  String formatDateToMonthYear(DateTime date) {
+    // Return formatted month-year string
+    return '${date.month}-${date.year}';
   }
 
   // Extract the unique sub-headquarters and their doctor count
@@ -320,229 +338,236 @@ class _AutotpState extends State<Autotp> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Calendar view
-          !isCalendarVisible
-              ? TableCalendar(
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2030, 12, 31),
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-            },
-            calendarFormat: CalendarFormat.month,
-            calendarStyle: CalendarStyle(
-              selectedDecoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-              todayDecoration: BoxDecoration(
-                color: Colors.orange,
-                shape: BoxShape.circle,
-              ),
-              outsideDaysVisible: false,
-            ),
-            headerStyle: HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-            ),
-
-            // Use CalendarBuilders to add custom decorations
-            calendarBuilders: CalendarBuilders(
-              // Marker for doctors (green dot marker)
-              markerBuilder: (context, date, events) {
-                if (widget.data[formatDate(date)] != null && widget.data[formatDate(date)]!.isNotEmpty) {
-                  return Positioned(
-                    bottom: 4.0,
-                    child: Container(
-                      width: 5.0,
-                      height: 5.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.green, // Green dot for days with doctor events
-                      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 70.0),
+          child: Container(
+            child: Column(
+              children: [
+                // Calendar view
+                !isCalendarVisible
+                    ? TableCalendar(
+                  firstDay: DateTime.utc(2020, 1, 1),
+                  lastDay: DateTime.utc(2030, 12, 31),
+                  focusedDay: _focusedDay,
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  },
+                  calendarFormat: CalendarFormat.month,
+                  calendarStyle: CalendarStyle(
+                    selectedDecoration: BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
                     ),
-                  );
-                }
-                return SizedBox(); // No marker if no doctors
-              },
-
-              // Custom builder for days to color Sundays in red
-              defaultBuilder: (context, day, focusedDay) {
-                final isSunday = day.weekday == DateTime.sunday;
-                return Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    '${day.day}',
-                    style: TextStyle(
-                      color: isSunday ? Colors.red : Colors.black, // Red text for Sundays
-                      fontWeight: isSunday ? FontWeight.bold : FontWeight.normal, // Bold text for Sundays
+                    todayDecoration: BoxDecoration(
+                      color: Colors.orange,
+                      shape: BoxShape.circle,
                     ),
+                    outsideDaysVisible: false,
                   ),
-                );
-              },
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false,
+                    titleCentered: true,
+                  ),
 
-              // Selected day and today's custom style
-              selectedBuilder: (context, date, focusedDay) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.blue, // Blue circle for selected day
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '${date.day}',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                );
-              },
+                  // Use CalendarBuilders to add custom decorations
+                  calendarBuilders: CalendarBuilders(
+                    // Marker for doctors (green dot marker)
+                    markerBuilder: (context, date, events) {
+                      if (widget.data[formatDate(date)] != null && widget.data[formatDate(date)]!.isNotEmpty) {
+                        return Positioned(
+                          bottom: 4.0,
+                          child: Container(
+                            width: 5.0,
+                            height: 5.0,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.green, // Green dot for days with doctor events
+                            ),
+                          ),
+                        );
+                      }
+                      return SizedBox(); // No marker if no doctors
+                    },
 
-              todayBuilder: (context, date, focusedDay) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.orange, // Orange circle for today's date
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '${date.day}',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                );
-              },
-            ),
-          )
-              : SizedBox(),
-
-          // Toggle calendar visibility
-          InkWell(
-            onTap: () {
-              setState(() {
-                isCalendarVisible = !isCalendarVisible;
-              });
-            },
-            child: Container(
-              decoration: BoxDecoration(color: AppColors.primaryColor),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          DateFormat('dd/MM/yyyy').format(_selectedDay),
+                    // Custom builder for days to color Sundays in red
+                    defaultBuilder: (context, day, focusedDay) {
+                      final isSunday = day.weekday == DateTime.sunday;
+                      return Container(
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${day.day}',
                           style: TextStyle(
-                              color: AppColors.whiteColor, fontWeight: FontWeight.bold),
+                            color: isSunday ? Colors.red : Colors.black, // Red text for Sundays
+                            fontWeight: isSunday ? FontWeight.bold : FontWeight.normal, // Bold text for Sundays
+                          ),
                         ),
-                        isCalendarVisible
-                            ? Icon(Icons.keyboard_arrow_up, color: AppColors.whiteColor)
-                            : Icon(Icons.keyboard_arrow_down, color: AppColors.whiteColor),
+                      );
+                    },
+
+                    // Selected day and today's custom style
+                    selectedBuilder: (context, date, focusedDay) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue, // Blue circle for selected day
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${date.day}',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    },
+
+                    todayBuilder: (context, date, focusedDay) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.orange, // Orange circle for today's date
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${date.day}',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                )
+                    : SizedBox(),
+                SizedBox(height: 10,),
+                // Toggle calendar visibility
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      isCalendarVisible = !isCalendarVisible;
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(color: AppColors.primaryColor),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                DateFormat('dd/MM/yyyy').format(_selectedDay),
+                                style: TextStyle(
+                                    color: AppColors.whiteColor, fontWeight: FontWeight.bold),
+                              ),
+                              isCalendarVisible
+                                  ? Icon(Icons.keyboard_arrow_up, color: AppColors.whiteColor)
+                                  : Icon(Icons.keyboard_arrow_down, color: AppColors.whiteColor),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                ),
 
-          // Sub-headquarters chips
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal, // Horizontal scrolling
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: getSubHeadquarterCounts().entries.map((entry) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0), // Add spacing between chips
-                    child: ChoiceChip(
-                      backgroundColor: AppColors.textfiedlColor, // Unselected background color
-                      selectedColor: AppColors.primaryColor,     // Selected background color
-                      label: Text(
-                        '${entry.key} (${entry.value})',
-                        style: TextStyle(
-                          color: selectedSubHeadquarter == entry.key
-                              ? AppColors.whiteColor // Text color when selected
-                              : AppColors.blackColor, // Text color when unselected
-                          fontWeight: FontWeight.bold, // Add bold styling
-                        ),
-                      ),
-                      selected: selectedSubHeadquarter == entry.key, // Chip selected state
-                      onSelected: (selected) {
-                        setState(() {
-                          selectedSubHeadquarter = selected ? entry.key : null;
-                        });
-                      },
-                      elevation: 4, // Adds a shadow effect
-                      pressElevation: 8, // Elevation when pressed
-                      shape: RoundedRectangleBorder( // Shape without a border
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-
-          // Doctor list filtered by sub-headquarter
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.data[formatDate(_selectedDay)]?.length ?? 0,
-              itemBuilder: (context, index) {
-                final doctor = widget.data[formatDate(_selectedDay)]![index];
-
-                // Filter by selected sub-headquarter
-                if (selectedSubHeadquarter != null &&
-                    doctor['address']['subHeadQuarter'] != selectedSubHeadquarter) {
-                  return SizedBox.shrink(); // Skip this doctor if it doesn't match the selected sub-headquarter
-                }
-
-                return Padding(
+                // Sub-headquarters chips
+                Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(9),
-                      border: Border.all(
-                        width: 1,
-                        color: doctor['category'] == 'core'
-                            ? AppColors.tilecolor2
-                            : doctor['category'] == 'supercore'
-                            ? AppColors.tilecolor1
-                            : AppColors.tilecolor3,
-                      ),
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        child: Text(
-                          '${doctor['doctor'][3]}',
-                          style: TextStyle(color: AppColors.whiteColor),
-                        ),
-                        backgroundColor: doctor['category'] == 'core'
-                            ? AppColors.tilecolor2
-                            : doctor['category'] == 'supercore'
-                            ? AppColors.tilecolor1
-                            : AppColors.tilecolor3,
-                      ),
-                      title: Text(doctor['doctor']),
-                      trailing: Text(doctor['address']['address']),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal, // Horizontal scrolling
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: getSubHeadquarterCounts().entries.map((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0), // Add spacing between chips
+                          child: ChoiceChip(
+                            backgroundColor: AppColors.textfiedlColor, // Unselected background color
+                            selectedColor: AppColors.primaryColor,     // Selected background color
+                            label: Text(
+                              '${entry.key} (${entry.value})',
+                              style: TextStyle(
+                                color: selectedSubHeadquarter == entry.key
+                                    ? AppColors.whiteColor // Text color when selected
+                                    : AppColors.blackColor, // Text color when unselected
+                                fontWeight: FontWeight.bold, // Add bold styling
+                              ),
+                            ),
+                            selected: selectedSubHeadquarter == entry.key, // Chip selected state
+                            onSelected: (selected) {
+                              setState(() {
+                                selectedSubHeadquarter = selected ? entry.key : null;
+                              });
+                            },
+                            elevation: 4, // Adds a shadow effect
+                            pressElevation: 8, // Elevation when pressed
+                            shape: RoundedRectangleBorder( // Shape without a border
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ),
-                );
-              },
+                ),
+
+                // Doctor list filtered by sub-headquarter
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: widget.data[formatDate(_selectedDay)]?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      final doctor = widget.data[formatDate(_selectedDay)]![index];
+
+                      // Filter by selected sub-headquarter
+                      if (selectedSubHeadquarter != null &&
+                          doctor['address']['subHeadQuarter'] != selectedSubHeadquarter) {
+                        return SizedBox.shrink(); // Skip this doctor if it doesn't match the selected sub-headquarter
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(9),
+                            border: Border.all(
+                              width: 1,
+                              color: doctor['category'] == 'core'
+                                  ? AppColors.tilecolor2
+                                  : doctor['category'] == 'supercore'
+                                  ? AppColors.tilecolor1
+                                  : AppColors.tilecolor3,
+                            ),
+                          ),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              child: Text(
+                                '${doctor['doctor'][3]}',
+                                style: TextStyle(color: AppColors.whiteColor),
+                              ),
+                              backgroundColor: doctor['category'] == 'core'
+                                  ? AppColors.tilecolor2
+                                  : doctor['category'] == 'supercore'
+                                  ? AppColors.tilecolor1
+                                  : AppColors.tilecolor3,
+                            ),
+                            title: Text(doctor['doctor']),
+                            trailing: Text(doctor['address']['address']),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -559,7 +584,7 @@ class _AutotpState extends State<Autotp> {
       "user_id": userID,
       "data": [widget.data]
     };
-
+    print('auto tp data is :${widget.data}');
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -571,6 +596,7 @@ class _AutotpState extends State<Autotp> {
 
       var responseData = jsonDecode(response.body);
       Utils.flushBarErrorMessage('${responseData['message']}', context);
+      Navigator.pushNamedAndRemoveUntil(context, RoutesName.successsplash, (route) => false,);
 
     } catch (e) {
       print('Error: $e');
