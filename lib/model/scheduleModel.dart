@@ -12,7 +12,7 @@ class ScheduleNew {
 }
 
 class TimeSlot {
-  String day;
+  String day ;
   String? startTime;
   String? endTime;
 

@@ -239,7 +239,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../../app_colors.dart';
 import '../../My lists/Doctor_details/doctor_detials.dart';
-
+//view TP
 class TravelPlanPages2 extends StatefulWidget {
   int tpid;
   String monthandyear;
@@ -394,6 +394,9 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
 
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, day, focusedDay) {
+                print('aaaa:${events}');
+                print('cccc:${day}');
+                print('bbbb:${events[day]}');
                 bool hasDoctor = events.containsKey(day) && events[day]!.isNotEmpty;
                 bool isSunday = day.weekday == DateTime.sunday;
 

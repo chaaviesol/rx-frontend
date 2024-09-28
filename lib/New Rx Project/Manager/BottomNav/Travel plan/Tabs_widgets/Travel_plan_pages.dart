@@ -7,12 +7,14 @@ import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Manual/ManualTP.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/New_tp.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/Travel_plan_pages2.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/viewTP.dart';
 import 'package:rx_route_new/res/app_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../Util/Utils.dart';
 import '../../../../../app_colors.dart';
 import '../../../../../constants/styles.dart';
 import '../../My lists/Doctor_details/doctor_detials.dart';
+import '../Manual/NewManualTP.dart';
 
 class TravelPlanmainpage extends StatefulWidget {
   const TravelPlanmainpage({Key? key}) : super(key: key);
@@ -303,6 +305,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
             ),
+            // onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => Newmanualtp(),)),
             onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => Manualtp(),)),
             child: Text(
               'Manual TP',
@@ -343,6 +346,11 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                     String year = DateFormat('yyyy').format(DateTime.parse(travelPlans[index]['created_date']));
                     return InkWell(
                       onTap: () {
+                        // Navigator.push(context, MaterialPageRoute(builder: (context) => Viewtp(
+                        //   tpid: travelPlans[index]['id'],
+                        //     tp_status: travelPlans[index]['status'],
+                        //     monthandyear: '${monthName} ${year}',
+                        // ),));
                         // Handle the tap event
                         Navigator.push(context, MaterialPageRoute(builder: (context) => TravelPlanPages2(
                           tpid: travelPlans[index]['id'],
@@ -414,7 +422,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
             ),
           ),
         )
-            : Center(child: CircularProgressIndicator())
+            : Center(child: Text('No Travel Plans Yet ! Create One.'))
       ),
     );
   }

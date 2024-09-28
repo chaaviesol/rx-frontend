@@ -214,7 +214,7 @@ class _DoctorListState extends State<DoctorList> {
                                       doctor['visit_type'] ?? 'unknown';
                                   return Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: InkWell(
+                                    child:doctor['approvalStatus'] == "Accepted"?  InkWell(
                                       onTap: () {
                                         Navigator.push(
                                           context,
@@ -225,61 +225,127 @@ class _DoctorListState extends State<DoctorList> {
                                           ),
                                         );
                                       },
-                                      child: ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundColor:
-                                              doctor['visit_type'] == 'core'
-                                                  ? AppColors.tilecolor2
-                                                  : doctor['visit_type'] ==
-                                                          'supercore'
-                                                      ? AppColors.tilecolor1
-                                                      : AppColors.tilecolor3,
-                                          child: Text(
-                                            doctor['firstName'][0],
-                                            style: TextStyle(
-                                                color: AppColors.whiteColor),
+                                      child: Stack(
+                                        children: [
+                                          ListTile(
+                                            leading: CircleAvatar(
+                                              backgroundColor:
+                                                  doctor['visit_type'] == 'core'
+                                                      ? AppColors.tilecolor2
+                                                      : doctor['visit_type'] ==
+                                                              'supercore'
+                                                          ? AppColors.tilecolor1
+                                                          : AppColors.tilecolor3,
+                                              child: Text(
+                                                doctor['firstName'][0],
+                                                style: TextStyle(
+                                                    color: AppColors.whiteColor),
+                                              ),
+                                            ),
+                                            title: Text(
+                                              '${doctor['firstName']} ${doctor['lastName']}',
+                                              style: text50014black,
+                                            ),
+                                            subtitle: Text(
+                                              '${doctor['specialization']}',
+                                              style: text50012black,
+                                            ),
+                                            trailing: PopupMenuButton<String>(
+                                              onSelected: (action) =>
+                                                  _handleMenuAction(action, doctor),
+                                              itemBuilder: (BuildContext context) {
+                                                return [
+                                                  PopupMenuItem<String>(
+                                                    value: 'edit',
+                                                    child: Row(
+                                                      children: const [
+                                                        Icon(Icons.edit),
+                                                        SizedBox(width: 10),
+                                                        Text('Edit',
+                                                            style: text50012black),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  PopupMenuItem<String>(
+                                                    value: 'delete',
+                                                    child: Row(
+                                                      children: const [
+                                                        Icon(Icons.delete),
+                                                        SizedBox(width: 10),
+                                                        Text('Delete',
+                                                            style: text50012black),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ];
+                                              },
+                                            ),
                                           ),
-                                        ),
-                                        title: Text(
-                                          '${doctor['firstName']} ${doctor['lastName']}',
-                                          style: text50014black,
-                                        ),
-                                        subtitle: Text(
-                                          '${doctor['specialization']}',
-                                          style: text50012black,
-                                        ),
-                                        trailing: PopupMenuButton<String>(
-                                          onSelected: (action) =>
-                                              _handleMenuAction(action, doctor),
-                                          itemBuilder: (BuildContext context) {
-                                            return [
-                                              PopupMenuItem<String>(
-                                                value: 'edit',
-                                                child: Row(
-                                                  children: const [
-                                                    Icon(Icons.edit),
-                                                    SizedBox(width: 10),
-                                                    Text('Edit',
-                                                        style: text50012black),
-                                                  ],
-                                                ),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                value: 'delete',
-                                                child: Row(
-                                                  children: const [
-                                                    Icon(Icons.delete),
-                                                    SizedBox(width: 10),
-                                                    Text('Delete',
-                                                        style: text50012black),
-                                                  ],
-                                                ),
-                                              ),
-                                            ];
-                                          },
-                                        ),
+                                        ],
                                       ),
-                                    ),
+                                    ):InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DoctorDetailsPage(doctorId: doctor['id']),
+                                          ),
+                                        );
+                                      },
+                                      child: Stack(
+                                        children: [
+                                          ListTile(
+                                            leading: CircleAvatar(
+                                              backgroundColor: doctor['visit_type'] == 'core'
+                                                  ? Colors.grey[300] // Grayscale for core
+                                                  : doctor['visit_type'] == 'supercore'
+                                                  ? Colors.grey[400] // Grayscale for supercore
+                                                  : Colors.grey[200], // Grayscale for other types
+                                              child: Text(
+                                                doctor['firstName'][0],
+                                                style: TextStyle(color: Colors.black), // Black text for contrast
+                                              ),
+                                            ),
+                                            title: Text(
+                                              '${doctor['firstName']} ${doctor['lastName']}',
+                                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500), // Black text
+                                            ),
+                                            subtitle: Text(
+                                              '${doctor['specialization']}',
+                                              style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500), // Lighter grey for subtitle
+                                            ),
+                                            trailing: PopupMenuButton<String>(
+                                              onSelected: (action) => _handleMenuAction(action, doctor),
+                                              itemBuilder: (BuildContext context) {
+                                                return [
+                                                  PopupMenuItem<String>(
+                                                    value: 'edit',
+                                                    child: Row(
+                                                      children: const [
+                                                        Icon(Icons.edit, color: Colors.black), // Black icon for edit
+                                                        SizedBox(width: 10),
+                                                        Text('Edit', style: TextStyle(color: Colors.black)), // Black text
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  PopupMenuItem<String>(
+                                                    value: 'delete',
+                                                    child: Row(
+                                                      children: const [
+                                                        Icon(Icons.delete, color: Colors.black), // Black icon for delete
+                                                        SizedBox(width: 10),
+                                                        Text('Delete', style: TextStyle(color: Colors.black)), // Black text
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ];
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                    ,
                                   );
                                 } else {
                                   return Container(

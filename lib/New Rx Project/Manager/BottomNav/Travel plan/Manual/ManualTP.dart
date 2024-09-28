@@ -244,7 +244,7 @@ class _ManualtpState extends State<Manualtp> {
                 shape: BoxShape.circle,
               ),
             ),
-          ):Text(''),
+          ) :Text(''),
           InkWell(
             onTap: (){
               setState(() {

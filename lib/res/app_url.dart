@@ -135,6 +135,8 @@ class AppUrl{
   // get doctor visit data
   static var getuserPerformance = '$baseUrl/user/Performance';
 
+  static var getAddedDoctors = '$baseUrl/user/getAddedDoctor';
+
   //reports
  static var getallVisitData = '$baseUrl/user/visitedCount';
 

@@ -234,7 +234,7 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                             ),
                           ),
                         ),
-                        
+
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -490,37 +490,98 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
 
   Widget _buildScheduleTab() {
     return ListView.builder(
-      itemCount: _doctorDetails!['schedule'].length,
+      itemCount:_doctorDetails!['addressDetail'].length,
+      // _doctorDetails!['schedule'].length,
       itemBuilder: (context, index) {
+        print('${_doctorDetails!['addressDetail'].length}');
         final schedule = _doctorDetails!['schedule'][index][0];
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 10,),
-              Text('${_doctorDetails!['addressDetail'][0][0]['address']['address']}'),
-              Row(
+        return Stack(
+          children: [
+            // Positioned(
+            //     top: 10,
+            //     right: 10,
+            //     child: Row(
+            //       children: [
+            //         Icon(Icons.delete,size: 20,),
+            //         Icon(Icons.edit,size: 20,),
+            //       ],
+            //     )),
+            Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                        height: 30,width:100,
-                        color: AppColors.primaryColor,
-                        child: Center(child: Text(schedule['schedule']['day'], style: text50014))),
+                  Text('Sub HeadQuart : ${_doctorDetails!['addressDetail'][index][0]['address']['subHeadQuarter']}',style: TextStyle(fontWeight: FontWeight.bold),),
+                  Text('Area : ${_doctorDetails!['addressDetail'][index][0]['address']['address']}',style: TextStyle(fontWeight: FontWeight.bold),),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount:_doctorDetails!['addressDetail'][index][0]['address']['schedule'].length ,
+                    itemBuilder: (context,subIndex) {
+                      return Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Container(
+                              width:100,
+                                decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                  borderRadius: BorderRadius.circular(9)
+                            ),
+                                child: Center(child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text('${_doctorDetails!['addressDetail'][index][0]['address']['schedule'][subIndex]['day']}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
+                                ))),
+                            Text('${_doctorDetails!['addressDetail'][index][0]['address']['schedule'][subIndex]['start_time']}',style: TextStyle(fontWeight: FontWeight.bold),),
+                            Text('${_doctorDetails!['addressDetail'][index][0]['address']['schedule'][subIndex]['end_time']}',style: TextStyle(fontWeight: FontWeight.bold))
+                          ],
+                        ),
+                      );
+                    }
                   ),
-                  SizedBox(width: 10,),
-                  Text('${schedule['schedule']['start_time']} - ${schedule['schedule']['end_time']}', style: text50014black),
+                  Divider()
+
+                  // Text('${_doctorDetails!['addressDetail'][1][0]['address']['address']}',style: TextStyle(fontWeight: FontWeight.bold),),
+                  // SizedBox(height: 10,),
+                  // Text('${_doctorDetails!['addressDetail'][index]}'),
+                  // SizedBox(height: 10,),
+                  // Container(
+                  //   decoration: BoxDecoration(
+                  //     color: AppColors.textfiedlColor
+                  //   ),
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.all(8.0),
+                  //     child: Text('${_doctorDetails!['addressDetail'][index][0]['address']['subHeadQuarter']}',style: TextStyle(fontWeight: FontWeight.bold),),
+                  //   ),
+                  // ),
+                  // SizedBox(height: 10,),
+                  // // Text('${_doctorDetails!['addressDetail'][index][0]}'),
+                  // ListView.builder(
+                  //   shrinkWrap: true,
+                  //   itemCount: _doctorDetails!['addressDetail'][index][0]['address']['schedule'].length,
+                  //   itemBuilder: (context,subIndex) {
+                  //     return Row(
+                  //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  //       children: [
+                  //         Container(
+                  //           height: 50,
+                  //           width: 100,
+                  //           decoration: BoxDecoration(
+                  //             color: AppColors.primaryColor
+                  //           ),
+                  //             child: Padding(
+                  //               padding: const EdgeInsets.all(8.0),
+                  //               child: Text('${_doctorDetails!['addressDetail'][0][subIndex]['address']['schedule'][subIndex]['day']}',style: text50012,),
+                  //             )),
+                  //         Text('${_doctorDetails!['addressDetail'][0][subIndex]['address']['schedule'][subIndex]['start_time']}'),
+                  //         Text('${_doctorDetails!['addressDetail'][0][subIndex]['address']['schedule'][subIndex]['end_time']}'),
+                  //       ],
+                  //     );
+                  //   }
+                  // ),
                 ],
               ),
-              ListView.builder(
-                itemCount: _doctorDetails!['addressDetail'],
-                shrinkWrap: true,
-                itemBuilder: (context,index) {
-                  return Text('${_doctorDetails!["addressDetail"]}');
-                }
-              )
-
-            ],
-
+            ),
+          ],
         );
       },
     );

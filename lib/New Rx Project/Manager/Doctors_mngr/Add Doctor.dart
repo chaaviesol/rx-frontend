@@ -62,10 +62,25 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   List<Chemist> _selectedChemists = [];
   String _selectedChemistsText = '';
 
+  // Mapping of abbreviated day names to full day names
+  String getFullDayName(String abbreviatedDay) {
+    Map<String, String> dayMap = {
+      'Mon': 'Monday',
+      'Tue': 'Tuesday',
+      'Wed': 'Wednesday',
+      'Thu': 'Thursday',
+      'Fri': 'Friday',
+      'Sat': 'Saturday',
+      'Sun': 'Sunday',
+    };
+    return dayMap[abbreviatedDay] ?? abbreviatedDay; // Return the full name or the abbreviated one if not found
+  }
+
   Future<ProductResponse> _fetchProducts() async {
     String url = AppUrl.list_products;
     try {
-      final response = await http.get(Uri.parse(url));
+      final response
+      = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         return ProductResponse.fromJson(jsonDecode(response.body));
       } else {
@@ -192,7 +207,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       // Combine days and time slots into one set, including startTime and endTime
       List<Map<String, dynamic>> scheduleSets = List.generate(minLength, (index) {
         return {
-          "day": schedule.days[index],
+          "day": getFullDayName(schedule.days[index]),
             "start_time": schedule.timeSlots[index].startTime,
             "end_time": schedule.timeSlots[index].endTime,
           // "time": {
