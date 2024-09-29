@@ -859,6 +859,18 @@ class _SeeAllPageState extends State<SeeAllPage> with TickerProviderStateMixin {
       length: 2, // Main tabs
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                color: AppColors.primaryColor,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: Text("Events"),
           bottom: TabBar(
             controller: _mainTabController,

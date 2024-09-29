@@ -6,6 +6,8 @@ import 'dart:convert';
 import 'package:rx_route_new/res/app_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../app_colors.dart';
+
 class Myreports extends StatefulWidget {
   @override
   _MyreportsState createState() => _MyreportsState();
@@ -92,8 +94,16 @@ class _MyreportsState extends State<Myreports> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: _isLoading

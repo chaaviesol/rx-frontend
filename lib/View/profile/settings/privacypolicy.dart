@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../app_colors.dart';
+
 class PrivacyPolicyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -7,6 +9,18 @@ class PrivacyPolicyPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Privacy Policy'),
         centerTitle: true,
+        leading: IconButton(
+          icon: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),

@@ -95,8 +95,9 @@ print('id is ${uniqueId}');
     }
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? uniqueId = preferences.getString('uniqueID');
+    String? userID = preferences.getString('userID');
     var data = {
-      "requesterUniqueId":1,
+      "requesterUniqueId":int.parse(userID.toString()),
       "docId":selectedDoctorId
     };
     String url = AppUrl.getvisitedDates; // Replace with your API URL

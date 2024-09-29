@@ -24,10 +24,20 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // _initPackageInfo();
+    checkloggeddata();
     _navigateToHome();
     verifyPrefrencedata();
   }
 
+
+  Future<void>checkloggeddata()async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? userID = preferences.getString('userID');
+    String? uniqueID = preferences.getString('uniqueID');
+    if(userID == "null" || uniqueID == "null"){
+      Utils.deleteuser(context);
+    }
+  }
   // Future<void> _initPackageInfo() async {
   //   final info = await PackageInfo.fromPlatform();
   //   setState(() {

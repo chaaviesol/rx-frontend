@@ -117,7 +117,7 @@ class ExpenseApprovalsWidgets{
                                       ),
                                       Padding(
                                         padding: EdgeInsets.only(left: 20.0),
-                                        child: Text('${snapdata[index]['doctorDetails'][0]['doc_name']}',style: TextStyle(
+                                        child: Text('${snapdata[index]['doctorDetails'][0]['firstName']}',style: TextStyle(
                                             fontWeight: FontWeight.w400,
                                             color: AppColors.borderColor,
                                             fontSize: 12)),
@@ -266,13 +266,10 @@ class ExpenseApprovalsWidgets{
                                             Text('#TRNX${snapdata[index]['id']}'),
                                           ],
                                         ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 20.0),
-                                          child: Text('${snapdata[index]['doctorDetails'][0]['doc_name']}',style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: AppColors.borderColor,
-                                              fontSize: 12)),
-                                        ),
+                                        Text('${snapdata[index]['doctorDetails'][0]['firstName']}',style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            color: AppColors.borderColor,
+                                            fontSize: 12)),
                                         // Padding(
                                         //   padding: EdgeInsets.only(left: 20.0),
                                         //   child: Text('Inna Fred',style: TextStyle(
@@ -417,7 +414,7 @@ class ExpenseApprovalsWidgets{
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(left: 20.0),
-                                          child: Text('${snapdata[index]['doctorDetails'][0]['doc_name']}',style: TextStyle(
+                                          child: Text('${snapdata[index]['doctorDetails'][0]['firstName']}',style: TextStyle(
                                               fontWeight: FontWeight.w400,
                                               color: AppColors.borderColor,
                                               fontSize: 12)),

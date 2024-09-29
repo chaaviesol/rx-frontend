@@ -77,6 +77,18 @@ class _ManualtpState extends State<Manualtp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: Text('Select a Day'),
         actions: [
           ElevatedButton(

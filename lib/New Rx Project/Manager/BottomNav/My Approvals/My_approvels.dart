@@ -101,9 +101,14 @@ class _MyApprovalState extends State<MyApproval> with SingleTickerProviderStateM
         ),
       ),
       body: SafeArea(
-        child: TabBarView(
-          controller: _tabController,
-          children: _pages,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom:75.0),
+          child: Container(
+            child: TabBarView(
+              controller: _tabController,
+              children: _pages,
+            ),
+          ),
         ),
       ),
     );

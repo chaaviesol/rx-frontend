@@ -112,8 +112,8 @@ class _LeaveApprovalsState extends State<LeaveApprovals> with SingleTickerProvid
             ),
           ),
           Positioned(
-            left: MediaQuery.of(context).size.width/3,
-            bottom: MediaQuery.of(context).size.height/7.9,
+            left: 250,
+            bottom: 100,
             child: ElevatedButton(style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryColor),
               onPressed: () {

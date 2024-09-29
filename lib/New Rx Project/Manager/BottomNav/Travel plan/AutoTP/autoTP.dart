@@ -315,10 +315,23 @@ class _AutotpState extends State<Autotp> {
     return subHeadquarterCounts;
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: Text('Automatic Schedule'),
       ),
       floatingActionButton: Row(
@@ -344,6 +357,7 @@ class _AutotpState extends State<Autotp> {
           child: Container(
             child: Column(
               children: [
+                Text('${widget.data}'),
                 // Calendar view
                 !isCalendarVisible
                     ? TableCalendar(
@@ -580,11 +594,11 @@ class _AutotpState extends State<Autotp> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     int? userID = int.parse(preferences.getString('userID').toString());
     String url = AppUrl.submitAutoTP;
+
     var data = {
       "user_id": userID,
       "data": [widget.data]
     };
-    print('auto tp data is :${widget.data}');
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -593,10 +607,16 @@ class _AutotpState extends State<Autotp> {
         },
         body: jsonEncode(data),
       );
-
-      var responseData = jsonDecode(response.body);
+      print('resposne is :${jsonDecode(response.body)}');
+      if(response.statusCode == 200){
+        var responseData = jsonDecode(response.body);
       Utils.flushBarErrorMessage('${responseData['message']}', context);
       Navigator.pushNamedAndRemoveUntil(context, RoutesName.successsplash, (route) => false,);
+      }
+      else{
+        var responseData = jsonDecode(response.body);
+        Utils.flushBarErrorMessage2(responseData['message'], context);
+      }
 
     } catch (e) {
       print('Error: $e');

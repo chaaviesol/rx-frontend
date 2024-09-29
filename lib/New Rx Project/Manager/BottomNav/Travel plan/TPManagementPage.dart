@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/Travel_plan_pages2.dart';
 import 'package:rx_route_new/Util/Utils.dart';
 import 'package:rx_route_new/app_colors.dart';
 import 'package:rx_route_new/res/app_url.dart';
@@ -141,69 +142,91 @@ class _TPManagementPageState extends State<TPManagementPage>
         final item = filteredData[index];
         final user = item['user']; // User data from the 'user' key
 
-        return Card(
-          color: AppColors.textfiedlColor,
-          margin: const EdgeInsets.all(10),
-          elevation: 5,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'TP ID: ${item['id']}',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        return InkWell(
+          onTap: (){
+            // Parsing the current format 'MM-yyyy' (09-2024) into a DateTime object
+            DateTime parsedDate = DateFormat('MM-yyyy').parse('${item['month']}-2024');
+
+// Formatting it back to 'MMMM yyyy' format
+            String formattedDate = DateFormat('MMMM yyyy').format(parsedDate);
+
+// Pass the formattedDate to the next page
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TravelPlanPages2(
+                  tpid: item['id'],
+                  monthandyear: formattedDate,  // Now it passes 'September 2024'
+                  tp_status: item['status'],
                 ),
-                Text(
-                  'User: ${user['name']}',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Month: ${getMonthName(item['month'])}',  // Use month name instead of number
-                  style: TextStyle(fontSize: 12),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Created Date: ${formatDateTime(item['created_date'])}',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-                SizedBox(height: 12),
-                if (showButtons)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          _acceptTP(item['id']);
-                        },
-                        child: Text('Accept', style: TextStyle(color: AppColors.whiteColor)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () {
-                          _rejectTP(item['id']);
-                        },
-                        child: Text('Reject', style: TextStyle(color: AppColors.whiteColor)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ],
+              ),
+            );
+
+          },
+          child: Card(
+            color: AppColors.textfiedlColor,
+            margin: const EdgeInsets.all(10),
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'TP ID: ${item['id']}',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
-              ],
+                  Text(
+                    'User: ${user['name']}',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Month: ${getMonthName(item['month'])}',  // Use month name instead of number
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Created Date: ${formatDateTime(item['created_date'])}',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                  SizedBox(height: 12),
+                  if (showButtons)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            _acceptTP(item['id']);
+                          },
+                          child: Text('Accept', style: TextStyle(color: AppColors.whiteColor)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            _rejectTP(item['id']);
+                          },
+                          child: Text('Reject', style: TextStyle(color: AppColors.whiteColor)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
             ),
           ),
         );

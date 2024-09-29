@@ -297,411 +297,419 @@ class _HomepageManagerState extends State<HomepageManager> {
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Stack(
-              children: [
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: isLoading
-                        ? Center(child: CircularProgressIndicator()) // Show loading indicator
-                        : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              child: SingleChildScrollView(
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: isLoading
+                            ? Center(child: CircularProgressIndicator()) // Show loading indicator
+                            : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                InkWell(
-                                  onTap:(){
-                                    print('pressed');
-                                    print('locatoin name:$_locationName');
-                                    _checkLocationPermission();
-                                    _getCurrentLocation();
-                                  },
-                                  child: Icon(
-                                    CupertinoIcons.location_solid,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ),
-                                Wrap(
-
-                                  children: [
-                                    Text(
-                                      overflow: TextOverflow.ellipsis,
-                                      '${_locationName}',
-                                      style: text50012black,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
                                   children: [
-                                    IconButton(
-                                      icon: CircleAvatar(child: Icon(Icons.settings,color: AppColors.primaryColor,size: 25,)),
-                                      onPressed: () {
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage(),));
+                                    InkWell(
+                                      onTap:(){
+                                        print('pressed');
+                                        print('locatoin name:$_locationName');
+                                        _checkLocationPermission();
+                                        _getCurrentLocation();
                                       },
-                                    ),
-                                    CircleAvatar(
-                                      child: IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Icons.notifications,
-                                          color: AppColors.primaryColor,
-                                          size: 25,
-                                        ),
+                                      child: Icon(
+                                        CupertinoIcons.location_solid,
+                                        color: AppColors.primaryColor,
                                       ),
                                     ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(width: 0.5, color: AppColors.borderColor),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: TextFormField(
-                                  controller: _searchText,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Search',
-                                    prefixIcon: Icon(Icons.search),
-                                    border: InputBorder.none,
-                                  ),
-                                  onFieldSubmitted: (value){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => HomesearchRep(searachString: _searchText.text,),));
-                                  },
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryColor,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: SizedBox(
-                                  height: 25,
-                                  width: 25,
-                                  child: Image.asset('assets/icons/settings.png'),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Text('Calls', style: text40016black),
-                        SizedBox(height: 10),
-                        SizedBox(
-                          // height: 100,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                CallTileWidget(icon: Icons.call, title: 'Assigned Calls', totalCalls: totalCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, updateDate: currentDate,percentage: visitPercentage,),
-                                SizedBox(width: 10,),
-                                CallTileWidget(icon: Icons.phone_callback_sharp, title: 'Missed Calls', totalCalls: missedCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, updateDate: currentDate,percentage: visitPercentage,),
+                                    Wrap(
 
-                                // Hometilewidget(),
-                                // SizedBox(width: 10,),
-                                // Hometilewidget(),
-                                // SizedBox(width: 10,),
-                                // Hometilewidget()
-                                // Container(
-                                //   width:MediaQuery.of(context).size.width/1.9,
-                                //   decoration: BoxDecoration(
-                                //     color: AppColors.primaryColor,
-                                //     borderRadius: BorderRadius.circular(20),
-                                //   ),
-                                //   padding: EdgeInsets.all(8.0),
-                                //   height: MediaQuery.of(context).size.height / 6,
-                                //   child: Row(
-                                //     children: [
-                                //       CircleAvatar(
-                                //         radius: 20,
-                                //         child: IconButton(
-                                //           onPressed: () {},
-                                //           icon: Icon(Icons.call, color: AppColors.primaryColor),
-                                //         ),
-                                //       ),
-                                //       const SizedBox(width: 20),
-                                //       Column(
-                                //         mainAxisAlignment: MainAxisAlignment.center,
-                                //         crossAxisAlignment: CrossAxisAlignment.start,
-                                //         children: [
-                                //           Text(
-                                //             'Calls',
-                                //             style: text60012,
-                                //           ),
-                                //           Text('Missed: 5', style: text40012),
-                                //           Text('14-08-2024', style: text40012),
-                                //         ],
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
-                                // SizedBox(width: 10,),
-                                // Container(
-                                //   width:MediaQuery.of(context).size.width/1.9,
-                                //   decoration: BoxDecoration(
-                                //     color: AppColors.primaryColor,
-                                //     borderRadius: BorderRadius.circular(20),
-                                //   ),
-                                //   padding: EdgeInsets.all(8.0),
-                                //   height: MediaQuery.of(context).size.height / 6,
-                                //   child: Row(
-                                //     children: [
-                                //       CircleAvatar(
-                                //         radius: 20,
-                                //         child: IconButton(
-                                //           onPressed: () {},
-                                //           icon: Icon(Icons.call, color: AppColors.primaryColor),
-                                //         ),
-                                //       ),
-                                //       const SizedBox(width: 20),
-                                //       Column(
-                                //         mainAxisAlignment: MainAxisAlignment.center,
-                                //         crossAxisAlignment: CrossAxisAlignment.start,
-                                //         children: [
-                                //           Text(
-                                //             'Total Calls',
-                                //             style: text60012,
-                                //           ),
-                                //           Text('1800', style: text40012),
-                                //           Text('14-08-2024', style: text40012),
-                                //         ],
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
+                                      children: [
+                                        Text(
+                                          overflow: TextOverflow.ellipsis,
+                                          '${_locationName}',
+                                          style: text50012black,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: CircleAvatar(child: Icon(Icons.settings,color: AppColors.primaryColor,size: 25,)),
+                                          onPressed: () {
+                                            Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage(),));
+                                          },
+                                        ),
+                                        CircleAvatar(
+                                          child: IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(
+                                              Icons.notifications,
+                                              color: AppColors.primaryColor,
+                                              size: 25,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ],
                             ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Events',style: TextStyle(
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 0.5, color: AppColors.borderColor),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: TextFormField(
+                                      controller: _searchText,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Search',
+                                        prefixIcon: Icon(Icons.search),
+                                        border: InputBorder.none,
+                                      ),
+                                      onFieldSubmitted: (value){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => HomesearchRep(searachString: _searchText.text,),));
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryColor,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: SizedBox(
+                                      height: 25,
+                                      width: 25,
+                                      child: Image.asset('assets/icons/settings.png'),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            const Text('Calls',style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
                             ),),
-                            InkWell(
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => SeeAllPage()));
-                                // Navigator.push(context, MaterialPageRoute(builder: (context) => Events(eventType: 'Todays Events'),));
-                              },
-                              child: const Text('See all',style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.underline),),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-            
-                        // Events Section
-                        // Container(
-                        //   decoration: BoxDecoration(
-                        //     color: AppColors.primaryColor,
-                        //     borderRadius: BorderRadius.circular(6),
-                        //   ),
-                        //   padding: const EdgeInsets.all(10.0),
-                        //   child: Column(
-                        //     crossAxisAlignment: CrossAxisAlignment.start,
-                        //     children: [
-                        //       if (todayAnniversaries.isEmpty && upcomingBirthdays.isEmpty)
-                        //         Center(
-                        //           child: Text(
-                        //             'There are no events',
-                        //             style: TextStyle(
-                        //               fontWeight: FontWeight.w500,
-                        //               color: AppColors.whiteColor,
-                        //               fontSize: 14,
-                        //             ),
-                        //           ),
-                        //         )
-                        //       else ...[
-                        //         // Display Upcoming Birthdays
-                        //         if (upcomingBirthdays.isNotEmpty) ...[
-                        //           Text(
-                        //             'Upcoming Birthdays',
-                        //             style: TextStyle(
-                        //               fontWeight: FontWeight.w500,
-                        //               color: AppColors.whiteColor,
-                        //               fontSize: 12,
-                        //             ),
-                        //           ),
-                        //           SizedBox(height: 10),
-                        //           for (var birthday in upcomingBirthdays) ...[
-                        //             Row(
-                        //               children: [
-                        //                 CircleAvatar(
-                        //                   radius: 25,
-                        //                   backgroundColor: Colors.white,
-                        //                   child: Icon(
-                        //                     Icons.cake,
-                        //                     color: AppColors.primaryColor,
-                        //                   ),
-                        //                 ),
-                        //                 SizedBox(width: 10),
-                        //                 Expanded(
-                        //                   child: Column(
-                        //                     crossAxisAlignment: CrossAxisAlignment.start,
-                        //                     children: [
-                        //                       Text(
-                        //                         '${birthday['firstName']} ${birthday['lastName']}',
-                        //                         style: TextStyle(
-                        //                           fontWeight: FontWeight.w500,
-                        //                           color: AppColors.whiteColor,
-                        //                           fontSize: 12,
-                        //                         ),
-                        //                       ),
-                        //                       Text(
-                        //                         'DOB: ${birthday['date_of_birth']}',
-                        //                         style: TextStyle(
-                        //                           color: AppColors.whiteColor,
-                        //                           fontSize: 12,
-                        //                         ),
-                        //                       ),
-                        //                     ],
-                        //                   ),
-                        //                 ),
-                        //               ],
-                        //             ),
-                        //             SizedBox(height: 10),
-                        //           ],
-                        //         ],
-                        //         SizedBox(height: 20),
-                        //         Container(
-                        //           decoration: BoxDecoration(
-                        //             color: AppColors.primaryColor2,
-                        //             borderRadius: BorderRadius.circular(6),
-                        //           ),
-                        //           child: Padding(
-                        //             padding: const EdgeInsets.all(8.0),
-                        //             child: Row(
-                        //               mainAxisAlignment: MainAxisAlignment.center,
-                        //               children: [
-                        //                 Text(
-                        //                   'Notify me',
-                        //                   style: TextStyle(
-                        //                     fontWeight: FontWeight.w500,
-                        //                     color: AppColors.whiteColor,
-                        //                     fontSize: 12,
-                        //                   ),
-                        //                 ),
-                        //                 SizedBox(width: 10),
-                        //                 Icon(Icons.notifications_active, color: AppColors.whiteColor),
-                        //               ],
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ],
-                        //   ),
-                        // ),
-
-                        FutureBuilder(
-                          future: getEvents(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Some error occurred!'));
-                            } else if (snapshot.hasData) {
-                              print('event data:${snapshot.data}');
-                              return SingleChildScrollView(
+                            SizedBox(height: 10),
+                            SizedBox(
+                              // height: 100,
+                              child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        height:100,
-                                        width:250,
-                                        decoration: BoxDecoration(
-                                            color: AppColors.primaryColor2,
-                                            borderRadius: BorderRadius.circular(9)
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            // Text('${snapshot.data['todays']}'),
-                                            Text('Todays Birthdays : ${snapshot.data['todayEvents'][0]['todayBirthday'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
-                                            Text('Todays Anniversarys : ${snapshot.data['todayEvents'][0]['todayAnniversary'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        height:100,
-                                        width:250,
-                                        decoration: BoxDecoration(
-                                            color: AppColors.primaryColor2,
-                                            borderRadius: BorderRadius.circular(9)
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            // Text('${snapshot.data['todays']}'),
-                                            Text('Upcoming Birthdays : ${snapshot.data['UpcomingEvents'][0]['BirthdayNotification'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
-                                            Text('Upcoming Anniversarys : ${snapshot.data['UpcomingEvents'][0]['AnniversaryNotification'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                                    CallTileWidget(icon: Icons.call, title: 'Assigned Calls', totalCalls: totalCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, updateDate: currentDate,percentage: visitPercentage,),
+                                    SizedBox(width: 10,),
+                                    CallTileWidget(icon: Icons.phone_callback_sharp, title: 'Missed Calls', totalCalls: missedCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, updateDate: currentDate,percentage: visitPercentage,),
 
+                                    // Hometilewidget(),
+                                    // SizedBox(width: 10,),
+                                    // Hometilewidget(),
+                                    // SizedBox(width: 10,),
+                                    // Hometilewidget()
+                                    // Container(
+                                    //   width:MediaQuery.of(context).size.width/1.9,
+                                    //   decoration: BoxDecoration(
+                                    //     color: AppColors.primaryColor,
+                                    //     borderRadius: BorderRadius.circular(20),
+                                    //   ),
+                                    //   padding: EdgeInsets.all(8.0),
+                                    //   height: MediaQuery.of(context).size.height / 6,
+                                    //   child: Row(
+                                    //     children: [
+                                    //       CircleAvatar(
+                                    //         radius: 20,
+                                    //         child: IconButton(
+                                    //           onPressed: () {},
+                                    //           icon: Icon(Icons.call, color: AppColors.primaryColor),
+                                    //         ),
+                                    //       ),
+                                    //       const SizedBox(width: 20),
+                                    //       Column(
+                                    //         mainAxisAlignment: MainAxisAlignment.center,
+                                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                                    //         children: [
+                                    //           Text(
+                                    //             'Calls',
+                                    //             style: text60012,
+                                    //           ),
+                                    //           Text('Missed: 5', style: text40012),
+                                    //           Text('14-08-2024', style: text40012),
+                                    //         ],
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // ),
+                                    // SizedBox(width: 10,),
+                                    // Container(
+                                    //   width:MediaQuery.of(context).size.width/1.9,
+                                    //   decoration: BoxDecoration(
+                                    //     color: AppColors.primaryColor,
+                                    //     borderRadius: BorderRadius.circular(20),
+                                    //   ),
+                                    //   padding: EdgeInsets.all(8.0),
+                                    //   height: MediaQuery.of(context).size.height / 6,
+                                    //   child: Row(
+                                    //     children: [
+                                    //       CircleAvatar(
+                                    //         radius: 20,
+                                    //         child: IconButton(
+                                    //           onPressed: () {},
+                                    //           icon: Icon(Icons.call, color: AppColors.primaryColor),
+                                    //         ),
+                                    //       ),
+                                    //       const SizedBox(width: 20),
+                                    //       Column(
+                                    //         mainAxisAlignment: MainAxisAlignment.center,
+                                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                                    //         children: [
+                                    //           Text(
+                                    //             'Total Calls',
+                                    //             style: text60012,
+                                    //           ),
+                                    //           Text('1800', style: text40012),
+                                    //           Text('14-08-2024', style: text40012),
+                                    //         ],
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
-                              );
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Events',style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                ),),
+                                InkWell(
+                                  onTap: (){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => SeeAllPage()));
+                                    // Navigator.push(context, MaterialPageRoute(builder: (context) => Events(eventType: 'Todays Events'),));
+                                  },
+                                  child: const Text('See all',style: TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                      decoration: TextDecoration.underline),),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
 
-                            }
-                            return Center(child: Text('Some error occurred, Please restart your application!'));
-                          },
-                        ),
-            
-            
-                        // Positioned(
-                        //   left: MediaQuery.of(context).size.width/3,
-                        //   bottom: MediaQuery.of(context).size.height/7.9,
-                        //   child:
-                        SizedBox(height: 10,),
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            // ElevatedButton(style: ElevatedButton.styleFrom(
-                            //     backgroundColor: AppColors.primaryColor),
-                            //   onPressed: () {
-                            //     Navigator.push(context, MaterialPageRoute(builder: (context) => MyLeaveandexpense(),));
-                            //   }, child: Text('Leave & Expense',style: text50012,),),
-            
+                            // Events Section
+                            // Container(
+                            //   decoration: BoxDecoration(
+                            //     color: AppColors.primaryColor,
+                            //     borderRadius: BorderRadius.circular(6),
+                            //   ),
+                            //   padding: const EdgeInsets.all(10.0),
+                            //   child: Column(
+                            //     crossAxisAlignment: CrossAxisAlignment.start,
+                            //     children: [
+                            //       if (todayAnniversaries.isEmpty && upcomingBirthdays.isEmpty)
+                            //         Center(
+                            //           child: Text(
+                            //             'There are no events',
+                            //             style: TextStyle(
+                            //               fontWeight: FontWeight.w500,
+                            //               color: AppColors.whiteColor,
+                            //               fontSize: 14,
+                            //             ),
+                            //           ),
+                            //         )
+                            //       else ...[
+                            //         // Display Upcoming Birthdays
+                            //         if (upcomingBirthdays.isNotEmpty) ...[
+                            //           Text(
+                            //             'Upcoming Birthdays',
+                            //             style: TextStyle(
+                            //               fontWeight: FontWeight.w500,
+                            //               color: AppColors.whiteColor,
+                            //               fontSize: 12,
+                            //             ),
+                            //           ),
+                            //           SizedBox(height: 10),
+                            //           for (var birthday in upcomingBirthdays) ...[
+                            //             Row(
+                            //               children: [
+                            //                 CircleAvatar(
+                            //                   radius: 25,
+                            //                   backgroundColor: Colors.white,
+                            //                   child: Icon(
+                            //                     Icons.cake,
+                            //                     color: AppColors.primaryColor,
+                            //                   ),
+                            //                 ),
+                            //                 SizedBox(width: 10),
+                            //                 Expanded(
+                            //                   child: Column(
+                            //                     crossAxisAlignment: CrossAxisAlignment.start,
+                            //                     children: [
+                            //                       Text(
+                            //                         '${birthday['firstName']} ${birthday['lastName']}',
+                            //                         style: TextStyle(
+                            //                           fontWeight: FontWeight.w500,
+                            //                           color: AppColors.whiteColor,
+                            //                           fontSize: 12,
+                            //                         ),
+                            //                       ),
+                            //                       Text(
+                            //                         'DOB: ${birthday['date_of_birth']}',
+                            //                         style: TextStyle(
+                            //                           color: AppColors.whiteColor,
+                            //                           fontSize: 12,
+                            //                         ),
+                            //                       ),
+                            //                     ],
+                            //                   ),
+                            //                 ),
+                            //               ],
+                            //             ),
+                            //             SizedBox(height: 10),
+                            //           ],
+                            //         ],
+                            //         SizedBox(height: 20),
+                            //         Container(
+                            //           decoration: BoxDecoration(
+                            //             color: AppColors.primaryColor2,
+                            //             borderRadius: BorderRadius.circular(6),
+                            //           ),
+                            //           child: Padding(
+                            //             padding: const EdgeInsets.all(8.0),
+                            //             child: Row(
+                            //               mainAxisAlignment: MainAxisAlignment.center,
+                            //               children: [
+                            //                 Text(
+                            //                   'Notify me',
+                            //                   style: TextStyle(
+                            //                     fontWeight: FontWeight.w500,
+                            //                     color: AppColors.whiteColor,
+                            //                     fontSize: 12,
+                            //                   ),
+                            //                 ),
+                            //                 SizedBox(width: 10),
+                            //                 Icon(Icons.notifications_active, color: AppColors.whiteColor),
+                            //               ],
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ],
+                            //   ),
+                            // ),
+
+                            FutureBuilder(
+                              future: getEvents(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(child: Text('Some error occurred!'));
+                                } else if (snapshot.hasData) {
+                                  print('event data:${snapshot.data}');
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            height:100,
+                                            width:250,
+                                            decoration: BoxDecoration(
+                                                color: AppColors.primaryColor2,
+                                                borderRadius: BorderRadius.circular(9)
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                // Text('${snapshot.data['todays']}'),
+                                                Text('Todays Birthdays : ${snapshot.data['todayEvents'][0]['todayBirthday'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
+                                                Text('Todays Anniversarys : ${snapshot.data['todayEvents'][0]['todayAnniversary'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            height:100,
+                                            width:250,
+                                            decoration: BoxDecoration(
+                                                color: AppColors.primaryColor2,
+                                                borderRadius: BorderRadius.circular(9)
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                // Text('${snapshot.data['todays']}'),
+                                                Text('Upcoming Birthdays : ${snapshot.data['UpcomingEvents'][0]['BirthdayNotification'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
+                                                Text('Upcoming Anniversarys : ${snapshot.data['UpcomingEvents'][0]['AnniversaryNotification'].length}',style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold),),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                      ],
+                                    ),
+                                  );
+
+                                }
+                                return Center(child: Text('Some error occurred, Please restart your application!'));
+                              },
+                            ),
+
+
+                            // Positioned(
+                            //   left: MediaQuery.of(context).size.width/3,
+                            //   bottom: MediaQuery.of(context).size.height/7.9,
+                            //   child:
+                            SizedBox(height: 10,),
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                // ElevatedButton(style: ElevatedButton.styleFrom(
+                                //     backgroundColor: AppColors.primaryColor),
+                                //   onPressed: () {
+                                //     Navigator.push(context, MaterialPageRoute(builder: (context) => MyLeaveandexpense(),));
+                                //   }, child: Text('Leave & Expense',style: text50012,),),
+
+                              ],
+                            ),
+                            // ),
                           ],
                         ),
-                        // ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

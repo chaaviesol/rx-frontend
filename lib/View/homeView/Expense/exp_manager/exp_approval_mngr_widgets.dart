@@ -63,7 +63,8 @@ class ExpenseApprovalManagerWidgets {
 
   static Future<void> acceptRejectExpMngr(BuildContext context, int reportID, String? status) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? userID = preferences.getString('uniqueID');
+    String? uniqueID = preferences.getString('uniqueID');
+    String? userID = preferences.getString('userID');
     String url = AppUrl.accept_reject_exp_mngr; // Replace with your actual URL
     Map<String, dynamic> data = {
       "report_id": reportID,
@@ -79,13 +80,13 @@ class ExpenseApprovalManagerWidgets {
         },
         body: jsonEncode(data),
       );
-
+      print('object');
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
         Utils.flushBarErrorMessage('${responseData['message']}', context);
       } else {
         var responseData = jsonDecode(response.body);
-        Utils.flushBarErrorMessage('${responseData['message']}', context);
+        Utils.flushBarErrorMessage2('${responseData['message']}', context);
         throw Exception('Failed to load data (status code: ${response.statusCode})');
       }
     } catch (e) {

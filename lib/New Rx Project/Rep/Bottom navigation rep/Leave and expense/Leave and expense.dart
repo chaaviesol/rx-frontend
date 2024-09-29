@@ -48,20 +48,20 @@ class _MyLeaveandexpenseState extends State<MyLeaveandexpense> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: true,
+      appBar: AppBar(automaticallyImplyLeading: false,
         backgroundColor: AppColors.whiteColor,
-        // leading: IconButton(
-        //   icon: CircleAvatar(
-        //     backgroundColor: Colors.white,
-        //     child: Icon(
-        //       Icons.arrow_back_ios_rounded,
-        //       color: AppColors.primaryColor,
-        //     ),
-        //   ),
-        //   onPressed: () {
-        //     Navigator.pop(context);
-        //   },
-        // ),
+        leading: IconButton(
+          icon: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: Text(
           'Leave and Expense',
           style: text40016black,

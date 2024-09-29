@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/Travel_plan_pages2.dart';
 import 'package:rx_route_new/Util/Utils.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -193,116 +194,121 @@ class DoctorList extends StatelessWidget {
           padding: const EdgeInsets.all(10.0),
           child: Stack(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.textfiedlColor,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Display "name": "Manu"
-                      Text(
-                        'From: ${doctor['repName']}', // Display the rep's name
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+              InkWell(
+                onTap: (){
+                  // Navigator.push(context, MaterialPageRoute(builder: TravelPlanPages2(tpid: tpid, monthandyear: monthandyear, tp_status: tp_status)))
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.textfiedlColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Display "name": "Manu"
+                        Text(
+                          'From: ${doctor['repName']}', // Display the rep's name
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            child: Text(doctor['firstName'][0]),
-                          ),
-                          SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  '${doctor['firstName']} ${doctor['lastName']}',
-                                  style: text60014black),
-                              Text(doctor['specialization'],
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.borderColor,
-                                      fontSize: 12)),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 30),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 12.0),
-                                    child: Text(doctor['approvalStatus'],
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 16)),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      if (showActions)
+                        SizedBox(height: 10),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            InkWell(
-                              onTap: () {
-                                if (doctor['id'] != null) {
-                                  onApproveDoctor(doctor['id'], 'Accepted');
-                                } else {
-                                  print('Doctor ID is null');
-                                }
-                              },
-                              child: Container(
-                                width: 150,
-                                decoration: BoxDecoration(
-                                  color: AppColors.whiteColor,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Center(child: Text('Accept')),
-                                ),
-                              ),
+                            CircleAvatar(
+                              child: Text(doctor['firstName'][0]),
                             ),
-                            InkWell(
-                              onTap: () {
-                                if (doctor['id'] != null) {
-                                  onApproveDoctor(doctor['id'], 'Rejected');
-                                } else {
-                                  print('Doctor ID is null');
-                                }
-                              },
-                              child: Container(
-                                width: 150,
-                                decoration: BoxDecoration(
-                                  color: AppColors.whiteColor,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Center(child: Text('Reject')),
-                                ),
-                              ),
+                            SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    '${doctor['firstName']} ${doctor['lastName']}',
+                                    style: text60014black),
+                                Text(doctor['specialization'],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.borderColor,
+                                        fontSize: 12)),
+                              ],
                             ),
                           ],
                         ),
-                    ],
+                        SizedBox(height: 30),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 12.0),
+                                      child: Text(doctor['approvalStatus'],
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 16)),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        if (showActions)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  if (doctor['id'] != null) {
+                                    onApproveDoctor(doctor['id'], 'Accepted');
+                                  } else {
+                                    print('Doctor ID is null');
+                                  }
+                                },
+                                child: Container(
+                                  width: 150,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.whiteColor,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(child: Text('Accept')),
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  if (doctor['id'] != null) {
+                                    onApproveDoctor(doctor['id'], 'Rejected');
+                                  } else {
+                                    print('Doctor ID is null');
+                                  }
+                                },
+                                child: Container(
+                                  width: 150,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.whiteColor,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(child: Text('Reject')),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
