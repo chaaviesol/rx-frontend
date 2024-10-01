@@ -46,6 +46,30 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
       throw Exception('Failed to load performance data');
     }
   }
+  void _showApprovalDialog(String status) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevents dismissal when tapping outside the dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: status == 'Rejected'?AppColors.primaryColor5:AppColors.primaryColor,
+          title: Text('Approval Required',style: TextStyle(color: AppColors.whiteColor),),
+          content: status == 'Rejected' ? Text('This doctor\'s profile is $status. You cannot proceed further until it is approved.Contact your manager !',style: TextStyle(color: AppColors.whiteColor),):Text('This doctor\'s profile is not approved yet. You cannot proceed further until it is approved.',style: TextStyle(color: AppColors.whiteColor),),
+          actions: [
+            TextButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:AppColors.whiteColor,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('OK',),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -242,40 +266,29 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Basic Information', style: text50014black),
-                        _doctorDetails!['approvalStatus'] == "Accepted"? InkWell(
+                        InkWell(
                           onTap: (){
+                            // Check approval status and show popup if not approved
+                            if (_doctorDetails?['approvalStatus'] != "Accepted") {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                _showApprovalDialog(_doctorDetails?['approvalStatus']);
+                              });
+                            }else{
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(
+                                tpid: widget.tpid,
+                                doctorID: widget.doctorId,products:_doctorDetails!["addressDetail"][0][0]['product'],),));
+                            }
                             // Navigator.pushNamed(context, RoutesName.markasvisited,arguments: doctorDetails);
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(
-                              doctorID: widget.doctorId,products:_doctorDetails!["addressDetail"][0][0]['product'],),));
                           },
                           child: Container(
                             decoration: BoxDecoration(
-                                color: AppColors.primaryColor2,
+                                color: _doctorDetails!['approvalStatus'] == "Accepted"? AppColors.primaryColor2 : AppColors.textfiedlColor,
                                 borderRadius: BorderRadius.circular(50)),
                             child: const Padding(
                               padding: EdgeInsets.only(top: 8.0,bottom: 8.0,left: 10,right: 10),
                               child: Text(
                                 'Mark as Visited',
                                 style: text40012
-                              ),
-                            ),
-                          ),
-                        ):InkWell(
-                          onTap: (){
-
-                            // Navigator.pushNamed(context, RoutesName.markasvisited,arguments: doctorDetails);
-                            // Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAsVisited(
-                            //   doctorID: widget.doctorId,products:_doctorDetails!["addressDetail"][0][0]['product'],),));
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(50)),
-                            child: const Padding(
-                              padding: EdgeInsets.only(top: 8.0,bottom: 8.0,left: 10,right: 10),
-                              child: Text(
-                                  'Mark as Visited',
-                                  style: text40012
                               ),
                             ),
                           ),

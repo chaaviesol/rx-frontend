@@ -52,7 +52,7 @@ dependencies:
   flutter_typeahead:
   local_auth:
   fl_chart:
-  table_calendar:
+  table_calendar: ^3.1.2
   geolocator:
   fluttertoast: ^8.0.9
 

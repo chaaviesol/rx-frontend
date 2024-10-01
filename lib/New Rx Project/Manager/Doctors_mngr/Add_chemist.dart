@@ -276,7 +276,7 @@ class _Adding_chemistmngrState extends State<Adding_chemistmngr> {
 
   Widget _buildButton(String text, Color bgColor, Color textColor, VoidCallback onPressed, {Border? border}) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width / 2.5,
+      width: 150,
       child: InkWell(
         onTap: onPressed,
         child: Defaultbutton(

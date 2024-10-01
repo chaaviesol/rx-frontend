@@ -102,8 +102,8 @@ class _Edit_employee_mngrState extends State<Edit_employee_mngr> {
       "qualification": _qualificationController.text,
       "headquarters":int.parse(selectedHeadquarter!.id.toString()),// Assuming selectedHeadquarters is a list of objects
       "password": _passwordController.text,
-      "role": _designationController.text, // Assuming role is the same as designation
-      "reportingOfficer": int.parse(_selectedReportingOfficer.toString()),
+      "role": 'Rep',
+      "reportingOfficer": _selectedReportingOfficer,
       "reportingType": "Online", // Assuming this is static
       "createdBy": int.parse(myid.toString()),
       "adminid": 1, // Assuming this is static, or replace with a dynamic value
@@ -124,10 +124,10 @@ class _Edit_employee_mngrState extends State<Edit_employee_mngr> {
         Utils.flushBarErrorMessage('Employee added successfully!', context);
       } else {
         var responseData = jsonDecode(response.body);
-        Utils.flushBarErrorMessage('${responseData['message']}', context);
+        Utils.flushBarErrorMessage2('${responseData['message']}', context);
       }
     } catch (e) {
-      Utils.flushBarErrorMessage('Failed to load data: $e', context);
+      Utils.flushBarErrorMessage2('Failed to load data: $e', context);
     }
   }
 
@@ -219,7 +219,7 @@ class _Edit_employee_mngrState extends State<Edit_employee_mngr> {
             child: ListView(
               children: [
                 Text('Basic information',style: text40014bordercolor,),
-                Text('fill required fields and Get started',style: text40012bordercolor,),
+                Text('Fill required fields and Get started',style: text40012bordercolor,),
                 SizedBox(height: 10,),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -514,6 +514,7 @@ class _Edit_employee_mngrState extends State<Edit_employee_mngr> {
                               onChanged: (value) {
                                 setState(() {
                                   selectedHeadquarter = value;
+                                  print('headqrt:$selectedHeadquarter');
                                 });
                               },
                             ),

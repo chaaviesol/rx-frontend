@@ -154,51 +154,7 @@ class _ManualtpState extends State<Manualtp> {
       ),
       body: Column(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Wrap(
-                  spacing: 8.0,
-                  runSpacing: 4.0,
-                  children: selectedItems.map((item) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedDistrict = item; // Set the selected district
-                        });
-                      },
-                      child: Chip(
-                        label: Text(item),
-                        onDeleted: () {
-                          setState(() {
-                            selectedItems.remove(item);
-                            if (selectedDistrict == item) {
-                              selectedDistrict = null;
-                            }
-                          });
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              // if (selectedDistrict != null)
-              //   Container(
-              //     padding: const EdgeInsets.all(8.0),
-              //     decoration: BoxDecoration(
-              //       color: Colors.blueAccent,
-              //       borderRadius: BorderRadius.circular(8.0),
-              //     ),
-              //     child: Text(
-              //       'Selected District: $selectedDistrict',
-              //       style: TextStyle(color: Colors.white),
-              //     ),
-              //   ),
-            ],
-          ),
+
           iscalenderVisible ? TableCalendar
             (
             focusedDay: _focusedDay,
@@ -312,6 +268,51 @@ class _ManualtpState extends State<Manualtp> {
                   ),
                 ),
               ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: selectedItems.map((item) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedDistrict = item; // Set the selected district
+                        });
+                      },
+                      child: Chip(
+                        label: Text(item),
+                        onDeleted: () {
+                          setState(() {
+                            selectedItems.remove(item);
+                            if (selectedDistrict == item) {
+                              selectedDistrict = null;
+                            }
+                          });
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              SizedBox(height: 16.0),
+              // if (selectedDistrict != null)
+              //   Container(
+              //     padding: const EdgeInsets.all(8.0),
+              //     decoration: BoxDecoration(
+              //       color: Colors.blueAccent,
+              //       borderRadius: BorderRadius.circular(8.0),
+              //     ),
+              //     child: Text(
+              //       'Selected District: $selectedDistrict',
+              //       style: TextStyle(color: Colors.white),
+              //     ),
+              //   ),
             ],
           ),
           Expanded(
@@ -445,7 +446,12 @@ class _ManualtpState extends State<Manualtp> {
                                             Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Text('${secondDoctor.firstName} ${secondDoctor.lastName}'),
+                                                Text(
+                                                  '${secondDoctor.firstName} ${secondDoctor.lastName}',
+                                                  maxLines: null, // Allows for unlimited lines
+                                                  overflow: TextOverflow.visible, // Ensures that overflowing text is visible
+                                                  softWrap: true, // Enables soft wrapping of text
+                                                ),
                                                 // Text('Visit Type: ${secondDoctor.visitType}'),
                                               ],
                                             )

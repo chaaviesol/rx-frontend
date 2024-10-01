@@ -229,22 +229,26 @@
 //     );
 //   }
 // }
+import 'dart:convert';
 
-import 'dart:convert'; // For decoding JSON response
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; // For API requests
-import 'package:intl/intl.dart';
-import 'package:rx_route_new/res/app_url.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:http/http.dart' as http;
 
 import '../../../../../app_colors.dart';
-import '../../My lists/Doctor_details/doctor_detials.dart';
-//view TP
+import '../../../../../res/app_url.dart';
+
+
 class TravelPlanPages2 extends StatefulWidget {
-  int tpid;
-  String monthandyear;
-  String tp_status;
-  TravelPlanPages2({required this.tpid,required this.monthandyear,required this.tp_status,Key? key}) : super(key: key);
+  final int tpid;
+  final String monthandyear;
+  final String tp_status;
+
+  TravelPlanPages2({
+    required this.tpid,
+    required this.monthandyear,
+    required this.tp_status,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<TravelPlanPages2> createState() => _TravelPlanPages2State();
@@ -252,10 +256,11 @@ class TravelPlanPages2 extends StatefulWidget {
 
 class _TravelPlanPages2State extends State<TravelPlanPages2> {
   Map<DateTime, List<Map<String, dynamic>>> events = {};
-  DateTime? selectedDate;
-  List<Map<String, dynamic>> selectedDoctors = [];
   bool isLoading = true;
-  bool isVisibleCalendar = true;
+  String selectedSubHeadquarter = "";
+  List<String> subHeadquarters = [];
+  DateTime? selectedDate;
+  List<Map<String, dynamic>> doctorsForSelectedDate = []; // Initialize as an empty list
 
   @override
   void initState() {
@@ -263,12 +268,10 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
     _fetchTravelPlanData();
   }
 
-
   Future<void> _fetchTravelPlanData() async {
-    final String apiUrl = AppUrl.getCreatedTP;
+    final String apiUrl = AppUrl.getCreatedTP; // Replace with your API URL
     final Map<String, dynamic> body = {
-      // "travelPlanId": int.parse(widget.tpid.toString()),
-      "travelPlanId":widget.tpid,
+      "travelPlanId": widget.tpid,
     };
 
     try {
@@ -279,40 +282,34 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
         },
         body: json.encode(body),
       );
-      print('passed body:${body}');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+
         if (data['success'] == true) {
           Map<DateTime, List<Map<String, dynamic>>> fetchedEvents = {};
 
           for (var item in data['data']) {
-            // Manually parse the date in DD-MM-YYYY format
             String dateString = item['date'];
             List<String> parts = dateString.split('-');
             int day = int.parse(parts[0]);
             int month = int.parse(parts[1]);
             int year = int.parse(parts[2]);
 
-            // Create a DateTime object with the parsed day, month, and year
             DateTime date = DateTime(year, month, day);
+            List<Map<String, dynamic>> doctors = List<Map<String, dynamic>>.from(item['drDetails']);
 
-            // Extract doctor details
-            List<Map<String, dynamic>> doctors =
-            List<Map<String, dynamic>>.from(item['drDetails']);
-
-            // Add the doctors to the corresponding date
-            if (fetchedEvents[date] != null) {
-              fetchedEvents[date]!.addAll(doctors);
+            // Add the doctors to the correct date
+            if (fetchedEvents.containsKey(date)) {
+              fetchedEvents[date]!.addAll(doctors); // Append doctors if date already exists
             } else {
-              fetchedEvents[date] = doctors;
+              fetchedEvents[date] = doctors; // Create a new entry if date does not exist
             }
           }
 
           setState(() {
             events = fetchedEvents;
+            _updateSubHeadquarters(); // Update sub-headquarters on load
             isLoading = false;
           });
         } else {
@@ -335,6 +332,39 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
     }
   }
 
+  void _updateSubHeadquarters() {
+    final List<String> uniqueSubHeadquarters = [];
+    if (selectedDate != null && events.containsKey(selectedDate)) {
+      events[selectedDate]!.forEach((doctor) {
+        final subHeadquarter = doctor['addresses'][0]['address']['subHeadQuarter'];
+        if (!uniqueSubHeadquarters.contains(subHeadquarter)) {
+          uniqueSubHeadquarters.add(subHeadquarter);
+        }
+      });
+    }
+
+    setState(() {
+      subHeadquarters = uniqueSubHeadquarters;
+      selectedSubHeadquarter = ''; // Reset selected chip when day changes
+    });
+  }
+
+  void _onChipSelected(String subHeadquarter) {
+    setState(() {
+      selectedSubHeadquarter = subHeadquarter; // Update the selected sub-headquarter
+
+      // Filter doctors based on selected sub-headquarter
+      if (selectedDate != null && events.containsKey(selectedDate)) {
+        doctorsForSelectedDate = events[selectedDate]!.where((doctor) {
+          return doctor['addresses'][0]['address']['subHeadQuarter'] == selectedSubHeadquarter;
+        }).toList();
+      } else {
+        doctorsForSelectedDate = []; // Reset if no date is selected
+      }
+    });
+  }
+
+
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -356,191 +386,177 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('View Travel Plan'),
+      appBar: AppBar(
+        title: const Text('View TP'),
+        leading: IconButton(
+          icon: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: [
-         widget.tp_status=="Submitted" || widget.tp_status == 'Approved'?Text(''): ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryColor),
-              onPressed: (){}, child: Text('Save',style: TextStyle(color: Colors.white),)),
-          SizedBox(width: 10,),
+          if (widget.tp_status != "Submitted" && widget.tp_status != 'Approved')
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryColor),
+              onPressed: () {},
+              child: const Text('Save', style: TextStyle(color: Colors.white)),
+            ),
+          const SizedBox(width: 10),
+          if (widget.tp_status != "Submitted" && widget.tp_status != 'Approved')
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryColor),
+              onPressed: () {},
+              child: const Text('Edit', style: TextStyle(color: Colors.white)),
+            ),
         ],
       ),
-      body: Container(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator()) // Show loading spinner while fetching data
-            : Column(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+        child: Column(
           children: [
-          isVisibleCalendar
-              ? TableCalendar(
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2030, 12, 31),
-
-            // Parse the `monthandyear` into a DateTime
-            focusedDay: selectedDate ?? DateFormat('MMMM yyyy').parse(widget.monthandyear), // Open the month and year from `widget.monthandyear`
-
-            selectedDayPredicate: (day) {
-              return isSameDay(selectedDate, day);
-            },
-
-            eventLoader: (day) {
-              return events[day] ?? [];
-            },
-
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
-                selectedDoctors = events[selectedDate] ?? [];
-              });
-            },
-
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, focusedDay) {
-                print('aaaa:${events}');
-                print('cccc:${day}');
-                print('bbbb:${events[day]}');
-                bool hasDoctor = events.containsKey(day) && events[day]!.isNotEmpty;
-                bool isSunday = day.weekday == DateTime.sunday;
-
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Text(
-                      '${day.day}',
-                      style: TextStyle(
-                        color: isSunday ? Colors.red : (hasDoctor ? Colors.green : Colors.black), // Text color: red for Sundays, green for events, black otherwise
-                        fontWeight: hasDoctor ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                    if (hasDoctor) // Show dot if there is a doctor
-                      Positioned(
-                        bottom: 4,
-                        child: Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: Colors.green, // Dot color for events
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
-
-            headerStyle: HeaderStyle(
-              formatButtonVisible: false, // Hides the "2 weeks" format button
-              titleCentered: true, // Centers the month title
-              formatButtonShowsNext: false,
-            ),
-          )
-              : Container(),
-            const SizedBox(height: 16),
-            InkWell(
-              onTap: (){
-                setState(() {
-                  isVisibleCalendar = !isVisibleCalendar;
-                });
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('${DateFormat('dd-MM-yyyy').format(selectedDate ?? DateTime.now())}', style: TextStyle(color: AppColors.whiteColor,fontWeight: FontWeight.bold)),
-                      isVisibleCalendar?Icon(Icons.arrow_drop_up,color: AppColors.whiteColor,):Icon(Icons.arrow_drop_down,color: AppColors.whiteColor,)
-                    ],
-                  ),
+            // Add table header with month and year
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0), // Add padding for better spacing
+              child: Text(
+                widget.monthandyear, // Use monthandyear property
+                style: const TextStyle(
+                  fontSize: 24, // Size of the text
+                  fontWeight: FontWeight.bold, // Make it bold
                 ),
               ),
             ),
-            if (selectedDoctors.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: selectedDoctors.length,
-                  itemBuilder: (context, index) {
-                    final doctor = selectedDoctors[index];
-                    return Column(
-                      children: [
-                        InkWell(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => DoctorDetailsPage(tpid: widget.tpid,doctorId: doctor['id']),));
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  // color: Colors.white,border: Border.all(color: Colors.orange),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color:doctor['visit_type'] == 'core'
-                                          ? AppColors.tilecolor2
-                                          : doctor['visit_type'] == 'supercore'
-                                          ? AppColors.tilecolor1
-                                          : AppColors.tilecolor3,
-                                      border: Border.all(color: Colors.white),),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 6,
+                  childAspectRatio: 1.0,
+                ),
+                itemCount: _getDaysInMonth(DateTime.now().month, DateTime.now().year),
+                itemBuilder: (context, index) {
+                  final DateTime date = DateTime(DateTime.now().year, DateTime.now().month, index + 1);
+                  final doctors = events[date] ?? [];
 
-                                  ),
-                                  Expanded(
-                                    child: Center(
-                                      child: Stack(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(9),
-                                              border: Border.all(
-                                                width: 1,
-                                                color: doctor['visit_type'] == 'core'
-                                                    ? AppColors.tilecolor2
-                                                    : doctor['visit_type'] == 'supercore'
-                                                    ? AppColors.tilecolor1
-                                                    : AppColors.tilecolor3,
-                                              ),
-                                            ),
-                                            child: ListTile(
-                                              leading: CircleAvatar(
-                                                backgroundColor: doctor['visit_type'] == 'core'
-                                                    ? AppColors.tilecolor2
-                                                    : doctor['visit_type'] == 'supercore'
-                                                    ? AppColors.tilecolor1
-                                                    : AppColors.tilecolor3,
-                                                child: Text(doctor['firstName'][3]),
-                                              ),
-                                              title: Text('${doctor['firstName']} ${doctor['lastName']}'),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedDate = date;
+                        doctorsForSelectedDate = List<Map<String, dynamic>>.from(doctors);
+                        _updateSubHeadquarters();
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        color: doctors.isNotEmpty ? AppColors.primaryColor : AppColors.textfiedlColor,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: doctors.isNotEmpty ? AppColors.primaryColor2 : Colors.grey, width: 1.5),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${date.day}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: doctors.isNotEmpty ? Colors.white : Colors.black,
                             ),
                           ),
-                        ),
-
-                      ],
-                    );
-                  },
-                ),
-              )
-            else
-              const Expanded(
-                child: Center(
-                  child: Text('No doctors available for the selected date'),
+                          if (doctors.isNotEmpty)
+                            Text(
+                              '${doctors.length} ${doctors.length > 1 ? 'Doctors' : 'Doctor'}',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: doctors.isNotEmpty ? Colors.white : Colors.black,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            if (doctorsForSelectedDate.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              InkWell(
+                onTap: (){},
+                child: Text(
+                  'Doctors for ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}:',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8.0,
+                children: subHeadquarters.map((subHQ) {
+                  final count = doctorsForSelectedDate.where((doctor) {
+                    return doctor['addresses'][0]['address']['subHeadQuarter'] == subHQ;
+                  }).length;
+
+                  return ChoiceChip(
+                    selectedColor: selectedSubHeadquarter == subHQ ? AppColors.primaryColor:AppColors.textfiedlColor,
+                    backgroundColor: selectedSubHeadquarter == subHQ ? AppColors.primaryColor : AppColors.textfiedlColor,
+                    label: Text('$subHQ ($count)',style: TextStyle(
+                      color: selectedSubHeadquarter == subHQ ? AppColors.whiteColor : AppColors.primaryColor
+                    ),),
+                    selected: selectedSubHeadquarter == subHQ,
+                    onSelected: (isSelected) {
+                      _onChipSelected(isSelected ? subHQ : '');
+                    },
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 10),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: doctorsForSelectedDate.length,
+                itemBuilder: (context, index) {
+                  final doctor = doctorsForSelectedDate[index];
+                  final address = doctor['addresses'][0]['address'];
+                  final schedule = address['schedule'] as List;
+
+                  return ExpansionTile(
+                    leading: CircleAvatar(
+                      backgroundColor: doctor['visit_type'] == 'core'
+                          ? AppColors.tilecolor2
+                          : doctor['visit_type'] == 'supercore'
+                          ? AppColors.tilecolor1
+                          : AppColors.tilecolor3,
+                      child: Text('${doctor['firstName'][0]}'), // Updated to show first character
+                    ),
+                    title: Text('${doctor['firstName']} ${doctor['lastName']}'),
+                    children: [
+                      ListTile(
+                        title: Text('Address: ${address['address']}'),
+                        subtitle: Text('Scheduled Times:\n' +
+                            schedule.map((s) => '${s['day']}: ${s['start_time']} - ${s['end_time']}').join('\n')),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+
+
+  int _getDaysInMonth(int month, int year) {
+    return DateTime(year, month + 1, 0).day;
   }
 }

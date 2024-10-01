@@ -246,20 +246,17 @@ class _EditRepState extends State<EditRep> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-              decoration: BoxDecoration(
+        leading: IconButton(
+          icon: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
                 color: AppColors.primaryColor,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Icon(Icons.arrow_back, color: AppColors.whiteColor),
-            ),
-          ),
+              )), // Replace with your desired icon
+          onPressed: () {
+            // Handle the button press
+            Navigator.pop(context);
+          },
         ),
         actions: [
           Padding(
@@ -277,7 +274,7 @@ class _EditRepState extends State<EditRep> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           SizedBox(
-            width: MediaQuery.of(context).size.width / 3,
+            width: 150,
             child: InkWell(
               onTap: () {
                 // if (_formKey.currentState!.validate()) {
@@ -296,7 +293,7 @@ class _EditRepState extends State<EditRep> {
           ),
 
           SizedBox(
-            width: MediaQuery.of(context).size.width / 3,
+            width: 150,
             child: InkWell(
               onTap: () {
                 Navigator.pop(context);

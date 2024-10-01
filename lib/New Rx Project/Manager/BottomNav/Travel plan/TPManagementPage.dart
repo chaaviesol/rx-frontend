@@ -28,13 +28,15 @@ class _TPManagementPageState extends State<TPManagementPage>
 
   Future<void> _fetchData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    int? uniqueID = int.parse(preferences.getString('userID').toString());
+    int? userID = int.parse(preferences.getString('userID').toString());
 
     final response = await http.post(
       Uri.parse(AppUrl.getUserAddedTP),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': uniqueID}),
+      body: jsonEncode({'reportingOfficer_id': userID}),
     );
+    print('id is :$userID');
+    print('response data is :${response.body}');
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
@@ -55,14 +57,14 @@ class _TPManagementPageState extends State<TPManagementPage>
     }
   }
 
-  Future<void> _acceptTP(int id) async {
+  Future<void> _acceptTP(int id,int tpuserid) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    int? userID = int.parse(preferences.getString('userID').toString());
     final response = await http.post(
       Uri.parse(AppUrl.approveUserAddedTP),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'travelPlanId': id, 'userId': userID}),
+      body: jsonEncode({'travelPlanId': id, 'userId': tpuserid}),
     );
+    print('sssssss:${{'travelPlanId': id, 'userId': tpuserid}}');
     print('approval data :${response.body}');
     if (response.statusCode == 200) {
       Fluttertoast.showToast(msg: 'Travel plan successfully approved');
@@ -175,14 +177,32 @@ class _TPManagementPageState extends State<TPManagementPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'TP ID: ${item['id']}',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 15,
+                        child: Text("${user['name'][0]}"),
+                      ),
+                      SizedBox(width: 10,),
+                      Text(
+                        '${user['name']}',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  Text(
-                    'User: ${user['name']}',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
+
+                  // Text(
+                  //   'TP ID: ${item['id']}',
+                  //   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  // ),
+                  // Text(
+                  //   'User: ${user["id"]}',
+                  //   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  // ),
+                  // Text(
+                  //   'User: ${user['name']}',
+                  //   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  // ),
                   SizedBox(height: 8),
                   Text(
                     'Month: ${getMonthName(item['month'])}',  // Use month name instead of number
@@ -200,7 +220,7 @@ class _TPManagementPageState extends State<TPManagementPage>
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            _acceptTP(item['id']);
+                            _acceptTP(item['id'],user['id']);
                           },
                           child: Text('Accept', style: TextStyle(color: AppColors.whiteColor)),
                           style: ElevatedButton.styleFrom(
@@ -213,7 +233,7 @@ class _TPManagementPageState extends State<TPManagementPage>
                         SizedBox(width: 10),
                         ElevatedButton(
                           onPressed: () {
-                            _rejectTP(item['id']);
+                            _rejectTP(user['id']);
                           },
                           child: Text('Reject', style: TextStyle(color: AppColors.whiteColor)),
                           style: ElevatedButton.styleFrom(

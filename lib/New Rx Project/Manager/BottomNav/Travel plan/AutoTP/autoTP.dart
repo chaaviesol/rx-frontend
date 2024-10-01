@@ -357,7 +357,6 @@ class _AutotpState extends State<Autotp> {
           child: Container(
             child: Column(
               children: [
-                Text('${widget.data}'),
                 // Calendar view
                 !isCalendarVisible
                     ? TableCalendar(

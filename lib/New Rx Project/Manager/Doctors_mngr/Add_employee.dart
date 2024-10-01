@@ -103,15 +103,16 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
       "nationality": _nationalityController.text,
       "mobile": _mobileController.text,
       "email": _emailController.text,
-      "designation": _designationController.text,
+      // "designation": _designationController.text,
+      "designation": "Rep",
       "qualification": _qualificationController.text,
-      "headquarters": int.parse(selectedHeadquarter!.id.toString()), // Assuming selectedHeadquarters is a list of objects
+      "headquaters": selectedHeadquarter!.id, // Assuming selectedHeadquarters is a list of objects
       "password": _passwordController.text,
-      "role": _designationController.text, // Assuming role is the same as designation
+      "role": 'Rep', // Assuming role is the same as designation
       "reportingOfficer": int.parse(_selectedReportingOfficer.toString()),
       "reportingType": "Online", // Assuming this is static
       "createdBy": int.parse(myid.toString()),
-      "reportingType": selectedReportingType,
+      // "reportingType": selectedReportingType,
       "adminid": 0001, // Assuming this is static, or replace with a dynamic value
     };
 
@@ -521,40 +522,40 @@ class _Adding_employee_mngrState extends State<Adding_employee_mngr> {
                         SizedBox(
                           width: 10,
                         ),
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Designation',
-                                style: text50012black,
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.textfiedlColor,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: CustomDropdown(
-                                  options: ['REP', 'MANAGER'],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (value == 'REP') {
-                                        _designationController.text = "Rep";
-                                      } else if (value == 'MANAGER') {
-                                        _designationController.text = "Manager";
-                                      }
-                                    });
-                                  },
-                                ),
-                              )
-
-                            ],
-                          ),
-                        )
+                        // Expanded(
+                        //   flex: 3,
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       Text(
+                        //         'Designation',
+                        //         style: text50012black,
+                        //       ),
+                        //       SizedBox(
+                        //         height: 10,
+                        //       ),
+                        //       Container(
+                        //         decoration: BoxDecoration(
+                        //           color: AppColors.textfiedlColor,
+                        //           borderRadius: BorderRadius.circular(6),
+                        //         ),
+                        //         child: CustomDropdown(
+                        //           options: ['REP', 'MANAGER'],
+                        //           onChanged: (value) {
+                        //             setState(() {
+                        //               if (value == 'REP') {
+                        //                 _designationController.text = "Rep";
+                        //               } else if (value == 'MANAGER') {
+                        //                 _designationController.text = "Manager";
+                        //               }
+                        //             });
+                        //           },
+                        //         ),
+                        //       )
+                        //
+                        //     ],
+                        //   ),
+                        // )
                       ],
                     ),
                   ],

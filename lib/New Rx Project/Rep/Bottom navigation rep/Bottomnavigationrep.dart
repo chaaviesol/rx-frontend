@@ -79,11 +79,18 @@ class _BottomNavigationRepState extends State<BottomNavigationRep>
             children: pages,
           ),
           if (_showButtons)
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Blur effect
-                child: Container(
-                  color: Colors.black.withOpacity(0.3), // Semi-transparent overlay
+            InkWell(
+              onTap: (){
+                setState(() {
+                  _showButtons = false;
+                });
+              },
+              child: Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Blur effect
+                  child: Container(
+                    color: Colors.black.withOpacity(0.3), // Semi-transparent overlay
+                  ),
                 ),
               ),
             ),

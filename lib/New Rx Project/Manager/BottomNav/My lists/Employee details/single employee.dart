@@ -126,13 +126,13 @@ class _EmployeeDetailsPageState extends State<EmployeeDetailsPage>
         backgroundColor: AppColors.whiteColor,
         leading: IconButton(
           icon: CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back_ios_rounded,
-              color: AppColors.primaryColor,
-            ),
-          ),
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                color: AppColors.primaryColor,
+              )), // Replace with your desired icon
           onPressed: () {
+            // Handle the button press
             Navigator.pop(context);
           },
         ),

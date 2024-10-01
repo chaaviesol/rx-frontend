@@ -78,6 +78,7 @@ class AppUrl{
   static var accept_reject_exp_mngr = '$baseUrl/manager/change_reportStatus';
 
   static var mark_as_visited = '$baseUrl/rep/markAsVisited';
+  static var mark_as_visitedWithTP = '$baseUrl/rep/markAsVisitedForTp';
 
   static var edit_doctor = '$baseUrl/manager/editDoctor';
 
@@ -141,5 +142,8 @@ class AppUrl{
  static var getallVisitData = '$baseUrl/user/visitedCount';
 
  static var userPerformance = '$baseUrl/user/userPerformance';
+
+ //listdoctorsforcalendar
+static var listDoctors = '$baseUrl/user/listDoctors';
 
 }

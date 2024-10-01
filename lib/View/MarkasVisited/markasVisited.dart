@@ -15,7 +15,7 @@ class MarkAsVisited extends StatefulWidget {
   int doctorID;
   List<dynamic> products;
   int? tpid;
-  MarkAsVisited({required this.doctorID,required this.products,this.tpid,Key? key}) : super(key: key);
+  MarkAsVisited({required this.doctorID,required this.products,required this.tpid,Key? key}) : super(key: key);
 
   @override
   State<MarkAsVisited> createState() => _MarkAsVisitedState();
@@ -122,6 +122,46 @@ class _MarkAsVisitedState extends State<MarkAsVisited> {
 
   }
 
+  Future<dynamic>markasvisitedWithTP()async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+    String? userID = preferences.getString('userID');
+    String url = AppUrl.mark_as_visited;
+    Map<String,dynamic> data = {
+      "reporterUniqueId":uniqueID,
+      "reporterId":int.parse(userID.toString()),
+      // "date":_selectedDate?.toIso8601String(),
+      // "time":_selectedTime != null ? _selectedTime!.format(context):null,
+      "products":widget.products,
+      "remark":_remark.text,
+      "doctorId":widget.doctorID,
+      "travelid":widget.tpid
+    };
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+      print('body:${(data)}');
+      print('st code :${response.statusCode}');
+      print('body :${response.body}');
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        Navigator.pushNamedAndRemoveUntil(context, RoutesName.successsplash, (route) => false,);
+        Utils.flushBarErrorMessage('${responseData['message']}', context);
+      } else {
+        var responseData = jsonDecode(response.body);
+        Utils.flushBarErrorMessage2('${responseData}', context);
+      }
+    } catch (e) {
+      throw Exception('Failed to load data: $e');
+    }
+
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -139,6 +179,9 @@ class _MarkAsVisitedState extends State<MarkAsVisited> {
           'Mark as visited',
           style: TextStyle(),
         ),
+        actions: [
+         widget.tpid!=null? Text('In TP :${widget.tpid}'):Text('')
+        ],
         centerTitle: true,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -307,7 +350,7 @@ class _MarkAsVisitedState extends State<MarkAsVisited> {
                           ),
                           ElevatedButton(
                               onPressed: () {
-                                markasvisited();
+                                widget.tpid!=null?markasvisitedWithTP():markasvisited();
                                 // if (_myformKey.currentState!.validate()) {
                                 // Map data = {
                                 //   "staff_id": Utils.empId,
