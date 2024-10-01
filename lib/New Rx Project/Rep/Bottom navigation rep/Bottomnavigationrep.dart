@@ -1,11 +1,7 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui'; // Import for blur effect
 
-import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My_Reports.dart';
-import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20Approvals/My_approvels.dart';
-import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/My%20lists/My_list.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Doctors_mngr/Add%20Doctor.dart';
 import 'package:rx_route_new/app_colors.dart';
 
@@ -36,7 +32,6 @@ class _BottomNavigationRepState extends State<BottomNavigationRep>
     MyLeaveandexpense(),
     Mngr_T_P(),
   ];
-
 
   @override
   void initState() {
@@ -80,16 +75,20 @@ class _BottomNavigationRepState extends State<BottomNavigationRep>
           ),
           if (_showButtons)
             GestureDetector(
-              onTap: (){
+              onTap: () {
                 setState(() {
-                  _showButtons = !_showButtons;
+                  _showButtons = false;  // Hide buttons and blur when tapping outside
                 });
               },
-              child: Positioned.fill(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Blur effect
-                  child: Container(
-                    color: Colors.black.withOpacity(0.3), // Semi-transparent overlay
+              child: AbsorbPointer(
+                absorbing: true, // Ensures that clicks go through this widget to close blur
+                child: Container(
+                  color: Colors.transparent, // Transparent area for taps
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.3),
+                    ),
                   ),
                 ),
               ),
@@ -104,7 +103,7 @@ class _BottomNavigationRepState extends State<BottomNavigationRep>
                   _buildActionButton('Add Doctor', Add_doctor_mngr()),
                   SizedBox(height: 10),
                   _buildActionButton('Add Chemist', Adding_chemistmngr()),
-                  SizedBox(height: 80,),
+                  SizedBox(height: 80),
                 ],
               ),
             ),
@@ -221,9 +220,6 @@ class _BottomNavigationRepState extends State<BottomNavigationRep>
               Expanded(child: buildNavItem(
                   iconWidget: Image.asset('assets/icons/myapprovals.png', height: 24, width: 24),
                   index: 2, title: "Leave & Expense")),
-              // Expanded(child: buildNavItem(
-              //     iconWidget: Image.asset('assets/icons/myreports.png', height: 24, width: 24),
-              //     index: 3, title: "Reports")),
               Expanded(child: buildNavItem(
                   iconWidget: Image.asset('assets/icons/mytp.png', height: 24, width: 24),
                   index: 4, title: "TP")),
@@ -250,10 +246,11 @@ class _BottomNavigationRepState extends State<BottomNavigationRep>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            iconWidget ??
-                Icon(iconData,
-                    size: 24,
-                    color: isSelected ? Colors.white : Colors.white70),
+            iconWidget ?? Icon(
+                iconData,
+                size: 24,
+                color: isSelected ? Colors.white : Colors.white70
+            ),
             Text(
               title,
               style: TextStyle(
