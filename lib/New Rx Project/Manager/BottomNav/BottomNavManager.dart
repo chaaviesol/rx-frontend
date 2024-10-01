@@ -84,7 +84,7 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
             GestureDetector(
               onTap: (){
                 setState(() {
-                  _showButtons = false;
+                  _showButtons = !_showButtons;
                 });
               },
               child: Positioned.fill(

@@ -79,10 +79,10 @@ class _BottomNavigationRepState extends State<BottomNavigationRep>
             children: pages,
           ),
           if (_showButtons)
-            InkWell(
+            GestureDetector(
               onTap: (){
                 setState(() {
-                  _showButtons = false;
+                  _showButtons = !_showButtons;
                 });
               },
               child: Positioned.fill(

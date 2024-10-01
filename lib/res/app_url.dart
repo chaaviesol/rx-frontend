@@ -144,6 +144,7 @@ class AppUrl{
  static var userPerformance = '$baseUrl/user/userPerformance';
 
  //listdoctorsforcalendar
-static var listDoctors = '$baseUrl/user/listDoctors';
+
+  static var listDoctors = '$baseUrl/user/listDoctors';
 
 }
