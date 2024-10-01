@@ -44,7 +44,6 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
   void initState() {
     super.initState();
     _pageController = PageController();
-    _showButtons = false;
   }
 
   @override
@@ -80,18 +79,23 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
             onPageChanged: _onPageChanged,
             children: pages,
           ),
+          // Blur overlay and dismiss when tapping outside buttons
           if (_showButtons)
             GestureDetector(
-              onTap: (){
+              onTap: () {
                 setState(() {
-                  _showButtons = !_showButtons;
+                  _showButtons = false;  // Hide buttons and blur when tapping outside
                 });
               },
-              child: Positioned.fill(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Blur effect
-                  child: Container(
-                    color: Colors.black.withOpacity(0.3), // Semi-transparent overlay
+              child: AbsorbPointer(
+                absorbing: true,
+                child: Container(
+                  color: Colors.transparent, // Transparent area for taps
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.3),
+                    ),
                   ),
                 ),
               ),
@@ -110,7 +114,7 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
                   _buildActionButton('Add Employee', Adding_employee_mngr()),
                   SizedBox(height: 10),
                   _buildActionButton('Leave & Expense', MyLeaveandexpense()),
-                  SizedBox(height: 80,),
+                  SizedBox(height: 80),
                 ],
               ),
             ),
@@ -126,7 +130,7 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
                 child: Icon(Icons.add, color: Colors.white),
               ),
             ),
-          if(currentIndex == 0)
+          if (currentIndex == 0)
             Positioned(
               bottom: MediaQuery.of(context).padding.bottom + 56 + 30,
               left: 20,
@@ -134,7 +138,7 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
                 backgroundColor: AppColors.primaryColor,
                 shape: CircleBorder(),
                 onPressed: () {
-                  _showConfirmationDialog(context);  // Call the method to show the alert box
+                  _showConfirmationDialog(context);
                 },
                 child: Icon(Icons.add_chart_rounded, color: AppColors.whiteColor),
               ),
@@ -143,6 +147,7 @@ class _BottomNavigationMngrState extends State<BottomNavigationMngr>
       ),
     );
   }
+
 
   void _showConfirmationDialog(BuildContext context) {
     showDialog(
