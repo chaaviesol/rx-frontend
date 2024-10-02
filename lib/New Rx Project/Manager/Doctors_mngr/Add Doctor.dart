@@ -156,6 +156,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
   }
 
   List<Map<String, dynamic>> _headquartersData = [];
+  List<Map<String,dynamic>> _subHeadquartersData = [];
   Map<String, List<String>> _headquartersMap = {};
   int? _selectedHeadquarters;
   bool _isLoading = false;
@@ -324,16 +325,13 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
 
         if (data['success']) {
           setState(() {
-            // Map each headquarter's name and id along with sub-headquarters
+            // Map each headquarter's name and id
             _headquartersData = List<Map<String, dynamic>>.from(data['data']);
 
-            // Create map to store sub-headquarters
+            // Create map to store headquarters (without sub-headquarters for now)
             _headquartersMap = {
               for (var item in _headquartersData)
-                item['headquarter_name'].trim(): (item['sub_headquarter'] as String)
-                    .split('\n')
-                    .where((sub) => sub.isNotEmpty)
-                    .toList(),
+                item['headquarter_name'].trim(): [] // Empty list as there's no sub-headquarter in response
             };
 
             _isLoading = false; // Stop loader after data is loaded
@@ -357,6 +355,41 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
       print('Error: $e');
     }
   }
+
+  Future<void> _fetchSubHeadquarters(int headquarterId) async {
+    try {
+      // Prepare the request body
+      final body = json.encode({
+        'headquarterId': headquarterId,
+      });
+
+      final response = await http.post(
+        Uri.parse(AppUrl.list_subqrts),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['success']) {
+          setState(() {
+            // Parse the sub-headquarters list from the response
+            _subHeadquartersData = List<Map<String, dynamic>>.from(data['data']);
+          });
+        } else {
+          throw Exception('Failed to load sub-headquarters');
+        }
+      } else {
+        throw Exception('Failed to load sub-headquarters');
+      }
+    } catch (e) {
+      print('Error fetching sub-headquarters: $e');
+    }
+  }
+
 
 
 
@@ -715,6 +748,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                   SizedBox(
                     height: 10,
                   ),
+                  //visittype
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -951,6 +985,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                   SizedBox(
                     height: 10,
                   ),
+                  //products
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -965,6 +1000,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                     ],
                   ),
                   SizedBox(height: 10,),
+                  //chemist
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -974,6 +1010,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                     ],
                   ),
                   SizedBox(height: 10),
+                  //headquarters
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -985,7 +1022,6 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                         height: 10,
                       ),
 
-
                       _isLoading
                           ? Center(child: CircularProgressIndicator())
                           : Container(
@@ -996,20 +1032,20 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                         child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 16.0),
-                              child: DropdownButton<int>( // Change to int to hold ID
+                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                              child: DropdownButton<int>(
                                 hint: Text("Select Headquarters"),
-                                value: _selectedHeadquarters, // Should hold ID
-                                items: _headquartersData.map((item) =>
-                                    DropdownMenuItem<int>(
-                                      value: item['id'], // Use ID here
-                                      child: Text(item['headquarter_name'].trim()), // Show name
-                                    )
-                                ).toList(),
+                                value: _selectedHeadquarters, // This holds the selected headquarter ID
+                                items: _headquartersData.map((item) {
+                                  return DropdownMenuItem<int>(
+                                    value: item['id'], // Use the ID of the headquarters as the value
+                                    child: Text(item['headquarter_name'].trim()), // Display the name of the headquarters
+                                  );
+                                }).toList(),
                                 onChanged: (value) {
                                   setState(() {
-                                    _selectedHeadquarters = value; // Store selected ID
+                                    _selectedHeadquarters = value; // Update the selected headquarter ID
+                                    _fetchSubHeadquarters(_selectedHeadquarters!);
                                   });
                                 },
                               ),
@@ -1088,11 +1124,9 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                                                       .selectedSubHeadquarter,
                                                   hint: Text(
                                                       'Select a sub-headquarter'),
-                                                  items: _headquartersData
+                                                  items: _subHeadquartersData
                                                       .expand((item) {
-                                                    return (item[
-                                                                'sub_headquarter']
-                                                            as String)
+                                                    return (item['subheadquarter'] as String)
                                                         .split('\n')
                                                         .where((sub) =>
                                                             sub.isNotEmpty)
@@ -1278,11 +1312,6 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
                           ],
                         ),
                       ),
-
-
-
-
-
 
                       // Text('Areas', style: text50012black),
                       // SizedBox(height: 10),
@@ -1538,8 +1567,7 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
     );
   }
 
-  Widget _buildVisitBox(
-      {required String label, required int value, required Color color}) {
+  Widget _buildVisitBox({required String label, required int value, required Color color}) {
     return GestureDetector(
       onTap: () => _setSelectedVisits(value),
       child: Container(
@@ -1948,5 +1976,72 @@ class _Add_doctor_mngrState extends State<Add_doctor_mngr> {
             style: TextStyle(fontSize: 12)),
       ),
     );
+  }
+}
+
+
+class SubHeadquarter {
+  int id;
+  int headquarterId;
+  String subheadquarter;
+
+  SubHeadquarter({
+    required this.id,
+    required this.headquarterId,
+    required this.subheadquarter,
+  });
+
+  // Factory constructor to create an instance from JSON
+  factory SubHeadquarter.fromJson(Map<String, dynamic> json) {
+    return SubHeadquarter(
+      id: json['id'],
+      headquarterId: json['headquarterId'],
+      subheadquarter: json['subheadquarter'],
+    );
+  }
+
+  // Method to convert an instance back to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'headquarterId': headquarterId,
+      'subheadquarter': subheadquarter,
+    };
+  }
+}
+
+class SubHeadquarterResponse {
+  bool error;
+  bool success;
+  String message;
+  List<SubHeadquarter> data;
+
+  SubHeadquarterResponse({
+    required this.error,
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  // Factory constructor to parse the API response and create an instance
+  factory SubHeadquarterResponse.fromJson(Map<String, dynamic> json) {
+    return SubHeadquarterResponse(
+      error: json['error'],
+      success: json['success'],
+      message: json['message'],
+      data: (json['data'] as List<dynamic>)
+          .map((item) => SubHeadquarter.fromJson(item))
+          .toList(),
+    );
+  }
+
+  // Method to convert the entire response back to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'error': error,
+      'success': success,
+      'message': message,
+      'data': data.map((item) => item.toJson()).toList(),
+    };
   }
 }

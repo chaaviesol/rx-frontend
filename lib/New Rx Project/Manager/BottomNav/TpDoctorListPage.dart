@@ -126,6 +126,18 @@ class _TpDoctorListPageState extends State<TpDoctorListPage> {
       },
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                color: AppColors.primaryColor,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: Text(
             'Doctors List for Month ${getMonthName(widget.month)}',
             style: text40016black,

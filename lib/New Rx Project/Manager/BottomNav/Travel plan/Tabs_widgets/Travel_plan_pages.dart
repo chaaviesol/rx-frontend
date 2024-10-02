@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/AutoTP/autoTP.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Manual/ManualTP.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Manual/ManualTP29THTRY.dart';
+import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Manual/ManualTPcreation.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/New_tp.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/Travel_plan_pages2.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/BottomNav/Travel%20plan/Tabs_widgets/viewTP.dart';
@@ -306,9 +307,11 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
             ),
+
             // onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => Newmanualtp(),)),
-            onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => Manualtp(),)),
+            // onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => Manualtp(),)),
             // onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => ManualTPPage(),)),
+            onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => CalendarPage(),)),
             child: Text(
               'Manual TP',
               style: TextStyle(color: AppColors.whiteColor),

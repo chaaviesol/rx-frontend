@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../app_colors.dart';
 import 'Routes/routes_name.dart';
@@ -140,17 +141,7 @@ class Utils{
     return true;
   }
 
-  static Future<void> makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    if (await canLaunchUrl(launchUri)) {
-      await launchUrl(launchUri);
-    } else {
-      throw 'Could not launch $launchUri';
-    }
-  }
+
 // //web credential storing
 //   static void saveLoginState(String token) {
 //     window.localStorage['token'] = token; // Store token in localStorage
@@ -190,5 +181,25 @@ class Utils{
     return monthNames[month];
   }
 
+  static Future<void> makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      throw 'Could not launch $launchUri';
+    }
+  }
+
+  static void openMap(String lat,String long) async {
+    final url = 'https://www.google.com/maps/search/?api=1&query=$lat,$long';
+    if (await canLaunchUrlString(url)) {
+      await launchUrlString(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
 }

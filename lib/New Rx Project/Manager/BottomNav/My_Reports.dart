@@ -90,7 +90,7 @@ class _MyreportsState extends State<Myreports> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('MY Reports'),
+        title: Text('MY Reportsss'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -226,36 +226,78 @@ class _MyreportsState extends State<Myreports> {
             textAlign: TextAlign.center,
           ),
         )
-            : SingleChildScrollView(
-          scrollDirection: Axis.horizontal, // Allow horizontal scroll if needed
-          child: Column(
-            children: [
-              _buildTableHeaders(),
-              Divider(),
-              ..._performanceData.map<Widget>((data) {
-                return Column(
+            : Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Fixed "Doctor Name" column
+            _buildFixedDoctorNameColumn(),
+            // Scrollable columns
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildDoctorRow(data),
+                    _buildScrollableTableHeaders(),
                     Divider(),
+                    ..._performanceData.map<Widget>((data) {
+                      return Column(
+                        children: [
+                          _buildScrollableDoctorRow(data),
+                          Divider(),
+                        ],
+                      );
+                    }).toList(),
                   ],
-                );
-              }).toList(),
-            ],
-          ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTableHeaders() {
+  Widget _buildFixedDoctorNameColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header for "Doctor Name"
+        _buildTableHeader('Doctor Name'),
+        Divider(),
+        // Rows for "Doctor Name"
+        ..._performanceData.map<Widget>((data) {
+          return Column(
+            children: [
+              _buildFixedDoctorNameCell(data['doctorName']),
+              Divider(),
+            ],
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  Widget _buildFixedDoctorNameCell(String doctorName) {
+    return Column(
+      children: [
+        Divider(),
+        Text(
+          doctorName,
+          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScrollableTableHeaders() {
     return Table(
       columnWidths: const {
-        0: FixedColumnWidth(150), // Width for "Doctor Name"
-        1: FixedColumnWidth(80), // Width for "Total Visits"
-        2: FixedColumnWidth(80), // Width for "Visited"
-        3: FixedColumnWidth(100), // Width for "Pending Calls"
-        4: FixedColumnWidth(150), // Width for "Specialization"
-        5: FixedColumnWidth(100), // Width for "Qualification"
+        0: FixedColumnWidth(80), // Width for "Total Visits"
+        1: FixedColumnWidth(80), // Width for "Visited"
+        2: FixedColumnWidth(100), // Width for "Pending Calls"
+        3: FixedColumnWidth(150), // Width for "Specialization"
+        4: FixedColumnWidth(100), // Width for "Qualification"
       },
       border: TableBorder(
         bottom: BorderSide(color: Colors.grey),
@@ -263,7 +305,6 @@ class _MyreportsState extends State<Myreports> {
       children: [
         TableRow(
           children: [
-            _buildTableHeader('Doctor Name'),
             _buildTableHeader('Total Visits'),
             _buildTableHeader('Visited'),
             _buildTableHeader('Pending Calls'),
@@ -275,30 +316,24 @@ class _MyreportsState extends State<Myreports> {
     );
   }
 
-  Widget _buildDoctorRow(Map<String, dynamic> data) {
+  Widget _buildScrollableDoctorRow(Map<String, dynamic> data) {
     return Table(
       columnWidths: const {
-        0: FixedColumnWidth(150),
+        0: FixedColumnWidth(80),
         1: FixedColumnWidth(80),
-        2: FixedColumnWidth(80),
-        3: FixedColumnWidth(100),
-        4: FixedColumnWidth(150),
-        5: FixedColumnWidth(100),
+        2: FixedColumnWidth(100),
+        3: FixedColumnWidth(150),
+        4: FixedColumnWidth(100),
       },
       children: [
         TableRow(
           children: [
-            _buildTableCell(data['doctorName'].toString(), color: Colors.blue),
-            // Blue for Doctor Name
             _buildTableCell(
                 data['total_visits'].toString(), color: Colors.purple),
-            // Violet for Total Visits
             _buildTableCell(
                 data['visited']?.toString() ?? '0', color: Colors.green),
-            // Green for Visited
             _buildTableCell(
                 data['balance_visit']?.toString() ?? '0', color: Colors.red),
-            // Red for Pending Calls
             _buildTableCell(data['specialization'].toString()),
             _buildTableCell(data['qualification'].toString()),
           ],
@@ -314,7 +349,7 @@ class _MyreportsState extends State<Myreports> {
         title,
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: Colors.black, // Black color for header
+          color: Colors.black,
         ),
       ),
     );
@@ -326,10 +361,9 @@ class _MyreportsState extends State<Myreports> {
       child: Text(
         data,
         style: TextStyle(
-          color: color ??
-              Colors.black87, // Apply specific color or default to black
+          color: color ?? Colors.black87,
         ),
-        overflow: TextOverflow.ellipsis, // Handle text overflow
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

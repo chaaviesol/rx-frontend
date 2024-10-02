@@ -183,20 +183,17 @@ class _MarkAsVisitedState extends State<MarkAsVisited> {
          widget.tpid!=null? Text('In TP :${widget.tpid}'):Text('')
         ],
         centerTitle: true,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor, // Replace with your desired color
-              borderRadius: BorderRadius.circular(6),
+        leading: IconButton(
+          icon: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: AppColors.primaryColor,
             ),
-            child: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.arrow_back, color: Colors.white),
-            ), // Adjust icon color
           ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: SingleChildScrollView(

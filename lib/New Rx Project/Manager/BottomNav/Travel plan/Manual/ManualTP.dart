@@ -42,6 +42,8 @@ class _ManualtpState extends State<Manualtp> {
   List<HeadQuart> _headQuarters = [];
   bool _isLoading = true;
 
+  bool _isGenerating=false;
+
   bool iscalenderVisible = true;
 
   Future<List<HeadQuart>> fetchHeadQuarts() async {
@@ -96,10 +98,15 @@ class _ManualtpState extends State<Manualtp> {
               backgroundColor: AppColors.primaryColor,
             ),
             onPressed: () async {
-               SharedPreferences prefrences = await SharedPreferences.getInstance();
-               int userId = int.parse(prefrences.getString('userID').toString());
-              // Show the loading dialog
-              // _showLoadingDialog(context);
+              // Check if already generating to prevent multiple presses
+              if (_isGenerating) return;
+
+              setState(() {
+                _isGenerating = true; // Show loader
+              });
+
+              SharedPreferences preferences = await SharedPreferences.getInstance();
+              int userId = int.parse(preferences.getString('userID').toString());
 
               // Filter out any dates with empty doctor lists
               var filteredPlan = _selectedDoctorsPerDay.entries
@@ -121,12 +128,17 @@ class _ManualtpState extends State<Manualtp> {
 
               try {
                 var response = await context.read<EventProvider>().submitPlan(data);
-                Navigator.of(context).pop(); // Close the loading dialog
+
+                // Close the loading dialog
+                if (!mounted) return; // Ensure the widget is still mounted
+                setState(() {
+                  _isGenerating = false; // Hide loader
+                });
 
                 // Check if the response indicates success
                 if (response['success'] == true) {
                   // Show the response data in the dialog
-                  _showResponseDialog(context, response['combinedVisitReport'],response['data']['id']);
+                  _showResponseDialog(context, response['combinedVisitReport'], response['data']['id']);
                 } else {
                   // Handle submission failure
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -134,7 +146,10 @@ class _ManualtpState extends State<Manualtp> {
                   );
                 }
               } catch (e) {
-                Navigator.of(context).pop(); // Close the loading dialog
+                if (!mounted) return; // Ensure the widget is still mounted
+                setState(() {
+                  _isGenerating = false; // Hide loader
+                });
 
                 // Handle any errors
                 print('Error submitting plan: $e');
@@ -143,8 +158,11 @@ class _ManualtpState extends State<Manualtp> {
                 );
               }
             },
-
-            child: Text(
+            child: _isGenerating // Conditional rendering based on loading state
+                ? CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.whiteColor),
+            )
+                : Text(
               'Generate',
               style: TextStyle(color: AppColors.whiteColor),
             ),

@@ -62,6 +62,7 @@ class AppUrl{
   static var delete_chemists = '$baseUrl/rep/delete_chemist';
 
   static var list_headqrts = '$baseUrl/rep/get_headquarters';
+  static var list_subqrts = '$baseUrl/rep/getSubheadquaters';
 
   static var list_products = '$baseUrl/rep/get_product';
 

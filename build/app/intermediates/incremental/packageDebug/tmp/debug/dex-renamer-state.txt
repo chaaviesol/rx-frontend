@@ -1,4 +1,4 @@
-#Tue Oct 01 10:31:47 IST 2024
+#Wed Oct 02 21:46:34 IST 2024
 base.0=C\:\\Users\\ASUS\\StudioProjects\\clone\\rx-frontend\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
 base.1=C\:\\Users\\ASUS\\StudioProjects\\clone\\rx-frontend\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
 base.2=C\:\\Users\\ASUS\\StudioProjects\\clone\\rx-frontend\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
