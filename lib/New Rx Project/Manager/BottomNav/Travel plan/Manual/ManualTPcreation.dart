@@ -1,15 +1,13 @@
-import 'dart:async';
 import 'dart:convert';
-import 'package:another_flushbar/flushbar.dart';
-import 'package:flutter/material.dart';
-import 'package:rx_route_new/constants/styles.dart';
-import 'package:rx_route_new/res/app_url.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart'; // Import the intl package for date formatting
-import '../../../../../Util/Utils.dart';
+
 import '../../../../../app_colors.dart';
+import '../../../../../constants/styles.dart';
+import '../../../../../res/app_url.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -18,307 +16,238 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _selectedDay = DateTime.now();
-  List doctors = [];
-  Map<String, List<int>> selectedDoctorsMap = {}; // Store selected doctors by date
-  bool isCalendarVisible = true;
-  bool _isLoading = false; // Loader state variable
+  DateTime _focusedDay = DateTime.now();
+  List<DateTime> _selectedDays = []; // Stores multiple selected days
+  List<dynamic> doctors = []; // List of all fetched doctors
+  List<dynamic> filteredDoctors = []; // Doctors filtered by subHeadquarters
+  Set<String> subHeadquarters = {}; // Unique subHeadquarters
+  Map<String, int> doctorCountPerSubHQ = {}; // Doctor count by subHeadquarters
+  String? selectedSubHeadquarter; // Selected subHeadquarters
+  bool _isLoading = false; // Loading state
+  bool isCalendarVisible = false; // To toggle calendar visibility
 
-  // Function to fetch doctors for a selected day
+  // Map to store doctor IDs for each selected day
+  Map<DateTime, List<int>> selectedDoctorsByDate = {};
+
+  // Fetch doctors for the selected day
   Future<void> fetchDoctors(String day) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? uniqueID = preferences.getString('uniqueID');
+    if (uniqueID == null) {
+      print('Error: uniqueID is null');
+      return;
+    }
 
     setState(() {
-      _isLoading = true; // Start loader
+      _isLoading = true;
+      subHeadquarters.clear();
+      doctorCountPerSubHQ.clear();
+      selectedSubHeadquarter = null;
     });
 
     final response = await http.post(
-      Uri.parse(AppUrl.listDoctors), // Replace with your API URL
+      Uri.parse(AppUrl.listDoctors),
       headers: {
         'Content-Type': 'application/json',
       },
       body: json.encode({
         "areas": [""],
-        "userId": uniqueID, // Replace with dynamic userId if needed
+        "userId": uniqueID,
         "day": day,
       }),
     );
 
     setState(() {
-      _isLoading = false; // Stop loader
+      _isLoading = false;
     });
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      setState(() {
-        doctors = data['data'];
-        // Clear selections for the newly fetched doctors
-        selectedDoctorsMap.putIfAbsent(
-          DateFormat('dd-MM-yyyy').format(_selectedDay),
-              () => [], // Initialize list if it doesn't exist
-        );
-      });
+      if (data['success'] == true && !data['error']) {
+        setState(() {
+          doctors = data['data'].map((doc) => doc['doctor']).toList();
+          filteredDoctors = doctors;
+
+          for (var doctor in doctors) {
+            String subHQ = doctor['findDrAddress']['address']['subHeadQuarter'] as String? ?? 'Unknown';
+            subHeadquarters.add(subHQ);
+            doctorCountPerSubHQ[subHQ] = (doctorCountPerSubHQ[subHQ] ?? 0) + 1;
+          }
+        });
+      } else {
+        print('Error fetching doctors: ${data['message']}');
+      }
     } else {
-      // Handle API error
-      print('Failed to fetch doctors');
+      print('Failed to fetch doctors, status code: ${response.statusCode}');
     }
   }
 
-  // Function to toggle selection of doctors
-  void toggleDoctorSelection(int index) {
-    String selectedDate = DateFormat('dd-MM-yyyy').format(_selectedDay);
+  // Filter doctors by selected subHeadquarter
+  void filterDoctorsBySubHeadquarter(String? subHeadquarterName) {
+    if (subHeadquarterName == null || subHeadquarterName == "All") {
+      setState(() {
+        filteredDoctors = doctors;
+      });
+    } else {
+      setState(() {
+        filteredDoctors = doctors.where((doctor) {
+          return doctor['findDrAddress']['address']['subHeadQuarter'] == subHeadquarterName;
+        }).toList();
+      });
+    }
+  }
 
+  // Toggle doctor selection for a specific day
+  void toggleDoctorSelection(DateTime selectedDay, int doctorId) {
     setState(() {
-      if (selectedDoctorsMap[selectedDate]!.contains(index)) {
-        selectedDoctorsMap[selectedDate]!.remove(index); // Deselect if already selected
+      selectedDoctorsByDate[selectedDay] ??= [];
+
+      // Toggle the doctor's selection for that day
+      if (selectedDoctorsByDate[selectedDay]!.contains(doctorId)) {
+        selectedDoctorsByDate[selectedDay]!.remove(doctorId);
       } else {
-        selectedDoctorsMap[selectedDate]!.add(index); // Select the doctor
+        selectedDoctorsByDate[selectedDay]!.add(doctorId);
       }
     });
   }
 
-  // Function to build the request body
-  Map<String, dynamic> buildRequestBody(int userId) {
-    List<Map<String, dynamic>> plans = [];
-    selectedDoctorsMap.forEach((date, doctorIndices) {
-      if (doctorIndices.isNotEmpty) {
-        plans.add({
-          "date": date,
-          "doctors": doctorIndices,
-        });
-      }
-    });
+  // Send selected doctors for each date to the API
+  Future<void> sendSelectedDoctorsWithDates() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+    if (uniqueID == null) {
+      print('Error: uniqueID is null');
+      return;
+    }
 
-    return {
-      "user_id": userId,
-      "plan": plans,
-    };
+    // Create a plan with each date and its selected doctors
+    List<Map<String, dynamic>> plan = selectedDoctorsByDate.entries.map((entry) {
+      String formattedDate = DateFormat('dd-MM-yyyy').format(entry.key);
+      List<int> doctorIds = entry.value;
+
+      return {
+        "date": formattedDate,
+        "doctors": doctorIds,
+      };
+    }).toList();
+
+    final response = await http.post(
+      Uri.parse(AppUrl.generateManulTP),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        "user_id": uniqueID,
+        "plan": plan,
+      }),
+    );
+
+    print('Response status: ${response.statusCode}, body: ${response.body}');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Day'),
+        title: Text('Select Days'),
         actions: [
-          IconButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-            ),
-            icon: Text(
-              'Generate',
-              style: TextStyle(color: AppColors.whiteColor),
-            ),
+          ElevatedButton(
             onPressed: () async {
-              SharedPreferences preferences = await SharedPreferences.getInstance();
-              int? userId = int.tryParse(preferences.getString('uniqueID') ?? '');
-
-              if (userId != null) {
-                Map<String, dynamic> requestBody = buildRequestBody(userId);
-
-                // You can send this requestBody to your API
-                print(jsonEncode(requestBody));
-
-                // Example API call (implement your own logic)
-                final response = await http.post(
-                  Uri.parse(AppUrl.confirmTP), // Your API URL
-                  headers: {'Content-Type': 'application/json'},
-                  body: jsonEncode(requestBody),
-                );
-
-                if (response.statusCode == 200) {
-                  // Handle successful response
-                  print('Successfully sent data!');
-                } else {
-                  // Handle error
-                  print('Failed to send data: ${response.statusCode}');
-                }
-              }
+              await sendSelectedDoctorsWithDates(); // Send doctors for selected days
             },
+            child: Text('Generate'),
           ),
-          SizedBox(width: 10),
         ],
       ),
       body: Column(
         children: [
-          isCalendarVisible
-              ? TableCalendar(
-            firstDay: DateTime.now(), // Disable past dates by setting firstDay to today
+          TableCalendar(
+            firstDay: DateTime.now(),
             lastDay: DateTime.utc(2030, 12, 31),
-            focusedDay: _selectedDay,
+            focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+            ),
             selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
+              return _selectedDays.contains(day);
             },
             onDaySelected: (selectedDay, focusedDay) {
-              if (!isPastDate(selectedDay)) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  // Initialize selections for the new day
-                  String selectedDate = DateFormat('dd-MM-yyyy').format(selectedDay);
-                  selectedDoctorsMap.putIfAbsent(selectedDate, () => []); // Ensure the date exists in map
-                });
-                fetchDoctors(getDayName(selectedDay));
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Cannot select a past date!')),
-                );
-              }
+              setState(() {
+                if (_selectedDays.contains(selectedDay)) {
+                  _selectedDays.remove(selectedDay);
+                } else {
+                  _selectedDays.add(selectedDay);
+                }
+                _focusedDay = focusedDay;
+              });
+              fetchDoctors(getDayName(selectedDay)); // Fetch doctors for the selected day
             },
             onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
-            headerStyle: HeaderStyle(
-              titleTextFormatter: (date, locale) {
-                // Center the month name in letters
-                return DateFormat('MMMM yyyy', locale).format(date);
-              },
-              titleCentered: true, // Center the month title
-              formatButtonVisible: false, // Hide the format button
-            ),
-          )
-              : Container(),
-          SizedBox(height: 10),
-          InkWell(
-            onTap: () {
               setState(() {
-                isCalendarVisible = !isCalendarVisible;
+                _calendarFormat = format;
               });
             },
-            child: Container(
-              decoration: BoxDecoration(color: AppColors.primaryColor),
+            onPageChanged: (focusedDay) {
+              setState(() {
+                _focusedDay = focusedDay;
+              });
+            },
+          ),
+          if (_isLoading) CircularProgressIndicator(),
+          SizedBox(height: 20),
+          if (subHeadquarters.isNotEmpty)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          DateFormat('dd/MM/yyyy').format(_selectedDay),
-                          style: TextStyle(
-                            color: AppColors.whiteColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        isCalendarVisible
-                            ? Icon(Icons.keyboard_arrow_up, color: AppColors.whiteColor)
-                            : Icon(Icons.keyboard_arrow_down, color: AppColors.whiteColor)
-                      ],
+                children: subHeadquarters.map((subHQ) {
+                  int doctorCount = doctorCountPerSubHQ[subHQ] ?? 0;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: ChoiceChip(
+                      label: Text('$subHQ ($doctorCount)'),
+                      selected: selectedSubHeadquarter == subHQ,
+                      onSelected: (bool selected) {
+                        setState(() {
+                          selectedSubHeadquarter = selected ? subHQ : null;
+                          filterDoctorsBySubHeadquarter(selectedSubHeadquarter);
+                        });
+                      },
                     ),
-                  )
-                ],
+                  );
+                }).toList(),
               ),
             ),
-          ),
-          SizedBox(height: 10),
           Expanded(
-            child: _isLoading
-                ? Center(
-              child: CircularProgressIndicator(), // Show loader
-            )
-                : doctors.isEmpty
-                ? Center(
-              child: Text(
-                'No doctors available for this day.',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-            )
-                : ListView.builder(
-              itemCount: doctors.length,
+            child: ListView.builder(
+              itemCount: filteredDoctors.length,
               itemBuilder: (context, index) {
-                var doctor = doctors[index]['doctor'];
-                String selectedDate = DateFormat('dd-MM-yyyy').format(_selectedDay);
-                bool isSelected = selectedDoctorsMap[selectedDate]!.contains(index); // Check if this doctor is selected
+                var doctor = filteredDoctors[index];
+                int doctorId = doctor['id'];
+                bool isSelected = selectedDoctorsByDate[_focusedDay]?.contains(doctorId) ?? false;
 
-                return Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      toggleDoctorSelection(index); // Toggle selection
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(9),
-                        border: Border.all(
-                          width: 1,
-                          color: doctor['visitType'] == 'core'
-                              ? AppColors.tilecolor2
-                              : doctor['visitType'] == 'supercore'
-                              ? AppColors.tilecolor1
-                              : AppColors.tilecolor3,
-                        ),
-                        // Remove the background color to not fill it
-                      ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: doctor['visitType'] == 'core'
-                              ? AppColors.tilecolor2
-                              : doctor['visitType'] == 'supercore'
-                              ? AppColors.tilecolor1
-                              : AppColors.tilecolor3,
-                          child: Text('${doctor['firstName'][0]}'), // Show first letter of the first name
-                        ),
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text('${doctor['firstName']} ${doctor['lastName']}'),
-                            ),
-                            if (isSelected) // Show checkmark if selected
-                              Icon(
-                                Icons.check,
-                                color: Colors.green, // Color of the checkmark
-                              ),
-                          ],
-                        ),
-                        subtitle: Text(
-                          '${doctor['schedule'][0]['schedule']['start_time']} - ${doctor['schedule'][0]['schedule']['end_time']}',
-                        ),
-                      ),
-                    ),
+                return GestureDetector(
+                  onTap: () {
+                    toggleDoctorSelection(_focusedDay, doctorId); // Toggle doctor selection for the current day
+                  },
+                  child: ListTile(
+                    title: Text('${doctor['firstName']} ${doctor['lastName']}'),
+                    subtitle: Text('Visit Type: ${doctor['visitType']}'),
+                    tileColor: isSelected ? Colors.blue.withOpacity(0.2) : null,
                   ),
                 );
               },
             ),
           ),
+          if (filteredDoctors.isEmpty && !_isLoading)
+            Center(child: Text('No doctors available for the selected subHeadquarter or day.')),
         ],
       ),
     );
   }
 
-  // Function to get the day name
-  String getDayName(DateTime date) {
-    switch (date.weekday) {
-      case 1:
-        return "Monday";
-      case 2:
-        return "Tuesday";
-      case 3:
-        return "Wednesday";
-      case 4:
-        return "Thursday";
-      case 5:
-        return "Friday";
-      case 6:
-        return "Saturday";
-      case 7:
-        return "Sunday";
-      default:
-        return "Unknown";
-    }
-  }
-
-  // Function to check if the selected day is in the past
-  bool isPastDate(DateTime date) {
-    final now = DateTime.now();
-    return date.year < now.year ||
-        (date.year == now.year && date.month < now.month) ||
-        (date.year == now.year && date.month == now.month && date.day < now.day);
+  String getDayName(DateTime day) {
+    return DateFormat('EEEE').format(day);
   }
 }

@@ -536,10 +536,15 @@ class _TravelPlanPages2State extends State<TravelPlanPages2> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        'Doctors for ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold,color: AppColors.whiteColor),
+                        'Doctors for ${selectedDate?.day ?? DateTime.now().day}/${selectedDate?.month ?? DateTime.now().month}/${selectedDate?.year ?? DateTime.now().year}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.whiteColor,
+                        ),
                       ),
                     ),
+
                     Icon(isViewCalendar?Icons.arrow_drop_up:Icons.arrow_drop_down,color: AppColors.whiteColor,)
                   ],
                 ),

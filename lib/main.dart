@@ -78,7 +78,6 @@ class MyApp extends StatelessWidget {
               return supportedLocales.first;
             },
           title: 'RXROUTE',
-          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
             fontFamily: 'Inter',

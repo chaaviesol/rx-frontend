@@ -13,29 +13,29 @@
 13         to allow setting breakpoints, to provide hot reload, etc.
 14    -->
 15    <uses-permission android:name="android.permission.INTERNET" />
-15-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:5:5-66
-15-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:5:22-64
+15-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:5:5-66
+15-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:5:22-64
 16    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-16-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:2:5-79
-16-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:2:22-76
+16-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:2:5-79
+16-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:2:22-76
 17    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-17-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:3:5-81
-17-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:3:22-78
+17-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:3:5-81
+17-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:3:22-78
 18    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-18-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:4:5-85
-18-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:4:22-82
+18-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:4:5-85
+18-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:4:22-82
 19    <uses-permission android:name="android.permission.VIBRATE" />
-19-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:6:5-65
-19-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:6:22-63
+19-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:6:5-65
+19-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:6:22-63
 20    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-20-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:7:5-80
-20-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:7:22-78
+20-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:7:5-80
+20-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:7:22-78
 21    <uses-permission android:name="android.permission.POST_NOTIFICATIOS" />
-21-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:8:5-75
-21-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:8:22-73
+21-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:8:5-75
+21-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:8:22-73
 22    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-22-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:9:5-80
-22-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:9:22-78
+22-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:9:5-80
+22-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:9:22-78
 23    <!--
 24 Required to query activities that can process text, see:
 25         https://developer.android.com/training/package-visibility and
@@ -44,41 +44,41 @@
 28         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
 29    -->
 30    <queries>
-30-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:53:5-58:15
+30-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:53:5-58:15
 31        <intent>
-31-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:54:9-57:18
+31-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:54:9-57:18
 32            <action android:name="android.intent.action.PROCESS_TEXT" />
-32-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:55:13-72
-32-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:55:21-70
+32-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:55:13-72
+32-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:55:21-70
 33
 34            <data android:mimeType="text/plain" />
-34-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:56:13-50
-34-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:56:19-48
+34-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:56:13-50
+34-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:56:19-48
 35        </intent>
 36        <intent>
-36-->[:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:14:9-18:18
+36-->[:file_picker] C:\Users\ASUS\StudioProjects\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:14:9-18:18
 37            <action android:name="android.intent.action.GET_CONTENT" />
-37-->[:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:15:13-72
-37-->[:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:15:21-69
+37-->[:file_picker] C:\Users\ASUS\StudioProjects\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:15:13-72
+37-->[:file_picker] C:\Users\ASUS\StudioProjects\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:15:21-69
 38
 39            <data android:mimeType="*/*" />
-39-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:56:13-50
-39-->C:\Users\ASUS\StudioProjects\clone\rx-frontend\android\app\src\main\AndroidManifest.xml:56:19-48
+39-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:56:13-50
+39-->C:\Users\ASUS\StudioProjects\rx-frontend\android\app\src\main\AndroidManifest.xml:56:19-48
 40        </intent>
 41    </queries>
 42
 43    <uses-permission
-43-->[:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-11:38
+43-->[:file_picker] C:\Users\ASUS\StudioProjects\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-11:38
 44        android:name="android.permission.READ_EXTERNAL_STORAGE"
-44-->[:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:10:9-64
+44-->[:file_picker] C:\Users\ASUS\StudioProjects\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:10:9-64
 45        android:maxSdkVersion="32" />
-45-->[:file_picker] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:11:9-35
+45-->[:file_picker] C:\Users\ASUS\StudioProjects\rx-frontend\build\file_picker\intermediates\merged_manifest\debug\AndroidManifest.xml:11:9-35
 46    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-46-->[:flutter_local_notifications] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\flutter_local_notifications\intermediates\merged_manifest\debug\AndroidManifest.xml:10:5-77
-46-->[:flutter_local_notifications] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\flutter_local_notifications\intermediates\merged_manifest\debug\AndroidManifest.xml:10:22-74
+46-->[:flutter_local_notifications] C:\Users\ASUS\StudioProjects\rx-frontend\build\flutter_local_notifications\intermediates\merged_manifest\debug\AndroidManifest.xml:10:5-77
+46-->[:flutter_local_notifications] C:\Users\ASUS\StudioProjects\rx-frontend\build\flutter_local_notifications\intermediates\merged_manifest\debug\AndroidManifest.xml:10:22-74
 47    <uses-permission android:name="android.permission.USE_BIOMETRIC" /> <!-- suppress DeprecatedClassUsageInspection -->
-47-->[:local_auth_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\local_auth_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-72
-47-->[:local_auth_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\local_auth_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:22-69
+47-->[:local_auth_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\local_auth_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-72
+47-->[:local_auth_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\local_auth_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:22-69
 48    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 48-->[androidx.biometric:biometric:1.1.0] C:\Users\ASUS\.gradle\caches\transforms-3\53e9e0339183a9e67232908bba99e5e2\transformed\biometric-1.1.0\AndroidManifest.xml:27:5-74
 48-->[androidx.biometric:biometric:1.1.0] C:\Users\ASUS\.gradle\caches\transforms-3\53e9e0339183a9e67232908bba99e5e2\transformed\biometric-1.1.0\AndroidManifest.xml:27:22-71
@@ -140,24 +140,24 @@
 98            android:value="default_channel_id" />
 99
 100        <service
-100-->[:geolocator_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:9-14:56
+100-->[:geolocator_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:9-14:56
 101            android:name="com.baseflow.geolocator.GeolocatorLocationService"
-101-->[:geolocator_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-77
+101-->[:geolocator_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-77
 102            android:enabled="true"
-102-->[:geolocator_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:12:13-35
+102-->[:geolocator_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:12:13-35
 103            android:exported="false"
-103-->[:geolocator_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:13:13-37
+103-->[:geolocator_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:13:13-37
 104            android:foregroundServiceType="location" />
-104-->[:geolocator_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:14:13-53
+104-->[:geolocator_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:14:13-53
 105
 106        <activity
-106-->[:url_launcher_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:9-13:74
+106-->[:url_launcher_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:9-13:74
 107            android:name="io.flutter.plugins.urllauncher.WebViewActivity"
-107-->[:url_launcher_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-74
+107-->[:url_launcher_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-74
 108            android:exported="false"
-108-->[:url_launcher_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:12:13-37
+108-->[:url_launcher_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:12:13-37
 109            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
-109-->[:url_launcher_android] C:\Users\ASUS\StudioProjects\clone\rx-frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:13:13-71
+109-->[:url_launcher_android] C:\Users\ASUS\StudioProjects\rx-frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:13:13-71
 110
 111        <uses-library
 111-->[androidx.window:window:1.2.0] C:\Users\ASUS\.gradle\caches\transforms-3\bcf8bd070fd43ff74956588c8c1699de\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40

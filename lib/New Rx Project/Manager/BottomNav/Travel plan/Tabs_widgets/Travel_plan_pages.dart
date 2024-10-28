@@ -79,6 +79,7 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
     'December': 12,
   };
 
+  List<String> availableMonths = [];
 //generate TP
   Future<dynamic> sendPostRequest(String userId, String month) async {
     final Uri url = Uri.parse(AppUrl.generateautoTP); // Replace with your API URL
@@ -121,6 +122,9 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
   }
 
   Future<void> _selectMonthAndGenerateTP() async {
+    // First, fetch the available months by calling the API
+    await checkMonthsinTP();
+
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? uniqueId = preferences.getString('uniqueID');
 
@@ -159,30 +163,61 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                   final monthNumber = monthNames[monthName]!;
                   final currentMonth = DateTime.now().month;
                   final isPastMonth = monthNumber < currentMonth; // Condition for past months
+                  final isAvailable = availableMonths.contains(monthName); // Check if month is available
 
                   return GestureDetector(
-                    onTap: isPastMonth
+                    onTap: isAvailable
+                        ? () {
+                      // Show popup message if month already has TP
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            title: Text(
+                              "Travel Plan Already Created",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                            content: Text(
+                              "A travel plan has already been created for $monthName. Please select another month.",
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text("OK", style: TextStyle(color: AppColors.primaryColor)),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                        : isPastMonth
                         ? null // Disable onTap for past months
-                        : ()async {
+                        : () async {
                       final formattedMonth = '$monthNumber-${DateTime.now().year}';
                       if (formattedMonth != null) {
-                        // _showLoaderDialog(context); // Show loader dialog
-
                         try {
-                          // Call your API request here
-                          var data = await sendPostRequest('${uniqueId}', formattedMonth);
-                          print('auto data: $data');
-
-                          // Ensure the response data is valid before navigating
+                          var data = await sendPostRequest(uniqueId!, formattedMonth);
                           if (data != null) {
-                            // Navigate to the Autotp page
-                            print('sending data to next page :${data['data']}');
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Autotp(
-                              selectedMonth:formattedMonth,
-                              data: data['data'],),),
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Autotp(
+                                  selectedMonth: formattedMonth,
+                                  data: data['data'],
+                                ),
+                              ),
                             );
 
-                            // Optionally show success message after navigation
                             Flushbar(
                               message: "Travel plan generated successfully for $formattedMonth!",
                               icon: Icon(
@@ -197,10 +232,6 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                             throw Exception("No data returned from the API");
                           }
                         } catch (e) {
-                          // Dismiss the loader in case of an error
-                          // Navigator.of(context).pop(); // Close the loader dialog
-
-                          // Show error message
                           Flushbar(
                             message: "Error generating travel plan. Please try again.",
                             icon: Icon(
@@ -212,15 +243,13 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
                             leftBarIndicatorColor: Colors.red,
                           ).show(context);
                         }
-                      }else{
-                        Utils.flushBarErrorMessage2('Some error occured !', context);
                       }
                     },
                     child: Opacity(
                       opacity: isPastMonth ? 0.5 : 1, // Reduce opacity for past months
                       child: Container(
                         decoration: BoxDecoration(
-                          color: isPastMonth ? Colors.grey : AppColors.primaryColor,
+                          color: isAvailable ? Colors.green : AppColors.primaryColor, // Set color based on availability
                           borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
@@ -259,9 +288,50 @@ class _TravelPlanmainpageState extends State<TravelPlanmainpage> {
         );
       },
     );
+  }
 
 
+  Future<void> checkMonthsinTP() async {
+    // Get userID from SharedPreferences
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? userIDString = preferences.getString('userID');
+    if (userIDString == null) {
+      print('UserID not found in preferences');
+      return;
+    }
 
+    int userID = int.parse(userIDString);
+
+    // Prepare the API request body
+    Map<String, dynamic> requestBody = {
+      "userID": userID
+    };
+
+    // Send the POST request
+    try {
+      final response = await http.post(
+        Uri.parse(AppUrl.checkTPinMonth),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the response
+        var responseData = json.decode(response.body);
+
+        if (responseData['success']) {
+          // Extract the list of months
+          availableMonths = List<String>.from(responseData['data']); // Save the months
+          print('Months available: $availableMonths');
+        } else {
+          print('Failed to fetch months: ${responseData['message']}');
+        }
+      } else {
+        print('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
   }
 
 

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Manager/Settings.dart';
 import 'package:rx_route_new/New%20Rx%20Project/Widgets/widgets.dart';
 import 'package:rx_route_new/Util/Utils.dart';
@@ -121,44 +122,92 @@ class _RepHomepageState extends State<RepHomepage> {
   // Method to get current location and reverse geocode it
   Future<void> _getCurrentLocation() async {
     print('current loc called...');
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
 
-      print('position:$position');
+    // Check if location permission is granted
+    PermissionStatus permission = await Permission.location.status;
 
-      // Reverse geocoding using OpenStreetMap Nominatim API
-      String url =
-          'https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.latitude}&lon=${position.longitude}&zoom=18&addressdetails=1';
-      var response = await http.get(Uri.parse(url));
+    if (permission.isDenied || permission.isPermanentlyDenied) {
+      // Request location permission
+      permission = await Permission.location.request();
 
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        String locationName = data['address']['city'] ??
-            data['address']['town'] ??
-            data['address']['village'] ??
-            "Unknown location";
+      if (permission.isDenied || permission.isPermanentlyDenied) {
+        // Handle the case when the permission is denied
         if (mounted) {
           setState(() {
-            _locationName = locationName;
+            _locationName = "Location permission denied";
           });
         }
-      } else {
-        if (mounted) {
-          setState(() {
-            _locationName = "Failed to fetch location";
-          });
-        }
+        return;
       }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _locationName = "Error occurred: $e";
-        });
+    }
+
+    if (permission.isGranted) {
+      try {
+        // Fetch current location
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+
+        print('position: $position');
+
+        // Reverse geocoding using OpenStreetMap Nominatim API
+        String url =
+            'https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.latitude}&lon=${position.longitude}&zoom=18&addressdetails=1';
+        var response = await http.get(Uri.parse(url));
+
+        if (response.statusCode == 200) {
+          var data = json.decode(response.body);
+          String locationName = data['address']['city'] ??
+              data['address']['town'] ??
+              data['address']['village'] ??
+              "Unknown location";
+
+          if (mounted) {
+            setState(() {
+              _locationName = locationName;
+            });
+          }
+        } else {
+          if (mounted) {
+            setState(() {
+              _locationName = "Failed to fetch location";
+            });
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _locationName = "Error occurred: $e";
+          });
+        }
       }
     }
   }
+
+  Future<void> _fetchCallData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? uniqueID = preferences.getString('uniqueID');
+    final response = await http.post(
+      Uri.parse(AppUrl.getallVisitData),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'userId': uniqueID}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        totalCalls = data['data'];
+        visitedCalls = data['visited'];
+        missedCalls = data['missedVisit'];
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
 
   @override
   void initState() {
@@ -166,6 +215,7 @@ class _RepHomepageState extends State<RepHomepage> {
     super.initState();
     getEvents();
     _getCurrentLocation();
+    _fetchCallData();
   }
 
   Future<dynamic> getEvents() async {
@@ -247,7 +297,7 @@ class _RepHomepageState extends State<RepHomepage> {
                 Row(
                   children: [
                     InkWell(
-                      onTap: (){
+                      onTap: () {
                         _getCurrentLocation();
                       },
                       child: Icon(
@@ -255,12 +305,18 @@ class _RepHomepageState extends State<RepHomepage> {
                         color: AppColors.primaryColor,
                       ),
                     ),
-                    Text(
-                      '${_locationName}',
-                      style: text50012black,
+                    SizedBox(width: 8), // Add spacing between the icon and text
+                    Expanded(
+                      child: Text(
+                        '${_locationName}',
+                        style: text50012black,
+                        overflow: TextOverflow.ellipsis, // Truncate text with ellipsis if it overflows
+                        softWrap: false, // Avoid wrapping text
+                      ),
                     ),
                   ],
                 ),
+
                 SizedBox(height: 10),
                 Row(
                   children: [
@@ -301,7 +357,10 @@ class _RepHomepageState extends State<RepHomepage> {
                   ],
                 ),
                 SizedBox(height: 10),
-                Text('Calls', style: text40016black),
+                const Text('Calls',style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),),
                 SizedBox(height: 10),
                 SizedBox(
                   // height: 100,
@@ -309,9 +368,9 @@ class _RepHomepageState extends State<RepHomepage> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        CallTileWidget(icon: Icons.phone_callback_sharp, title: "Missed Calls", totalCalls: totalCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, percentage: visitPercentage, updateDate: currentDate),
+                        CallTileWidget(icon: Icons.phone_callback_sharp, title: "Missed Calls", totalCalls: missedCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, percentage: visitPercentage, updateDate: currentDate),
                         SizedBox(width: 10,),
-                        CallTileWidget(icon: Icons.call, title: "Assigned Calls", totalCalls: missedCalls, missedcalls: missedCalls, visitedCalls: visitedCalls, percentage: visitPercentage, updateDate: currentDate)
+                        CallTileWidget(icon: Icons.call, title: "Assigned Calls", totalCalls: totalCalls, missedcalls: totalCalls, visitedCalls: visitedCalls, percentage: visitPercentage, updateDate: currentDate)
                         // Hometilewidget(),
                         // SizedBox(width: 10,),
                         // Hometilewidget(),
@@ -392,7 +451,7 @@ class _RepHomepageState extends State<RepHomepage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Events',style: TextStyle(
+                    const Text('Calls',style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                     ),),

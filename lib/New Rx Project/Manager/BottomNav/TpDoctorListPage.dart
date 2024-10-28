@@ -42,27 +42,34 @@ class _TpDoctorListPageState extends State<TpDoctorListPage> {
         body: jsonEncode(data),
         headers: {"Content-Type": "application/json"},
       );
-      print('Aaa  ${Utils.userId}');
-      print('heloo:$data');
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print(data);
-        if (data['success']) {
+        final responseData = jsonDecode(response.body);
+        print(responseData); // For debugging
+
+        if (responseData['success']) {
           List<dynamic> doctorsList = [];
-          for (var sublist in data['data']) {
-            doctorsList.addAll(sublist);
+
+          // Loop through each item in the 'data' array
+          for (var item in responseData['data']) {
+            // Ensure 'drDetails' exists and is a list
+            if (item['drDetails'] != null && item['drDetails'] is List) {
+              doctorsList.addAll(item['drDetails']); // Add all doctors to the list
+            }
           }
+
           return doctorsList;
         } else {
-          throw Exception(data['message']);
+          throw Exception(responseData['message']);
         }
       } else {
         throw Exception('Failed to load data: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('An error occurred while fetching data');
+      throw Exception('An error occurred while fetching data: $e');
     }
   }
+
 
   void _showNoDataDialog(BuildContext context) {
     showDialog(

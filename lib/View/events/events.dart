@@ -654,6 +654,7 @@ class _EventsState extends State<Events> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text('Hey,'),
                   Text(
                     'It\'s ${eventData['firstName']}\'s $eventType!',
                     style: const TextStyle(
@@ -791,62 +792,92 @@ class _SeeAllPageState extends State<SeeAllPage> with TickerProviderStateMixin {
             borderRadius: BorderRadius.circular(6),
           ),
           margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'It\'s ${eventData['firstName']}\'s ${eventType == "Birthday" ? "Birthday" : "Anniversary"}!',
-                  style: const TextStyle(
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Hey,',style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     color: AppColors.whiteColor,
                     fontSize: 12,
-                  ),
-                ),
-                const Text(
-                  'Wish them all the best!',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.whiteColor,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 25,
-                      child: Text(
-                        eventData['firstName'][0].toString().toUpperCase(),
+                  ),),
+                      Text(
+                        'It\'s ${eventData['firstName']}\'s ${eventType == "Birthday" ? "Birthday" : "Anniversary"}!',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.whiteColor,
+                          fontSize: 12,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          eventData['firstName'],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.whiteColor,
-                            fontSize: 12,
-                          ),
+                      const Text(
+                        'Wish them all the best!',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.whiteColor,
+                          fontSize: 12,
                         ),
-                        Text(
-                          eventData['doc_qualification'] ?? '',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.whiteColor,
-                            fontSize: 9,
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 25,
+                            child: Text(
+                              eventData['firstName'][0].toString().toUpperCase(),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                eventData['firstName'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.whiteColor,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Text(
+                                eventData['doc_qualification'] ?? '',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.whiteColor,
+                                  fontSize: 9,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  height: 70,
+                  width: 100,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryColor2,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(21),
+                      topRight: Radius.circular(6),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child:eventType == "Birthday"?Image.asset('assets/icons/cake.png') :Image.asset('assets/icons/rings-wedding.png',color: AppColors.whiteColor,),
+                  ),
+                ),
+              )
+            ],
           ),
         );
       },

@@ -329,7 +329,6 @@ class _HomepageManagerState extends State<HomepageManager> {
                                       ),
                                     ),
                                     Wrap(
-
                                       children: [
                                         Text(
                                           overflow: TextOverflow.ellipsis,
@@ -520,7 +519,6 @@ class _HomepageManagerState extends State<HomepageManager> {
                               ],
                             ),
                             SizedBox(height: 10),
-
                             // Events Section
                             // Container(
                             //   decoration: BoxDecoration(

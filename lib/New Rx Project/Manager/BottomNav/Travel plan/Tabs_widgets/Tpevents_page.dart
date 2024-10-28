@@ -428,6 +428,7 @@ class EventTabs extends StatelessWidget {
       length: 2, // Number of tabs
       child: Scaffold(
         appBar: AppBar(
+          toolbarHeight: 0,
           bottom: TabBar(
             tabs: [
               Tab(text: 'Birthday\'s'), // Tab for Birthday

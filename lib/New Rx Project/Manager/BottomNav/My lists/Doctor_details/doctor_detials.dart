@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rx_route_new/View/homeView/Doctor/edit_doctor.dart';
@@ -78,7 +79,11 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
     _taggedTabController = TabController(length: 5, vsync: this);
     _fetchDoctorDetails();
     _fetchVisitHistory();
-    _fetchPerformanceData();
+    _fetchPerformanceData(); super.initState();
+    // Set _selectedMonth to the current month in 'MM' format (01 for January, etc.)
+    _selectedMonth = DateTime.now().month.toString().padLeft(2, '0');
+    _fetchPerformanceData(); // Fetch data for the current month on startup
+
   }
 
   Future<void> _fetchDoctorDetails() async {
@@ -241,7 +246,7 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
                               },
                                 child: Icon(Icons.edit))),
                         Positioned(
-                          bottom: 20,
+                          bottom: 10,
                           right: 0,
                           child: ClipPath(
                             clipper: MyCustomClipper(),
@@ -358,7 +363,7 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           DropdownButton<String>(
-            value: _selectedMonth,
+            value: _selectedMonth, // Current month selected by default
             items: List.generate(12, (index) {
               String month = (index + 1).toString().padLeft(2, '0');
               return DropdownMenuItem(child: Text(monthNames[index]), value: month);
@@ -366,7 +371,7 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
             onChanged: (value) {
               setState(() {
                 _selectedMonth = value!;
-                _fetchPerformanceData();
+                _fetchPerformanceData(); // Fetch new data based on selected month
               });
             },
           ),
@@ -379,18 +384,23 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        height: 100,
+        height: 100 ,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.3), blurRadius: 8)],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Column(
           children: [
-            _buildStatCard('Total Visits', _performanceData.isNotEmpty ? _performanceData[0]['total_visits'].toString() : '0', Colors.purple),
-            _buildStatCard('Visited', _performanceData.isNotEmpty ? _performanceData[0]['visited'].toString() : '0', Colors.green),
-            _buildStatCard('Balance Visits', _performanceData.isNotEmpty ? _performanceData[0]['balance_visit'].toString() : '0', Colors.red),
+            SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildStatCard('Total Visits', _performanceData.isNotEmpty ? _performanceData[0]['total_visits'].toString() : '0', Colors.purple),
+                _buildStatCard('Visited', _performanceData.isNotEmpty ? _performanceData[0]['visited'].toString() : '0', Colors.green),
+                _buildStatCard('Balance Visits', _performanceData.isNotEmpty ? _performanceData[0]['balance_visit'].toString() : '0', Colors.red),
+              ],
+            ),
           ],
         ),
       ),
@@ -416,36 +426,38 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
             borderRadius: BorderRadius.circular(16),
             boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.3), blurRadius: 8)],
           ),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Table(
-                  columnWidths: {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1), 3: FlexColumnWidth(1)},
-                  children: [
-                    TableRow(
-                      decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-                      children: ['Doctor Name', 'Assigned Calls', 'Completed Calls', 'Pending Calls'].map((title) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          child: Text(title, style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Table(
+                    columnWidths: {0: FlexColumnWidth(2), 1: FlexColumnWidth(1), 2: FlexColumnWidth(1), 3: FlexColumnWidth(1)},
+                    children: [
+                      TableRow(
+                        decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                        children: ['Doctor Name', 'Assigned Calls', 'Completed Calls', 'Pending Calls'].map((title) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: Text(title, style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                          );
+                        }).toList(),
+                      ),
+                      ..._performanceData.map<TableRow>((data) {
+                        return TableRow(
+                          children: [
+                            Padding(padding: const EdgeInsets.all(8.0), child: Text('Dr. ${data['dr_Id']}', style: TextStyle(color: Colors.blue))),
+                            Padding(padding: const EdgeInsets.all(8.0), child: Text(data['total_visits'].toString(), textAlign: TextAlign.center)),
+                            Padding(padding: const EdgeInsets.all(8.0), child: Text(data['visited'].toString(), textAlign: TextAlign.center)),
+                            Padding(padding: const EdgeInsets.all(8.0), child: Text(data['balance_visit'].toString(), textAlign: TextAlign.center)),
+                          ],
                         );
                       }).toList(),
-                    ),
-                    ..._performanceData.map<TableRow>((data) {
-                      return TableRow(
-                        children: [
-                          Padding(padding: const EdgeInsets.all(8.0), child: Text('Dr. ${data['dr_Id']}', style: TextStyle(color: Colors.blue))),
-                          Padding(padding: const EdgeInsets.all(8.0), child: Text(data['total_visits'].toString(), textAlign: TextAlign.center)),
-                          Padding(padding: const EdgeInsets.all(8.0), child: Text(data['visited'].toString(), textAlign: TextAlign.center)),
-                          Padding(padding: const EdgeInsets.all(8.0), child: Text(data['balance_visit'].toString(), textAlign: TextAlign.center)),
-                        ],
-                      );
-                    }).toList(),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -496,7 +508,9 @@ class _DoctorDetailsPageState extends State<DoctorDetailsPage> with TickerProvid
       children: [
         _buildHeaderWithDropdown(),
         _buildPerformanceContainer(),
-        _buildDoctorTable()
+        // _buildDoctorTable()
+        Expanded(child: PerformanceChart(performanceData: _performanceData)),
+
       ],
     );
   }
@@ -721,5 +735,89 @@ class MyCustomClipper extends CustomClipper<Path> {
     path.close(); // Close the path
 
     return path;
+  }
+}
+
+class PerformanceChart extends StatelessWidget {
+  final List<dynamic> performanceData;
+
+  PerformanceChart({required this.performanceData});
+
+  @override
+  Widget build(BuildContext context) {
+    // Prepare data for the chart
+    List<BarChartGroupData> barChartData = [];
+
+    // Process the performance data
+    performanceData.forEach((data) {
+
+      double visitedPercentage = double.parse(data['visitedPercentage']);
+      DateTime dateTime = DateTime.parse(data['dateTime']); // Parse the dateTime
+
+      // Add data to the bar chart using the month as the x value
+      barChartData.add(
+        BarChartGroupData(
+          x: dateTime.month, // Using month as x value
+          barRods: [
+            BarChartRodData(
+              toY: visitedPercentage, // Visited percentage as bar height
+              color: Colors.blue, // Bar color
+              width: 20, // Bar width
+            ),
+          ],
+        ),
+      );
+    });
+
+    return BarChart(
+      BarChartData(
+        barGroups: barChartData,
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false), // Hide left titles
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              getTitlesWidget: (value, meta) {
+                return SideTitleWidget(
+                  axisSide: meta.axisSide,
+                  space: 8.0,
+                  child: Text(
+                    _getMonthName(value.toInt()), // Display month name
+                    style: TextStyle(color: Colors.black), // Text color
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        borderData: FlBorderData(show: false), // Hide border
+        gridData: FlGridData(show: false), // Hide grid
+        barTouchData: BarTouchData(
+          touchTooltipData: BarTouchTooltipData(
+            // tooltipBgColor: Colors.blueAccent,
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              String month = _getMonthName(group.x.toInt());
+              String percentage = rod.toY.toStringAsFixed(2); // Format percentage
+              return BarTooltipItem(
+                '$month\n$percentage%', // Show month and percentage
+                TextStyle(color: Colors.white),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper method to get the month name
+  String _getMonthName(int month) {
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return monthNames[month - 1]; // month is 1-indexed
   }
 }
